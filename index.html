@@ -334,7 +334,7 @@
     <script>
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 4,
+            DURATION_MINUTES: 5,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 5,
@@ -355,7 +355,10 @@
             examActive: false,
             sessionId: null,
             formLoaded: false,
-            terminated: false
+            terminated: false,
+            isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+            lastFocusTime: 0,
+            formInteractionStarted: false
         };
 
         // Generate unique session ID
@@ -491,8 +494,79 @@
             iframe.onload = function() {
                 setTimeout(() => {
                     examState.formLoaded = true;
-                }, 2000); // Give form 2 seconds to fully render
+                    
+                    // Add form interaction detection for mobile
+                    if (examState.isMobile) {
+                        // Give extra time for mobile form interactions
+                        setTimeout(() => {
+                            examState.formInteractionStarted = true;
+                        }, 5000); // 5 seconds on mobile
+                    } else {
+                        examState.formInteractionStarted = true;
+                    }
+                    
+                    // Monitor for form submission during exam
+                    monitorFormSubmission();
+                    
+                    console.log('Form monitoring started. Mobile:', examState.isMobile);
+                }, examState.isMobile ? 3000 : 2000); // Extra time for mobile
             };
+        }
+
+        function monitorFormSubmission() {
+            // Check periodically if form was submitted (indicated by URL change)
+            const checkSubmissionInterval = setInterval(() => {
+                if (examState.terminated) {
+                    clearInterval(checkSubmissionInterval);
+                    return;
+                }
+                
+                try {
+                    const iframe = document.getElementById("formFrame");
+                    const currentUrl = iframe.contentWindow.location.href;
+                    
+                    // Google Forms redirect to a confirmation page after submission
+                    if (currentUrl.includes('formResponse') || currentUrl.includes('thanks') || 
+                        currentUrl.includes('submitted') || currentUrl.includes('confirmation')) {
+                        
+                        // Form was submitted during exam time
+                        examState.examActive = false;
+                        examState.terminated = true;
+                        clearInterval(examState.timerInterval);
+                        clearTimeout(examState.autoSubmitTimer);
+                        clearInterval(checkSubmissionInterval);
+                        
+                        // Hide timer bar
+                        document.getElementById("timerBar").style.display = "none";
+                        
+                        // Show success message
+                        showEarlySubmissionSuccess();
+                        
+                        console.log('Form submitted during exam time');
+                    }
+                } catch (e) {
+                    // CORS prevents URL access - this is normal
+                }
+            }, 2000); // Check every 2 seconds
+        }
+
+        function showEarlySubmissionSuccess() {
+            document.getElementById("overlay").style.display = "flex";
+            document.getElementById("overlayTitle").textContent = "✅ Exam Submitted Successfully";
+            document.getElementById("overlayMessage").innerHTML = 
+                '<div class="termination-screen">' +
+                '<p><strong>Great job! Your exam has been submitted.</strong></p>' +
+                '<p>Submitted with ' + examState.violations + ' violation(s).</p>' +
+                '<p>You completed the exam early - well done!</p>' +
+                '<p>You may now close this browser window.</p>' +
+                '</div>';
+            
+            // Hide loading spinner if visible
+            const loader = document.querySelector('.loading');
+            if (loader) loader.style.display = 'none';
+            
+            // Send completion notification
+            sendViolationToServer('Exam submitted early');
         }
 
         function updateTimer() {
@@ -526,6 +600,9 @@
             clearInterval(examState.timerInterval);
             clearTimeout(examState.autoSubmitTimer);
             
+            // Hide timer bar when exam ends
+            document.getElementById("timerBar").style.display = "none";
+            
             document.getElementById("overlay").style.display = "flex";
             
             // Log exam end
@@ -557,46 +634,153 @@
             }
 
             if (!submitted) {
-                // Show manual submission instructions
+                // Show manual submission instructions with improved button
                 showManualSubmissionInstructions();
             }
         }
 
         function showTerminationSuccess() {
+            // Hide timer bar
+            document.getElementById("timerBar").style.display = "none";
+            
             document.getElementById("overlayTitle").textContent = "✅ Exam Submitted";
-            document.getElementById("overlayMessage").innerHTML = `
-                <div class="termination-screen">
-                    <p>Your exam has been submitted successfully!</p>
-                    <p>Total violations: ${examState.violations}</p>
-                    <p>You may now close this window.</p>
-                </div>
-            `;
+            document.getElementById("overlayMessage").innerHTML = 
+                '<div class="termination-screen">' +
+                '<p>Your exam has been submitted successfully!</p>' +
+                '<p>Total violations: ' + examState.violations + '</p>' +
+                '<p>You may now close this window.</p>' +
+                '</div>';
             
             // Hide loading spinner
             document.querySelector('.loading').style.display = 'none';
         }
 
         function showManualSubmissionInstructions() {
+            // Hide timer bar
+            document.getElementById("timerBar").style.display = "none";
+            
             document.getElementById("overlayTitle").textContent = "📝 Please Submit Your Exam";
-            document.getElementById("overlayMessage").innerHTML = `
-                <div class="termination-screen">
-                    <p>Please click the Submit button below to complete your exam.</p>
-                    <p>Total violations: ${examState.violations}</p>
-                    <div class="termination-actions">
-                        <button class="termination-button" onclick="hideOverlayForSubmission()">
-                            Continue to Submit
-                        </button>
-                    </div>
-                </div>
-            `;
+            document.getElementById("overlayMessage").innerHTML = 
+                '<div class="termination-screen">' +
+                '<p>Time is up! Please submit your exam now.</p>' +
+                '<p>Total violations: ' + examState.violations + '</p>' +
+                '<div class="termination-actions">' +
+                '<button class="termination-button" onclick="forceFormSubmission()">' +
+                'Submit My Exam Now' +
+                '</button>' +
+                '</div>' +
+                '</div>';
             
             // Hide loading spinner
             document.querySelector('.loading').style.display = 'none';
         }
 
-        function hideOverlayForSubmission() {
+        function forceFormSubmission() {
+            // Hide the overlay to access the form
             document.getElementById("overlay").style.display = "none";
-            // Allow user to submit manually
+            
+            // Show timer bar briefly to indicate action
+            const timerBar = document.getElementById("timerBar");
+            timerBar.style.display = "block";
+            timerBar.innerHTML = '<strong>🚀 Auto-submitting your exam...</strong>';
+            timerBar.style.background = 'linear-gradient(90deg, #28a745, #20c997)';
+            
+            // Try multiple methods to submit the form
+            setTimeout(() => {
+                const iframe = document.getElementById("formFrame");
+                
+                try {
+                    // Method 1: Try direct access to submit button
+                    const iframeDoc = iframe.contentWindow.document;
+                    const submitButtons = [
+                        'div[role="button"][aria-label*="Submit"]',
+                        'div[role="button"][data-value="Submit"]',
+                        'input[type="submit"]',
+                        'button[type="submit"]',
+                        'div[role="button"]:contains("Submit")',
+                        '[data-submit-type="0"]',
+                        'div[jsname][role="button"]'
+                    ];
+                    
+                    let submitted = false;
+                    for (const selector of submitButtons) {
+                        const btn = iframeDoc.querySelector(selector);
+                        if (btn) {
+                            btn.click();
+                            submitted = true;
+                            console.log('Form submitted using selector:', selector);
+                            break;
+                        }
+                    }
+                    
+                    if (submitted) {
+                        // Success - show confirmation
+                        setTimeout(() => {
+                            timerBar.innerHTML = '<strong>✅ Exam submitted successfully!</strong>';
+                            setTimeout(() => {
+                                showFinalConfirmation();
+                            }, 2000);
+                        }, 1000);
+                    } else {
+                        // Method 2: Try simulating Enter key on form
+                        const forms = iframeDoc.querySelectorAll('form');
+                        if (forms.length > 0) {
+                            const form = forms[0];
+                            const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                            form.dispatchEvent(submitEvent);
+                            
+                            setTimeout(() => {
+                                timerBar.innerHTML = '<strong>✅ Exam submitted via form event!</strong>';
+                                setTimeout(showFinalConfirmation, 2000);
+                            }, 1000);
+                        } else {
+                            // Fallback - direct user to submit manually
+                            showManualSubmitFallback();
+                        }
+                    }
+                    
+                } catch (corsError) {
+                    console.log('CORS prevents form access, showing manual instructions');
+                    showManualSubmitFallback();
+                }
+            }, 500);
+        }
+
+        function showManualSubmitFallback() {
+            document.getElementById("timerBar").style.display = "none";
+            document.getElementById("overlay").style.display = "flex";
+            
+            document.getElementById("overlayTitle").textContent = "⚠️ Manual Submission Required";
+            document.getElementById("overlayMessage").innerHTML = 
+                '<div class="termination-screen">' +
+                '<p><strong>Please look for the Submit button on the form below and click it.</strong></p>' +
+                '<p>The Submit button is usually blue and located at the bottom of the form.</p>' +
+                '<p>Total violations: ' + examState.violations + '</p>' +
+                '<div class="termination-actions">' +
+                '<button class="termination-button" onclick="hideOverlayForManualSubmission()">' +
+                'I\'ll Submit Manually' +
+                '</button>' +
+                '</div>' +
+                '</div>';
+        }
+
+        function hideOverlayForManualSubmission() {
+            document.getElementById("overlay").style.display = "none";
+            // Keep timer bar hidden since exam time is up
+        }
+
+        function showFinalConfirmation() {
+            document.getElementById("timerBar").style.display = "none";
+            document.getElementById("overlay").style.display = "flex";
+            
+            document.getElementById("overlayTitle").textContent = "🎉 Exam Complete";
+            document.getElementById("overlayMessage").innerHTML = 
+                '<div class="termination-screen">' +
+                '<p><strong>Your exam has been submitted successfully!</strong></p>' +
+                '<p>Exam session completed with ' + examState.violations + ' violation(s).</p>' +
+                '<p>You may now close this browser window.</p>' +
+                '<p style="color: #28a745; font-weight: bold;">Thank you for taking the exam!</p>' +
+                '</div>';
         }
 
         function startMonitoring() {
@@ -606,40 +790,108 @@
             else if (typeof document.webkitHidden !== "undefined") hidden = "webkitHidden";
 
             document.addEventListener("visibilitychange", () => {
-                // Only monitor after form has loaded and exam is active
-                if (examState.examActive && examState.formLoaded && document[hidden]) {
-                    recordViolation("Tab/window switch detected");
+                // Enhanced conditions for mobile
+                if (examState.examActive && 
+                    examState.formLoaded && 
+                    examState.formInteractionStarted && 
+                    document[hidden]) {
+                    
+                    // On mobile, add additional checks to prevent false positives
+                    if (examState.isMobile) {
+                        const timeSinceLastFocus = Date.now() - examState.lastFocusTime;
+                        // Only record violation if it's been more than 1 second since last focus event
+                        if (timeSinceLastFocus > 1000) {
+                            recordViolation("Tab/window switch detected");
+                        }
+                    } else {
+                        recordViolation("Tab/window switch detected");
+                    }
                 }
             });
 
-            // Fullscreen monitoring
+            // Fullscreen monitoring - less strict on mobile
             document.addEventListener('fullscreenchange', () => {
-                if (examState.examActive && examState.formLoaded && !document.fullscreenElement && CONFIG.ENABLE_FULLSCREEN) {
-                    document.getElementById("fullscreenPrompt").style.display = "block";
-                    recordViolation("Exited fullscreen mode");
-                    setTimeout(() => {
-                        document.getElementById("fullscreenPrompt").style.display = "none";
-                    }, 3000);
+                if (examState.examActive && 
+                    examState.formLoaded && 
+                    examState.formInteractionStarted && 
+                    !document.fullscreenElement && 
+                    CONFIG.ENABLE_FULLSCREEN) {
+                    
+                    // On mobile, fullscreen might exit when keyboard appears
+                    if (!examState.isMobile) {
+                        document.getElementById("fullscreenPrompt").style.display = "block";
+                        recordViolation("Exited fullscreen mode");
+                        setTimeout(() => {
+                            document.getElementById("fullscreenPrompt").style.display = "none";
+                        }, 3000);
+                    }
                 }
             });
 
-            // Focus monitoring - only after form loads
+            // Focus monitoring - much more careful on mobile
             window.addEventListener('blur', () => {
-                if (examState.examActive && examState.formLoaded) {
-                    recordViolation("Window lost focus");
+                if (examState.examActive && 
+                    examState.formLoaded && 
+                    examState.formInteractionStarted) {
+                    
+                    examState.lastFocusTime = Date.now();
+                    
+                    // On mobile, don't record focus violations as they happen frequently with form interactions
+                    if (!examState.isMobile) {
+                        // Even on desktop, be less aggressive
+                        setTimeout(() => {
+                            if (examState.examActive && document.hidden) {
+                                recordViolation("Window lost focus");
+                            }
+                        }, 500);
+                    }
                 }
             });
 
-            // Mouse leave monitoring - only after form loads
-            document.addEventListener('mouseleave', () => {
-                if (examState.examActive && examState.formLoaded) {
-                    recordViolation("Mouse left exam area");
-                }
+            // Focus event to track when user interacts with form elements
+            window.addEventListener('focus', () => {
+                examState.lastFocusTime = Date.now();
             });
+
+            // Mouse leave monitoring - disabled on mobile due to touch behavior
+            if (!examState.isMobile) {
+                document.addEventListener('mouseleave', () => {
+                    if (examState.examActive && 
+                        examState.formLoaded && 
+                        examState.formInteractionStarted) {
+                        // Only record if mouse actually leaves and stays out
+                        setTimeout(() => {
+                            if (examState.examActive && document.querySelector(':hover') === null) {
+                                recordViolation("Mouse left exam area");
+                            }
+                        }, 1000);
+                    }
+                });
+            }
         }
 
         function recordViolation(type) {
             if (examState.terminated) return; // Don't record violations after termination
+            
+            // Filter out false violations on mobile
+            if (examState.isMobile) {
+                const mobileIgnorePatterns = [
+                    'Window lost focus',
+                    'Mouse left exam area',
+                    'focus'
+                ];
+                
+                if (mobileIgnorePatterns.some(pattern => type.toLowerCase().includes(pattern.toLowerCase()))) {
+                    console.log('Mobile: Ignoring violation -', type);
+                    return;
+                }
+                
+                // Extra check for tab switching on mobile - only if truly switching
+                if (type.includes('Tab/window switch') && !document.hidden) {
+                    console.log('Mobile: False tab switch detection ignored');
+                    return;
+                }
+            }
             
             examState.violations++;
             document.getElementById("violationNumber").textContent = examState.violations;
@@ -647,23 +899,18 @@
             // Send to server
             sendViolationToServer(type);
             
-            console.log(`Violation ${examState.violations}: ${type} at ${new Date().toISOString()}`);
+            console.log('Violation ' + examState.violations + ': ' + type + ' at ' + new Date().toISOString());
             
-            // Show warning (but not for form-related focus events)
-            if (!type.includes('focus') && !type.includes('Mouse left')) {
+            // Show warning (but not for form-related focus events or mobile-specific events)
+            const silentViolations = ['focus', 'Mouse left', 'Window lost focus'];
+            if (!silentViolations.some(pattern => type.toLowerCase().includes(pattern.toLowerCase()))) {
                 alert(CONFIG.WARNING_MESSAGE);
             }
             
             // End exam if too many violations
             if (examState.violations >= CONFIG.MAX_VIOLATIONS) {
                 document.getElementById("overlayTitle").textContent = "⛔ Exam Terminated";
-                document.getElementById("overlayMessage").innerHTML = `
-                    <div class="termination-screen">
-                        <p>Too many violations detected (${examState.violations}).</p>
-                        <p>Your exam session has been terminated.</p>
-                        <p>Please contact your instructor.</p>
-                    </div>
-                `;
+                document.getElementById("overlayMessage").innerHTML = '<div class="termination-screen"><p>Too many violations detected (' + examState.violations + ').</p><p>Your exam session has been terminated.</p><p>Please contact your instructor.</p></div>';
                 endExam();
             }
         }
