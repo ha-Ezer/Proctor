@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proctored Exam System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+
+        /* Prevent text selection and right-click */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #timerBar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ee5a52);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            z-index: 10000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-bottom: 3px solid rgba(255,255,255,0.2);
+        }
+
+        #timerBar.warning {
+            animation: pulse 1s infinite;
+            background: linear-gradient(90deg, #ff4757, #ff3742);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        iframe {
+            width: 100%;
+            height: calc(100% - 70px);
+            border: none;
+            display: none;
+            background: white;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 2em;
+            color: white;
+            z-index: 20000;
+            text-align: center;
+        }
+
+        .overlay h2 {
+            margin-bottom: 20px;
+            color: #ff6b6b;
+        }
+
+        #studentForm {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            gap: 20px;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        #studentForm h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        #studentForm input {
+            padding: 15px;
+            font-size: 1.1em;
+            width: 100%;
+            max-width: 300px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.9);
+        }
+
+        #studentForm input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        #studentForm button {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #studentForm button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        #studentForm button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .instructions {
+            background: rgba(255, 235, 59, 0.1);
+            border: 2px solid #ffeb3b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            max-width: 400px;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            color: #555;
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin: 5px 0;
+        }
+
+        .violation-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-left: 20px;
+            font-size: 0.9em;
+        }
+
+        .fullscreen-prompt {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            border: 2px solid #ff6b6b;
+            z-index: 15000;
+            display: none;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 300px;
+            text-align: left;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: auto;
+            min-width: 20px;
+        }
+
+        .checkbox-container label {
+            font-size: 0.9em;
+            color: #333;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Student Info Capture -->
+    <div id="studentForm">
+        <h2>🎓 Proctored Exam System</h2>
+        
+        <div class="instructions">
+            <h3>⚠️ Important Instructions:</h3>
+            <ul>
+                <li>Do not switch tabs or windows during the exam</li>
+                <li>Do not minimize the browser</li>
+                <li>Ensure stable internet connection</li>
+                <li>The exam will auto-submit when time expires</li>
+                <li>Each violation will be recorded</li>
+            </ul>
+        </div>
+
+        <input type="text" id="studentName" placeholder="Full Name" required maxlength="100" />
+        <input type="email" id="studentEmail" placeholder="Email Address" required />
+        
+        <div class="checkbox-container">
+            <input type="checkbox" id="agreeTerms" required />
+            <label for="agreeTerms">I agree to the exam terms and conditions</label>
+        </div>
+        
+        <button onclick="startExam()" id="startBtn">Start Exam</button>
+    </div>
+
+    <!-- Timer + Exam -->
+    <div id="timerBar">
+        ⏳ Time remaining: <span id="timeLeft"></span>
+        <span id="violationCount" class="violation-count">Violations: <span id="violationNumber">0</span></span>
+    </div>
+    
+    <div id="overlay" class="overlay">
+        <h2 id="overlayTitle">⏰ Time's Up!</h2>
+        <div id="overlayMessage">Submitting your exam automatically...</div>
+        <div class="loading"></div>
+    </div>
+    
+    <div id="fullscreenPrompt" class="fullscreen-prompt">
+        <strong>Please return to fullscreen mode!</strong>
+    </div>
+    
+    <iframe id="formFrame" src="" sandbox="allow-forms allow-scripts allow-same-origin"></iframe>
+
+    <script>
+        // ========== CONFIGURATION - UPDATE THESE VALUES ==========
+        const CONFIG = {
+            DURATION_MINUTES: 30,
+            WARNING_AT_MINUTES: 5,
+            WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
+            MAX_VIOLATIONS: 5,
+            FORM_URL: "https://docs.google.com/forms/d/1_od1_1W-0AypoyPmIYCTbpJmYiT-ShjQdBg8h5xsKjM/viewform", // Replace with your form URL
+            WEBAPP_URL: "https://script.google.com/macros/s/AKfycbxmyeTfB4q0exAA56Utuf8drOVd1_4CHNSKlFNkETdXy856bqssUhaFEIFfnQzCbYHTlA/exec", // Replace with your deployed script URL
+            ENABLE_FULLSCREEN: true,
+            ENABLE_SERVER_LOGGING: true
+        };
+        // ========================================================
+
+        let examState = {
+            endTime: null,
+            timerInterval: null,
+            autoSubmitTimer: null,
+            violations: 0,
+            startTime: null,
+            studentData: {},
+            examActive: false,
+            sessionId: null
+        };
+
+        // Generate unique session ID
+        function generateSessionId() {
+            return 'session_' + new Date().getTime() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Send violation to server
+        function sendViolationToServer(violationType) {
+            if (!CONFIG.ENABLE_SERVER_LOGGING || !CONFIG.WEBAPP_URL.includes('script.google.com')) {
+                return;
+            }
+
+            const data = {
+                action: 'logViolation',
+                studentData: examState.studentData,
+                violationType: violationType,
+                sessionId: examState.sessionId,
+                browserInfo: navigator.userAgent,
+                timestamp: new Date().toISOString()
+            };
+
+            fetch(CONFIG.WEBAPP_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            }).catch(error => {
+                console.log('Error sending violation to server:', error);
+            });
+        }
+
+        // Enhanced security measures
+        function initSecurity() {
+            // Disable right-click
+            document.addEventListener('contextmenu', e => {
+                e.preventDefault();
+                if (examState.examActive) {
+                    recordViolation('Right-click attempted');
+                }
+            });
+            
+            // Disable common keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (!examState.examActive) return;
+                
+                const forbidden = [
+                    'F12', 'F11', // Dev tools, fullscreen toggle
+                    'F5' // Refresh
+                ];
+                
+                const ctrlShiftKeys = ['I', 'J', 'K', 'C']; // Dev tools and copy
+                const ctrlKeys = ['U', 'S', 'P', 'R', 'T', 'N', 'W']; // Various shortcuts
+                const altKeys = ['Tab']; // Alt-tab
+                
+                if (forbidden.includes(e.key) || 
+                    (e.ctrlKey && e.shiftKey && ctrlShiftKeys.includes(e.key)) ||
+                    (e.ctrlKey && ctrlKeys.includes(e.key)) ||
+                    (e.altKey && altKeys.includes(e.key))) {
+                    
+                    e.preventDefault();
+                    e.stopPropagation();
+                    recordViolation(`Keyboard shortcut attempted: ${e.ctrlKey ? 'Ctrl+' : ''}${e.shiftKey ? 'Shift+' : ''}${e.altKey ? 'Alt+' : ''}${e.key}`);
+                    return false;
+                }
+            });
+
+            // Disable text selection and drag
+            document.addEventListener('selectstart', e => e.preventDefault());
+            document.addEventListener('dragstart', e => e.preventDefault());
+        }
+
+        function startExam() {
+            const name = document.getElementById("studentName").value.trim();
+            const email = document.getElementById("studentEmail").value.trim();
+            const agreed = document.getElementById("agreeTerms").checked;
+
+            // Validation
+            if (!name || !email || !agreed) {
+                alert("Please fill all fields and agree to terms.");
+                return;
+            }
+
+            if (!/\S+@\S+\.\S+/.test(email)) {
+                alert("Please enter a valid email address.");
+                return;
+            }
+
+            // Store student data
+            examState.studentData = { name, email };
+            examState.startTime = new Date();
+            examState.examActive = true;
+            examState.sessionId = generateSessionId();
+
+            // Request fullscreen
+            if (CONFIG.ENABLE_FULLSCREEN) {
+                requestFullscreen();
+            }
+
+            // Hide student form
+            document.getElementById("studentForm").style.display = "none";
+
+            // Show timer + form
+            document.getElementById("timerBar").style.display = "block";
+            document.getElementById("formFrame").style.display = "block";
+
+            // Initialize exam iframe with student data
+            initializeForm();
+
+            // Start countdown
+            examState.endTime = Date.now() + CONFIG.DURATION_MINUTES * 60 * 1000;
+            examState.timerInterval = setInterval(updateTimer, 1000);
+            examState.autoSubmitTimer = setTimeout(endExam, CONFIG.DURATION_MINUTES * 60 * 1000);
+
+            // Start monitoring
+            startMonitoring();
+
+            // Log exam start
+            sendViolationToServer('Exam started');
+
+            console.log("Exam started for:", examState.studentData);
+        }
+
+        function initializeForm() {
+            const iframe = document.getElementById("formFrame");
+            let formUrl = CONFIG.FORM_URL;
+            
+            // Add pre-fill parameters if your form supports them
+            // Example: formUrl += `?usp=pp_url&entry.123456=${encodeURIComponent(examState.studentData.name)}`;
+            
+            iframe.src = formUrl;
+        }
+
+        function updateTimer() {
+            let remaining = examState.endTime - Date.now();
+            
+            if (remaining <= 0) {
+                clearInterval(examState.timerInterval);
+                document.getElementById("timeLeft").textContent = "00:00";
+                endExam();
+                return;
+            }
+
+            let minutes = Math.floor(remaining / 60000);
+            let seconds = Math.floor((remaining % 60000) / 1000);
+            
+            const timeDisplay = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+            document.getElementById("timeLeft").textContent = timeDisplay;
+
+            // Warning color when time is low
+            const timerBar = document.getElementById("timerBar");
+            if (minutes < CONFIG.WARNING_AT_MINUTES) {
+                timerBar.classList.add("warning");
+            }
+        }
+
+        function endExam() {
+            examState.examActive = false;
+            clearInterval(examState.timerInterval);
+            clearTimeout(examState.autoSubmitTimer);
+            
+            document.getElementById("overlay").style.display = "flex";
+            
+            // Log exam end
+            sendViolationToServer('Exam ended');
+            
+            // Log exam completion
+            console.log("Exam ended for:", examState.studentData.name, 
+                       "Violations:", examState.violations);
+
+            // Try to submit the form
+            setTimeout(attemptFormSubmission, 2000);
+        }
+
+        function attemptFormSubmission() {
+            const iframe = document.getElementById("formFrame");
+            let submitted = false;
+
+            try {
+                // Try to access iframe content (may fail due to CORS)
+                const iframeDoc = iframe.contentWindow.document;
+                const submitBtn = iframeDoc.querySelector('[type="submit"], [aria-label*="Submit"], div[role="button"]:contains("Submit")');
+                
+                if (submitBtn) {
+                    submitBtn.click();
+                    submitted = true;
+                    document.getElementById("overlayMessage").textContent = "Form submitted successfully!";
+                }
+            } catch (e) {
+                console.log("Cross-origin restriction, trying alternative method");
+            }
+
+            if (!submitted) {
+                // Fallback: navigate to form response page
+                try {
+                    let formUrl = iframe.src.split("/viewform")[0];
+                    iframe.src = formUrl + "/formResponse";
+                    document.getElementById("overlayMessage").textContent = "Redirecting to submission page...";
+                } catch (e) {
+                    document.getElementById("overlayMessage").textContent = "Please submit your form manually if it hasn't been submitted.";
+                }
+            }
+        }
+
+        function startMonitoring() {
+            // Visibility change detection
+            let hidden = "hidden";
+            if (typeof document.msHidden !== "undefined") hidden = "msHidden";
+            else if (typeof document.webkitHidden !== "undefined") hidden = "webkitHidden";
+
+            document.addEventListener("visibilitychange", () => {
+                if (examState.examActive && document[hidden]) {
+                    recordViolation("Tab/window switch detected");
+                }
+            });
+
+            // Fullscreen monitoring
+            document.addEventListener('fullscreenchange', () => {
+                if (examState.examActive && !document.fullscreenElement && CONFIG.ENABLE_FULLSCREEN) {
+                    document.getElementById("fullscreenPrompt").style.display = "block";
+                    recordViolation("Exited fullscreen mode");
+                    setTimeout(() => {
+                        document.getElementById("fullscreenPrompt").style.display = "none";
+                    }, 3000);
+                }
+            });
+
+            // Focus monitoring
+            window.addEventListener('blur', () => {
+                if (examState.examActive) {
+                    recordViolation("Window lost focus");
+                }
+            });
+
+            // Mouse leave monitoring
+            document.addEventListener('mouseleave', () => {
+                if (examState.examActive) {
+                    recordViolation("Mouse left exam area");
+                }
+            });
+        }
+
+        function recordViolation(type) {
+            examState.violations++;
+            document.getElementById("violationNumber").textContent = examState.violations;
+            
+            // Send to server
+            sendViolationToServer(type);
+            
+            console.log(`Violation ${examState.violations}: ${type} at ${new Date().toISOString()}`);
+            
+            // Show warning
+            alert(CONFIG.WARNING_MESSAGE);
+            
+            // End exam if too many violations
+            if (examState.violations >= CONFIG.MAX_VIOLATIONS) {
+                document.getElementById("overlayTitle").textContent = "⛔ Exam Terminated";
+                document.getElementById("overlayMessage").textContent = `Too many violations (${examState.violations}). Exam terminated.`;
+                endExam();
+            }
+        }
+
+        function requestFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // Initialize security when page loads
+        document.addEventListener('DOMContentLoaded', initSecurity);
+
+        // Prevent leaving page
+        window.addEventListener('beforeunload', function(e) {
+            if (examState.examActive) {
+                e.preventDefault();
+                e.returnValue = 'Are you sure you want to leave the exam?';
+                return 'Are you sure you want to leave the exam?';
+            }
+        });
+
+        // Additional protection against developer tools
+        setInterval(() => {
+            if (examState.examActive) {
+                const start = performance.now();
+                debugger;
+                const end = performance.now();
+                if (end - start > 100) {
+                    recordViolation("Developer tools detected");
+                }
+            }
+        }, 1000);
+
+        // Detect console access
+        let devtools = {
+            open: false,
+            orientation: null
+        };
+
+        const threshold = 160;
+
+        setInterval(() => {
+            if (examState.examActive && (window.outerHeight - window.innerHeight > threshold || 
+                window.outerWidth - window.innerWidth > threshold)) {
+                if (!devtools.open) {
+                    devtools.open = true;
+                    recordViolation("Developer tools opened");
+                }
+            } else {
+                devtools.open = false;
+            }
+        }, 500);
+    </script>
+</body>
+</html>
