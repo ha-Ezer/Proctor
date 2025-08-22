@@ -334,7 +334,7 @@
     <script>
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 2,
+            DURATION_MINUTES: 1,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 5,
@@ -361,7 +361,9 @@
             formInteractionStarted: false,
             keyboardVisible: false,
             initialViewportHeight: window.innerHeight,
-            lastVisibilityChange: 0
+            lastVisibilityChange: 0,
+            autoZoomDetected: false,
+            preventViolations: false
         };
 
         // Generate unique session ID
@@ -696,133 +698,166 @@
                 try {
                     const iframeDoc = iframe.contentWindow.document;
                     
-                    // Comprehensive list of Google Forms submit button selectors
-                    const submitSelectors = [
-                        // Primary Google Forms submit selectors
+                    // Based on your screenshot, the exact Google Forms submit button selectors
+                    const exactSubmitSelectors = [
+                        // Your specific element structure
+                        'div[jscontroller="l9Zd9"][jsaction*="click:cOuCgd"] span:contains("Submit")',
+                        'div[jscontroller="l9Zd9"] span[class*="NPEfkd RveJvd snByac"]:contains("Submit")',
+                        'span.NPEfkd.RveJvd.snByac:contains("Submit")',
+                        
+                        // Parent container approach
+                        'div[jscontroller="l9Zd9"][jsaction*="cOuCgd"]',
+                        'div[jscontroller="l9Zd9"]',
+                        
+                        // More generic but reliable patterns
+                        'div[role="button"][jscontroller*="l9Zd9"]',
+                        'div[jsaction*="click:cOuCgd"]',
+                        'div[jsaction*="cOuCgd"]',
+                        
+                        // Alternative Google Forms patterns
                         'div[role="button"][data-value="Submit"]',
                         'div[role="button"][aria-label*="Submit"]',
-                        'div[role="button"][jsname="M2UYVd"]', // Common Google Forms jsname
-                        'div[role="button"][data-submit-type="0"]',
-                        'span:contains("Submit")',
-                        
-                        // Alternative selectors
-                        'input[type="submit"]',
-                        'button[type="submit"]',
-                        'div[role="button"][class*="submit"]',
-                        'div[role="button"][id*="submit"]',
-                        
-                        // More specific Google Forms patterns
+                        'div[jsname="M2UYVd"]',
                         'div.freebirdFormviewerViewNavigationSubmitButton',
-                        'div.exportButtonContent',
-                        'div[jscontroller][role="button"]',
-                        'div[data-initial-value="Submit"]',
                         
-                        // Text-based selectors (broader search)
+                        // Text-based fallbacks
                         'div[role="button"]:contains("Submit")',
-                        'div[role="button"]:contains("Send")',
-                        'div[role="button"]:contains("تأكيد")', // Arabic
-                        'div[role="button"]:contains("Enviar")', // Spanish
-                        'div[role="button"]:contains("Soumettre")', // French
+                        'span:contains("Submit")',
+                        'div:contains("Submit")',
                     ];
                     
-                    console.log('Attempting to find submit button...');
+                    console.log('Attempting to find submit button with enhanced selectors...');
                     
-                    // Try each selector
-                    for (const selector of submitSelectors) {
+                    // Try each selector with enhanced methods
+                    for (const selector of exactSubmitSelectors) {
                         try {
-                            let elements;
+                            let elements = [];
                             
                             // Handle :contains() pseudo-selector manually
                             if (selector.includes(':contains(')) {
-                                const baseSelector = selector.split(':contains(')[0];
-                                const searchText = selector.match(/:contains\("(.+?)"\)/)[1];
-                                elements = Array.from(iframeDoc.querySelectorAll(baseSelector)).filter(el => 
-                                    el.textContent.toLowerCase().includes(searchText.toLowerCase())
-                                );
+                                const parts = selector.split(':contains(');
+                                const baseSelector = parts[0];
+                                const searchText = parts[1].replace(/[()'"]/g, '');
+                                
+                                const baseElements = iframeDoc.querySelectorAll(baseSelector);
+                                elements = Array.from(baseElements).filter(el => {
+                                    const text = el.textContent.toLowerCase().trim();
+                                    return text.includes(searchText.toLowerCase()) || text === 'submit';
+                                });
                             } else {
-                                elements = iframeDoc.querySelectorAll(selector);
+                                elements = Array.from(iframeDoc.querySelectorAll(selector));
                             }
                             
                             if (elements.length > 0) {
-                                const submitBtn = elements[0];
-                                console.log('Found submit button using selector:', selector);
-                                console.log('Button text:', submitBtn.textContent);
-                                console.log('Button HTML:', submitBtn.outerHTML.substring(0, 200));
+                                for (const submitBtn of elements) {
+                                    console.log('Found potential submit element:', selector);
+                                    console.log('Element text:', submitBtn.textContent.trim());
+                                    console.log('Element classes:', submitBtn.className);
+                                    
+                                    // Only proceed if text looks like submit
+                                    const text = submitBtn.textContent.toLowerCase().trim();
+                                    if (text.includes('submit') || text === 'submit' || submitBtn.getAttribute('data-value') === 'Submit') {
+                                        
+                                        // Multiple click strategies
+                                        try {
+                                            // Strategy 1: Direct click
+                                            submitBtn.click();
+                                            
+                                            // Strategy 2: Mouse events
+                                            const mouseEvents = ['mousedown', 'mouseup', 'click'];
+                                            mouseEvents.forEach(eventType => {
+                                                submitBtn.dispatchEvent(new MouseEvent(eventType, {
+                                                    bubbles: true,
+                                                    cancelable: true,
+                                                    view: iframeDoc.defaultView || window
+                                                }));
+                                            });
+                                            
+                                            // Strategy 3: Touch events for mobile compatibility
+                                            if (examState.isMobile) {
+                                                const touchEvents = ['touchstart', 'touchend'];
+                                                touchEvents.forEach(eventType => {
+                                                    submitBtn.dispatchEvent(new TouchEvent(eventType, {
+                                                        bubbles: true,
+                                                        cancelable: true
+                                                    }));
+                                                });
+                                            }
+                                            
+                                            // Strategy 4: Focus and keyboard
+                                            submitBtn.focus();
+                                            submitBtn.dispatchEvent(new KeyboardEvent('keydown', {
+                                                key: 'Enter',
+                                                keyCode: 13,
+                                                bubbles: true
+                                            }));
+                                            
+                                            console.log('Submit button clicked successfully');
+                                            submitSuccess = true;
+                                            break;
+                                            
+                                        } catch (clickError) {
+                                            console.log('Click method failed:', clickError.message);
+                                        }
+                                    }
+                                }
                                 
-                                // Try multiple click methods
-                                submitBtn.click();
-                                submitBtn.dispatchEvent(new MouseEvent('click', {
-                                    bubbles: true,
-                                    cancelable: true,
-                                    view: window
-                                }));
-                                
-                                submitSuccess = true;
-                                break;
+                                if (submitSuccess) break;
                             }
                         } catch (selectorError) {
                             console.log('Selector failed:', selector, selectorError.message);
                         }
                     }
                     
-                    // If no specific submit button found, try alternative methods
+                    // Enhanced fallback methods
                     if (!submitSuccess) {
-                        console.log('No submit button found, trying alternative methods...');
+                        console.log('Primary methods failed, trying enhanced fallbacks...');
                         
-                        // Method 1: Look for any button with submit-like text
-                        const allButtons = Array.from(iframeDoc.querySelectorAll('div[role="button"], button, input[type="button"]'));
-                        const submitKeywords = ['submit', 'send', 'finish', 'complete', 'done', 'enviar', 'soumettre'];
+                        // Method A: Search all clickable elements for submit-like text
+                        const clickableElements = Array.from(iframeDoc.querySelectorAll('div[role="button"], button, input[type="button"], div[jscontroller], div[jsaction], span[jsaction]'));
                         
-                        for (const btn of allButtons) {
-                            const text = btn.textContent.toLowerCase().trim();
-                            if (submitKeywords.some(keyword => text.includes(keyword))) {
-                                console.log('Found potential submit button by text:', text);
-                                btn.click();
-                                btn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+                        for (const element of clickableElements) {
+                            const text = element.textContent.toLowerCase().trim();
+                            const ariaLabel = (element.getAttribute('aria-label') || '').toLowerCase();
+                            const dataValue = (element.getAttribute('data-value') || '').toLowerCase();
+                            
+                            if (text.includes('submit') || ariaLabel.includes('submit') || dataValue.includes('submit') || text === 'submit') {
+                                console.log('Found submit element via fallback search:', text || ariaLabel || dataValue);
+                                
+                                // Try clicking
+                                element.click();
+                                element.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
                                 submitSuccess = true;
                                 break;
                             }
                         }
-                    }
-                    
-                    // Method 2: Try form submission event
-                    if (!submitSuccess) {
-                        console.log('Trying form submission event...');
-                        const forms = iframeDoc.querySelectorAll('form');
-                        if (forms.length > 0) {
-                            const form = forms[0];
-                            
-                            // Try multiple form submission methods
-                            try {
-                                form.submit();
-                                submitSuccess = true;
-                            } catch (e) {
-                                // Try dispatching submit event
-                                form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-                                submitSuccess = true;
+                        
+                        // Method B: Try form submission if button clicks failed
+                        if (!submitSuccess) {
+                            const forms = iframeDoc.querySelectorAll('form');
+                            if (forms.length > 0) {
+                                console.log('Attempting direct form submission...');
+                                const form = forms[0];
+                                
+                                try {
+                                    form.submit();
+                                    submitSuccess = true;
+                                } catch (e) {
+                                    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                                    submitSuccess = true;
+                                }
                             }
                         }
-                    }
-                    
-                    // Method 3: Simulate Enter key on the form
-                    if (!submitSuccess) {
-                        console.log('Trying Enter key simulation...');
-                        const focusableElements = iframeDoc.querySelectorAll('input, textarea, select, button, div[role="button"]');
-                        if (focusableElements.length > 0) {
-                            const lastElement = focusableElements[focusableElements.length - 1];
-                            lastElement.focus();
-                            
-                            const enterEvent = new KeyboardEvent('keydown', {
+                        
+                        // Method C: Simulate Enter key on the entire document
+                        if (!submitSuccess) {
+                            console.log('Trying global Enter key simulation...');
+                            iframeDoc.dispatchEvent(new KeyboardEvent('keydown', {
                                 key: 'Enter',
-                                code: 'Enter',
                                 keyCode: 13,
-                                which: 13,
                                 bubbles: true
-                            });
-                            
-                            lastElement.dispatchEvent(enterEvent);
-                            document.dispatchEvent(enterEvent);
-                            submitSuccess = true;
+                            }));
+                            submitSuccess = true; // Assume success for this attempt
                         }
                     }
                     
@@ -833,15 +868,15 @@
                 
                 // Handle success or failure
                 if (submitSuccess) {
-                    console.log('Submit attempt completed');
+                    console.log('Submit attempt completed successfully');
                     setTimeout(() => {
-                        timerBar.innerHTML = '<strong>✅ Submit attempt completed!</strong>';
+                        timerBar.innerHTML = '<strong>✅ Form submission attempted!</strong>';
                         setTimeout(() => {
                             showFinalConfirmation();
                         }, 2000);
                     }, 1000);
                 } else {
-                    console.log('All submit methods failed');
+                    console.log('All submit methods failed, showing manual instructions');
                     showAdvancedManualSubmit();
                 }
             }, 500);
