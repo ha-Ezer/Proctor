@@ -445,7 +445,7 @@
     <script>
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 3,
+            DURATION_MINUTES: 30,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 5,
@@ -758,9 +758,15 @@
             document.getElementById("overlay").style.display = "flex";
 
             const submissionType = manualSubmit ? 'Manual submission' : 'Time expired - auto submission';
+            
+            // Send exam submission with all data
+            console.log('Submitting exam with responses:', examState.responses);
+            console.log('Exam questions:', EXAM_QUESTIONS);
+            
             sendToServer('submitExam', {
                 submissionType: submissionType,
                 responses: examState.responses,
+                examQuestions: EXAM_QUESTIONS, // Include question structure
                 completionTime: new Date().toISOString()
             });
 
@@ -791,6 +797,7 @@
         function sendToServer(action, data) {
             if (!CONFIG.ENABLE_SERVER_LOGGING || !CONFIG.WEBAPP_URL.includes('script.google.com')) {
                 console.log('Server logging disabled or invalid URL');
+                console.log('Would send:', action, data);
                 return;
             }
 
@@ -800,9 +807,10 @@
                 sessionId: examState.sessionId,
                 timestamp: new Date().toISOString(),
                 browserInfo: navigator.userAgent,
-                examQuestions: EXAM_QUESTIONS, // Include question structure for context
                 ...data
             };
+
+            console.log('Sending to server:', payload);
 
             fetch(CONFIG.WEBAPP_URL, {
                 method: 'POST',
@@ -811,8 +819,16 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(payload)
-            }).catch(error => {
+            })
+            .then(response => {
+                console.log('Server response received (no-cors mode)');
+            })
+            .catch(error => {
                 console.log('Error sending data to server:', error);
+                // Show user that data might not have been saved
+                if (action === 'submitExam') {
+                    console.warn('Exam submission may have failed - please inform administrator');
+                }
             });
         }
 
