@@ -4,7 +4,7 @@
     <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proctored Exam System</title>
+    <title>Custom Proctored Exam System</title>
     <style>
         * {
             margin: 0;
@@ -16,7 +16,7 @@
             height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            overflow-x: hidden; /* Allow vertical scrolling, prevent horizontal */
+            overflow-x: hidden;
         }
 
         /* Prevent text selection and right-click */
@@ -27,6 +27,14 @@
             user-select: none;
             -webkit-touch-callout: none;
             -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Allow text selection in form elements */
+        input, textarea, select {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
         }
 
         #timerBar {
@@ -56,12 +64,14 @@
             50% { opacity: 0.7; }
         }
 
-        iframe {
-            width: 100%;
-            height: calc(100% - 70px);
-            border: none;
+        .exam-container {
             display: none;
-            background: white;
+            margin-top: 70px;
+            padding: 20px;
+            min-height: calc(100vh - 70px);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .overlay {
@@ -88,20 +98,19 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh; /* Changed from height to min-height for mobile */
+            min-height: 100vh;
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             gap: 20px;
-            padding: 40px 20px; /* Added horizontal padding for mobile */
+            padding: 40px 20px;
             border-radius: 20px;
             max-width: 500px;
-            margin: 20px auto; /* Added margin for mobile */
+            margin: 20px auto;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow-y: auto; /* Allow scrolling within form */
+            overflow-y: auto;
         }
 
-        /* Mobile responsive adjustments */
         @media (max-width: 600px) {
             #studentForm {
                 margin: 10px;
@@ -109,14 +118,6 @@
                 border-radius: 15px;
                 max-width: none;
                 min-height: calc(100vh - 20px);
-            }
-            
-            #studentForm h2 {
-                font-size: 1.5em;
-            }
-            
-            .instructions {
-                font-size: 0.9em;
             }
         }
 
@@ -193,26 +194,6 @@
             margin: 5px 0;
         }
 
-        .violation-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            margin-left: 20px;
-            font-size: 0.9em;
-        }
-
-        .fullscreen-prompt {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px;
-            border-radius: 5px;
-            border: 2px solid #ff6b6b;
-            z-index: 15000;
-            display: none;
-        }
-
         .checkbox-container {
             display: flex;
             align-items: center;
@@ -226,12 +207,149 @@
             min-width: 20px;
         }
 
-        .checkbox-container label {
+        .violation-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-left: 20px;
             font-size: 0.9em;
-            color: #333;
         }
 
-        /* Loading animation */
+        .question {
+            background: white;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .question h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .question.required h3::after {
+            content: " *";
+            color: #ff4757;
+        }
+
+        .question-image {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .question input[type="text"], 
+        .question textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: border-color 0.3s ease;
+            font-family: inherit;
+            resize: vertical;
+        }
+
+        .question input[type="text"]:focus,
+        .question textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .question textarea {
+            min-height: 100px;
+        }
+
+        .multiple-choice {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .choice {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .choice:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+
+        .choice input[type="radio"] {
+            margin: 0;
+            width: auto;
+        }
+
+        .choice.selected {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
         .loading {
             display: inline-block;
             width: 20px;
@@ -246,50 +364,29 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Termination screen styling */
-        .termination-screen {
-            padding: 40px 20px;
-            text-align: center;
-        }
-
-        .termination-screen h2 {
-            color: #ff4757;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-
-        .termination-screen p {
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        .termination-actions {
-            margin-top: 30px;
-        }
-
-        .termination-button {
-            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+        .error-message {
+            background: #ff4757;
             color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.1em;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
         }
 
-        .termination-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        .success-message {
+            background: #28a745;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            display: none;
         }
     </style>
 </head>
 <body>
     <!-- Student Info Capture -->
     <div id="studentForm">
-        <h2>🎓 Proctored Exam System</h2>
+        <h2>🎓 Custom Proctored Exam System</h2>
         
         <div class="instructions">
             <h3>⚠️ Important Instructions:</h3>
@@ -297,7 +394,8 @@
                 <li>Do not switch tabs or windows during the exam</li>
                 <li>Do not minimize the browser</li>
                 <li>Ensure stable internet connection</li>
-                <li>The exam will auto-submit when time expires</li>
+                <li>Answer all required questions marked with *</li>
+                <li>Your progress is automatically saved</li>
                 <li>Each violation will be recorded</li>
             </ul>
         </div>
@@ -325,117 +423,124 @@
         <div class="loading"></div>
     </div>
     
-    <div id="fullscreenPrompt" class="fullscreen-prompt">
-        <strong>Please return to fullscreen mode!</strong>
+    <!-- Custom Exam Form -->
+    <div id="examContainer" class="exam-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div id="errorMessage" class="error-message"></div>
+        <div id="successMessage" class="success-message"></div>
+        
+        <!-- Questions will be dynamically generated here -->
+        <div id="questionsContainer"></div>
+        
+        <div class="submit-section">
+            <button class="submit-btn" onclick="submitExam()" id="submitExamBtn">
+                Submit Exam
+            </button>
+        </div>
     </div>
-    
-    <iframe id="formFrame" src="" sandbox="allow-forms allow-scripts allow-same-origin"></iframe>
 
     <script>
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 1,
+            DURATION_MINUTES: 3,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 5,
-            FORM_URL: "https://docs.google.com/forms/d/1_od1_1W-0AypoyPmIYCTbpJmYiT-ShjQdBg8h5xsKjM/viewform",
-            WEBAPP_URL: "https://script.google.com/macros/s/AKfycbxmyeTfB4q0exAA56Utuf8drOVd1_4CHNSKlFNkETdXy856bqssUhaFEIFfnQzCbYHTlA/exec",
+            WEBAPP_URL: "https://script.google.com/macros/s/AKfycbxmyeTfB4q0exAA56Utuf8drOVd1_4CHNSKlFNkETdXy856bqssUhaFEIFfnQzCbYHTlA/exec", // Your Apps Script URL
             ENABLE_FULLSCREEN: true,
-            ENABLE_SERVER_LOGGING: true
+            ENABLE_SERVER_LOGGING: true,
+            AUTO_SAVE_INTERVAL: 30 // seconds
         };
+
+        // ========== EXAM QUESTIONS CONFIGURATION ==========
+        const EXAM_QUESTIONS = [
+            {
+                id: "q1",
+                type: "multiple-choice",
+                question: "What is the capital of France?",
+                required: true,
+                options: [
+                    "London",
+                    "Berlin", 
+                    "Paris",
+                    "Madrid"
+                ],
+                correctAnswer: 2 // Index of correct answer (for your reference)
+            },
+            {
+                id: "q2", 
+                type: "text",
+                question: "Explain the process of photosynthesis in plants.",
+                required: true,
+                placeholder: "Enter your detailed explanation here..."
+            },
+            {
+                id: "q3",
+                type: "multiple-choice", 
+                question: "Which of the following is NOT a programming language?",
+                required: false,
+                options: [
+                    "Python",
+                    "JavaScript",
+                    "HTML", 
+                    "Java"
+                ],
+                correctAnswer: 2
+            },
+            {
+                id: "q4",
+                type: "textarea",
+                question: "Describe your experience with web development technologies.",
+                required: false,
+                placeholder: "Share your thoughts and experiences..."
+            },
+            {
+                id: "q5",
+                type: "text",
+                question: "What is 15 + 27?",
+                required: true,
+                placeholder: "Enter the numerical answer"
+            },
+            {
+                id: "q6",
+                type: "multiple-choice",
+                question: "Which year did World War II end?",
+                required: true,
+                image: "https://via.placeholder.com/400x200/667eea/ffffff?text=Historical+Timeline", // Optional image
+                options: [
+                    "1944",
+                    "1945",
+                    "1946", 
+                    "1947"
+                ],
+                correctAnswer: 1
+            }
+        ];
         // ========================================================
 
         let examState = {
             endTime: null,
             timerInterval: null,
             autoSubmitTimer: null,
+            autoSaveInterval: null,
             violations: 0,
             startTime: null,
             studentData: {},
             examActive: false,
             sessionId: null,
-            formLoaded: false,
             terminated: false,
+            responses: {},
             isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
             lastFocusTime: 0,
-            formInteractionStarted: false,
-            keyboardVisible: false,
-            initialViewportHeight: window.innerHeight,
-            lastVisibilityChange: 0,
-            autoZoomDetected: false,
-            preventViolations: false
+            preventViolations: false,
+            keyboardVisible: false
         };
 
-        // Generate unique session ID
         function generateSessionId() {
             return 'session_' + new Date().getTime() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        // Send violation to server
-        function sendViolationToServer(violationType) {
-            if (!CONFIG.ENABLE_SERVER_LOGGING || !CONFIG.WEBAPP_URL.includes('script.google.com')) {
-                return;
-            }
-
-            const data = {
-                action: 'logViolation',
-                studentData: examState.studentData,
-                violationType: violationType,
-                sessionId: examState.sessionId,
-                browserInfo: navigator.userAgent,
-                timestamp: new Date().toISOString()
-            };
-
-            fetch(CONFIG.WEBAPP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            }).catch(error => {
-                console.log('Error sending violation to server:', error);
-            });
-        }
-
-        // Enhanced security measures
-        function initSecurity() {
-            // Disable right-click
-            document.addEventListener('contextmenu', e => {
-                e.preventDefault();
-                if (examState.examActive) {
-                    recordViolation('Right-click attempted');
-                }
-            });
-            
-            // Disable common keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
-                if (!examState.examActive) return;
-                
-                const forbidden = [
-                    'F12', 'F11', // Dev tools, fullscreen toggle
-                    'F5' // Refresh
-                ];
-                
-                const ctrlShiftKeys = ['I', 'J', 'K', 'C']; // Dev tools and copy
-                const ctrlKeys = ['U', 'S', 'P', 'R', 'T', 'N', 'W']; // Various shortcuts
-                const altKeys = ['Tab']; // Alt-tab
-                
-                if (forbidden.includes(e.key) || 
-                    (e.ctrlKey && e.shiftKey && ctrlShiftKeys.includes(e.key)) ||
-                    (e.ctrlKey && ctrlKeys.includes(e.key)) ||
-                    (e.altKey && altKeys.includes(e.key))) {
-                    
-                    e.preventDefault();
-                    e.stopPropagation();
-                    recordViolation('Keyboard shortcut attempted: ' + (e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + (e.altKey ? 'Alt+' : '') + e.key);
-                    return false;
-                }
-            });
-
-            // Disable text selection and drag
-            document.addEventListener('selectstart', e => e.preventDefault());
-            document.addEventListener('dragstart', e => e.preventDefault());
         }
 
         function startExam() {
@@ -443,18 +548,16 @@
             const email = document.getElementById("studentEmail").value.trim();
             const agreed = document.getElementById("agreeTerms").checked;
 
-            // Validation
             if (!name || !email || !agreed) {
-                alert("Please fill all fields and agree to terms.");
+                showError("Please fill all fields and agree to terms.");
                 return;
             }
 
             if (!/\S+@\S+\.\S+/.test(email)) {
-                alert("Please enter a valid email address.");
+                showError("Please enter a valid email address.");
                 return;
             }
 
-            // Store student data
             examState.studentData = { name, email };
             examState.startTime = new Date();
             examState.examActive = true;
@@ -468,110 +571,109 @@
             // Hide student form
             document.getElementById("studentForm").style.display = "none";
 
-            // Show timer + form
+            // Show timer + exam
             document.getElementById("timerBar").style.display = "block";
-            document.getElementById("formFrame").style.display = "block";
+            document.getElementById("examContainer").style.display = "block";
 
-            // Initialize exam iframe with student data
-            initializeForm();
+            // Generate exam questions
+            generateQuestions();
 
             // Start countdown
             examState.endTime = Date.now() + CONFIG.DURATION_MINUTES * 60 * 1000;
             examState.timerInterval = setInterval(updateTimer, 1000);
             examState.autoSubmitTimer = setTimeout(endExam, CONFIG.DURATION_MINUTES * 60 * 1000);
 
+            // Start auto-save
+            examState.autoSaveInterval = setInterval(autoSaveProgress, CONFIG.AUTO_SAVE_INTERVAL * 1000);
+
             // Start monitoring
             startMonitoring();
 
             // Log exam start
-            sendViolationToServer('Exam started');
+            sendToServer('logViolation', {
+                violationType: 'Exam started',
+                additionalInfo: 'Custom exam system initialized'
+            });
 
-            console.log("Exam started for:", examState.studentData);
+            console.log("Custom exam started for:", examState.studentData);
         }
 
-        function initializeForm() {
-            const iframe = document.getElementById("formFrame");
-            let formUrl = CONFIG.FORM_URL;
-            
-            iframe.src = formUrl;
-            
-            // Wait for form to load before starting strict monitoring
-            iframe.onload = function() {
-                setTimeout(() => {
-                    examState.formLoaded = true;
-                    
-                    // Add form interaction detection for mobile
-                    if (examState.isMobile) {
-                        // Give extra time for mobile form interactions
-                        setTimeout(() => {
-                            examState.formInteractionStarted = true;
-                        }, 5000); // 5 seconds on mobile
-                    } else {
-                        examState.formInteractionStarted = true;
-                    }
-                    
-                    // Monitor for form submission during exam
-                    monitorFormSubmission();
-                    
-                    console.log('Form monitoring started. Mobile:', examState.isMobile);
-                }, examState.isMobile ? 3000 : 2000); // Extra time for mobile
-            };
-        }
+        function generateQuestions() {
+            const container = document.getElementById("questionsContainer");
+            container.innerHTML = "";
 
-        function monitorFormSubmission() {
-            // Check periodically if form was submitted (indicated by URL change)
-            const checkSubmissionInterval = setInterval(() => {
-                if (examState.terminated) {
-                    clearInterval(checkSubmissionInterval);
-                    return;
+            EXAM_QUESTIONS.forEach((question, index) => {
+                const questionDiv = document.createElement("div");
+                questionDiv.className = `question ${question.required ? 'required' : ''}`;
+                questionDiv.setAttribute('data-question-id', question.id);
+
+                let questionHTML = `<h3>${index + 1}. ${question.question}</h3>`;
+
+                if (question.image) {
+                    questionHTML += `<img src="${question.image}" alt="Question ${index + 1} image" class="question-image">`;
                 }
-                
-                try {
-                    const iframe = document.getElementById("formFrame");
-                    const currentUrl = iframe.contentWindow.location.href;
-                    
-                    // Google Forms redirect to a confirmation page after submission
-                    if (currentUrl.includes('formResponse') || currentUrl.includes('thanks') || 
-                        currentUrl.includes('submitted') || currentUrl.includes('confirmation')) {
-                        
-                        // Form was submitted during exam time
-                        examState.examActive = false;
-                        examState.terminated = true;
-                        clearInterval(examState.timerInterval);
-                        clearTimeout(examState.autoSubmitTimer);
-                        clearInterval(checkSubmissionInterval);
-                        
-                        // Hide timer bar
-                        document.getElementById("timerBar").style.display = "none";
-                        
-                        // Show success message
-                        showEarlySubmissionSuccess();
-                        
-                        console.log('Form submitted during exam time');
-                    }
-                } catch (e) {
-                    // CORS prevents URL access - this is normal
+
+                if (question.type === 'multiple-choice') {
+                    questionHTML += '<div class="multiple-choice">';
+                    question.options.forEach((option, optionIndex) => {
+                        questionHTML += `
+                            <div class="choice" onclick="selectChoice('${question.id}', ${optionIndex})">
+                                <input type="radio" name="${question.id}" value="${optionIndex}" id="${question.id}_${optionIndex}">
+                                <label for="${question.id}_${optionIndex}">${option}</label>
+                            </div>
+                        `;
+                    });
+                    questionHTML += '</div>';
+                } else if (question.type === 'textarea') {
+                    questionHTML += `
+                        <textarea 
+                            id="${question.id}" 
+                            placeholder="${question.placeholder || 'Enter your answer here...'}"
+                            onchange="saveResponse('${question.id}', this.value)"
+                            oninput="saveResponse('${question.id}', this.value)"
+                        ></textarea>
+                    `;
+                } else if (question.type === 'text') {
+                    questionHTML += `
+                        <input 
+                            type="text" 
+                            id="${question.id}" 
+                            placeholder="${question.placeholder || 'Enter your answer here...'}"
+                            onchange="saveResponse('${question.id}', this.value)"
+                            oninput="saveResponse('${question.id}', this.value)"
+                        />
+                    `;
                 }
-            }, 2000); // Check every 2 seconds
+
+                questionDiv.innerHTML = questionHTML;
+                container.appendChild(questionDiv);
+            });
         }
 
-        function showEarlySubmissionSuccess() {
-            document.getElementById("overlay").style.display = "flex";
-            document.getElementById("overlayTitle").textContent = "✅ Exam Submitted Successfully";
-            document.getElementById("overlayMessage").innerHTML = 
-                '<div class="termination-screen">' +
-                '<p><strong>Great job! Your exam has been submitted.</strong></p>' +
-                '<p>Submitted with ' + examState.violations + ' violation(s).</p>' +
-                '<p>You completed the exam early - well done!</p>' +
-                '<p>You may now close this browser window.</p>' +
-                '</div>';
+        function selectChoice(questionId, choiceIndex) {
+            // Update visual selection
+            const choices = document.querySelectorAll(`[data-question-id="${questionId}"] .choice`);
+            choices.forEach((choice, index) => {
+                choice.classList.toggle('selected', index === choiceIndex);
+                const radio = choice.querySelector('input[type="radio"]');
+                radio.checked = index === choiceIndex;
+            });
+
+            // Save response
+            saveResponse(questionId, choiceIndex);
+        }
+
+        function saveResponse(questionId, value) {
+            examState.responses[questionId] = value;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const totalQuestions = EXAM_QUESTIONS.length;
+            const answeredQuestions = Object.keys(examState.responses).length;
+            const progress = (answeredQuestions / totalQuestions) * 100;
             
-            // Hide loading spinner if visible
-            const loader = document.querySelector('.loading');
-            if (loader) loader.style.display = 'none';
-            
-            // Send completion notification
-            sendViolationToServer('Exam submitted early');
+            document.getElementById("progressFill").style.width = progress + "%";
         }
 
         function updateTimer() {
@@ -590,575 +692,217 @@
             const timeDisplay = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
             document.getElementById("timeLeft").textContent = timeDisplay;
 
-            // Warning color when time is low
             const timerBar = document.getElementById("timerBar");
             if (minutes < CONFIG.WARNING_AT_MINUTES) {
                 timerBar.classList.add("warning");
             }
         }
 
-        function endExam() {
-            if (examState.terminated) return; // Prevent double execution
+        function autoSaveProgress() {
+            if (!examState.examActive) return;
+
+            sendToServer('saveProgress', {
+                responses: examState.responses,
+                progress: (Object.keys(examState.responses).length / EXAM_QUESTIONS.length) * 100
+            });
+        }
+
+        function submitExam() {
+            if (!validateRequiredQuestions()) {
+                return;
+            }
+
+            if (confirm("Are you sure you want to submit your exam? This action cannot be undone.")) {
+                endExam(true);
+            }
+        }
+
+        function validateRequiredQuestions() {
+            const requiredQuestions = EXAM_QUESTIONS.filter(q => q.required);
+            const missingQuestions = [];
+
+            requiredQuestions.forEach(question => {
+                if (!examState.responses[question.id] && examState.responses[question.id] !== 0) {
+                    missingQuestions.push(question.question);
+                }
+            });
+
+            if (missingQuestions.length > 0) {
+                showError(`Please answer the following required questions:\n• ${missingQuestions.join('\n• ')}`);
+                
+                // Scroll to first missing question
+                const firstMissing = requiredQuestions.find(q => !examState.responses[q.id] && examState.responses[q.id] !== 0);
+                if (firstMissing) {
+                    const element = document.querySelector(`[data-question-id="${firstMissing.id}"]`);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        element.style.animation = 'pulse 2s';
+                    }
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+        function endExam(manualSubmit = false) {
+            if (examState.terminated) return;
             
             examState.examActive = false;
             examState.terminated = true;
             clearInterval(examState.timerInterval);
             clearTimeout(examState.autoSubmitTimer);
-            
-            // Hide timer bar when exam ends
+            clearInterval(examState.autoSaveInterval);
+
             document.getElementById("timerBar").style.display = "none";
-            
             document.getElementById("overlay").style.display = "flex";
-            
-            // Log exam end
-            sendViolationToServer('Exam ended');
-            
-            console.log("Exam ended for:", examState.studentData.name, 
-                       "Violations:", examState.violations);
 
-            // Try to submit the form automatically
-            setTimeout(attemptFormSubmission, 2000);
-        }
+            const submissionType = manualSubmit ? 'Manual submission' : 'Time expired - auto submission';
+            sendToServer('submitExam', {
+                submissionType: submissionType,
+                responses: examState.responses,
+                completionTime: new Date().toISOString()
+            });
 
-        function attemptFormSubmission() {
-            const iframe = document.getElementById("formFrame");
-            let submitted = false;
-
-            try {
-                // Try to access iframe content (may fail due to CORS)
-                const iframeDoc = iframe.contentWindow.document;
-                const submitBtn = iframeDoc.querySelector('div[role="button"][aria-label*="Submit"], input[type="submit"], button[type="submit"]');
-                
-                if (submitBtn) {
-                    submitBtn.click();
-                    submitted = true;
-                    showTerminationSuccess();
-                }
-            } catch (e) {
-                console.log("Cross-origin restriction, using fallback method");
-            }
-
-            if (!submitted) {
-                // Show manual submission instructions with improved button
-                showManualSubmissionInstructions();
-            }
-        }
-
-        function showTerminationSuccess() {
-            // Hide timer bar
-            document.getElementById("timerBar").style.display = "none";
-            
-            document.getElementById("overlayTitle").textContent = "✅ Exam Submitted";
-            document.getElementById("overlayMessage").innerHTML = 
-                '<div class="termination-screen">' +
-                '<p>Your exam has been submitted successfully!</p>' +
-                '<p>Total violations: ' + examState.violations + '</p>' +
-                '<p>You may now close this window.</p>' +
-                '</div>';
-            
-            // Hide loading spinner
-            document.querySelector('.loading').style.display = 'none';
-        }
-
-        function showManualSubmissionInstructions() {
-            // Hide timer bar
-            document.getElementById("timerBar").style.display = "none";
-            
-            document.getElementById("overlayTitle").textContent = "📝 Please Submit Your Exam";
-            document.getElementById("overlayMessage").innerHTML = 
-                '<div class="termination-screen">' +
-                '<p>Time is up! Please submit your exam now.</p>' +
-                '<p>Total violations: ' + examState.violations + '</p>' +
-                '<div class="termination-actions">' +
-                '<button class="termination-button" onclick="forceFormSubmission()">' +
-                'Submit My Exam Now' +
-                '</button>' +
-                '</div>' +
-                '</div>';
-            
-            // Hide loading spinner
-            document.querySelector('.loading').style.display = 'none';
-        }
-
-        function forceFormSubmission() {
-            // Hide the overlay to access the form
-            document.getElementById("overlay").style.display = "none";
-            
-            // Show timer bar briefly to indicate action
-            const timerBar = document.getElementById("timerBar");
-            timerBar.style.display = "block";
-            timerBar.innerHTML = '<strong>🚀 Auto-submitting your exam...</strong>';
-            timerBar.style.background = 'linear-gradient(90deg, #28a745, #20c997)';
-            
-            // Try multiple methods to submit the form
             setTimeout(() => {
-                const iframe = document.getElementById("formFrame");
-                let submitSuccess = false;
-                
-                try {
-                    const iframeDoc = iframe.contentWindow.document;
-                    
-                    // Based on your screenshot, the exact Google Forms submit button selectors
-                    const exactSubmitSelectors = [
-                        // Your specific element structure
-                        'div[jscontroller="l9Zd9"][jsaction*="click:cOuCgd"] span:contains("Submit")',
-                        'div[jscontroller="l9Zd9"] span[class*="NPEfkd RveJvd snByac"]:contains("Submit")',
-                        'span.NPEfkd.RveJvd.snByac:contains("Submit")',
-                        
-                        // Parent container approach
-                        'div[jscontroller="l9Zd9"][jsaction*="cOuCgd"]',
-                        'div[jscontroller="l9Zd9"]',
-                        
-                        // More generic but reliable patterns
-                        'div[role="button"][jscontroller*="l9Zd9"]',
-                        'div[jsaction*="click:cOuCgd"]',
-                        'div[jsaction*="cOuCgd"]',
-                        
-                        // Alternative Google Forms patterns
-                        'div[role="button"][data-value="Submit"]',
-                        'div[role="button"][aria-label*="Submit"]',
-                        'div[jsname="M2UYVd"]',
-                        'div.freebirdFormviewerViewNavigationSubmitButton',
-                        
-                        // Text-based fallbacks
-                        'div[role="button"]:contains("Submit")',
-                        'span:contains("Submit")',
-                        'div:contains("Submit")',
-                    ];
-                    
-                    console.log('Attempting to find submit button with enhanced selectors...');
-                    
-                    // Try each selector with enhanced methods
-                    for (const selector of exactSubmitSelectors) {
-                        try {
-                            let elements = [];
-                            
-                            // Handle :contains() pseudo-selector manually
-                            if (selector.includes(':contains(')) {
-                                const parts = selector.split(':contains(');
-                                const baseSelector = parts[0];
-                                const searchText = parts[1].replace(/[()'"]/g, '');
-                                
-                                const baseElements = iframeDoc.querySelectorAll(baseSelector);
-                                elements = Array.from(baseElements).filter(el => {
-                                    const text = el.textContent.toLowerCase().trim();
-                                    return text.includes(searchText.toLowerCase()) || text === 'submit';
-                                });
-                            } else {
-                                elements = Array.from(iframeDoc.querySelectorAll(selector));
-                            }
-                            
-                            if (elements.length > 0) {
-                                for (const submitBtn of elements) {
-                                    console.log('Found potential submit element:', selector);
-                                    console.log('Element text:', submitBtn.textContent.trim());
-                                    console.log('Element classes:', submitBtn.className);
-                                    
-                                    // Only proceed if text looks like submit
-                                    const text = submitBtn.textContent.toLowerCase().trim();
-                                    if (text.includes('submit') || text === 'submit' || submitBtn.getAttribute('data-value') === 'Submit') {
-                                        
-                                        // Multiple click strategies
-                                        try {
-                                            // Strategy 1: Direct click
-                                            submitBtn.click();
-                                            
-                                            // Strategy 2: Mouse events
-                                            const mouseEvents = ['mousedown', 'mouseup', 'click'];
-                                            mouseEvents.forEach(eventType => {
-                                                submitBtn.dispatchEvent(new MouseEvent(eventType, {
-                                                    bubbles: true,
-                                                    cancelable: true,
-                                                    view: iframeDoc.defaultView || window
-                                                }));
-                                            });
-                                            
-                                            // Strategy 3: Touch events for mobile compatibility
-                                            if (examState.isMobile) {
-                                                const touchEvents = ['touchstart', 'touchend'];
-                                                touchEvents.forEach(eventType => {
-                                                    submitBtn.dispatchEvent(new TouchEvent(eventType, {
-                                                        bubbles: true,
-                                                        cancelable: true
-                                                    }));
-                                                });
-                                            }
-                                            
-                                            // Strategy 4: Focus and keyboard
-                                            submitBtn.focus();
-                                            submitBtn.dispatchEvent(new KeyboardEvent('keydown', {
-                                                key: 'Enter',
-                                                keyCode: 13,
-                                                bubbles: true
-                                            }));
-                                            
-                                            console.log('Submit button clicked successfully');
-                                            submitSuccess = true;
-                                            break;
-                                            
-                                        } catch (clickError) {
-                                            console.log('Click method failed:', clickError.message);
-                                        }
-                                    }
-                                }
-                                
-                                if (submitSuccess) break;
-                            }
-                        } catch (selectorError) {
-                            console.log('Selector failed:', selector, selectorError.message);
-                        }
-                    }
-                    
-                    // Enhanced fallback methods
-                    if (!submitSuccess) {
-                        console.log('Primary methods failed, trying enhanced fallbacks...');
-                        
-                        // Method A: Search all clickable elements for submit-like text
-                        const clickableElements = Array.from(iframeDoc.querySelectorAll('div[role="button"], button, input[type="button"], div[jscontroller], div[jsaction], span[jsaction]'));
-                        
-                        for (const element of clickableElements) {
-                            const text = element.textContent.toLowerCase().trim();
-                            const ariaLabel = (element.getAttribute('aria-label') || '').toLowerCase();
-                            const dataValue = (element.getAttribute('data-value') || '').toLowerCase();
-                            
-                            if (text.includes('submit') || ariaLabel.includes('submit') || dataValue.includes('submit') || text === 'submit') {
-                                console.log('Found submit element via fallback search:', text || ariaLabel || dataValue);
-                                
-                                // Try clicking
-                                element.click();
-                                element.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-                                submitSuccess = true;
-                                break;
-                            }
-                        }
-                        
-                        // Method B: Try form submission if button clicks failed
-                        if (!submitSuccess) {
-                            const forms = iframeDoc.querySelectorAll('form');
-                            if (forms.length > 0) {
-                                console.log('Attempting direct form submission...');
-                                const form = forms[0];
-                                
-                                try {
-                                    form.submit();
-                                    submitSuccess = true;
-                                } catch (e) {
-                                    form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-                                    submitSuccess = true;
-                                }
-                            }
-                        }
-                        
-                        // Method C: Simulate Enter key on the entire document
-                        if (!submitSuccess) {
-                            console.log('Trying global Enter key simulation...');
-                            iframeDoc.dispatchEvent(new KeyboardEvent('keydown', {
-                                key: 'Enter',
-                                keyCode: 13,
-                                bubbles: true
-                            }));
-                            submitSuccess = true; // Assume success for this attempt
-                        }
-                    }
-                    
-                } catch (corsError) {
-                    console.log('CORS prevents form access:', corsError.message);
-                    submitSuccess = false;
-                }
-                
-                // Handle success or failure
-                if (submitSuccess) {
-                    console.log('Submit attempt completed successfully');
-                    setTimeout(() => {
-                        timerBar.innerHTML = '<strong>✅ Form submission attempted!</strong>';
-                        setTimeout(() => {
-                            showFinalConfirmation();
-                        }, 2000);
-                    }, 1000);
-                } else {
-                    console.log('All submit methods failed, showing manual instructions');
-                    showAdvancedManualSubmit();
-                }
-            }, 500);
+                showFinalResults();
+            }, 2000);
         }
 
-        function showAdvancedManualSubmit() {
-            document.getElementById("timerBar").style.display = "none";
-            document.getElementById("overlay").style.display = "flex";
-            
-            document.getElementById("overlayTitle").textContent = "⚠️ Please Click Submit Now";
-            document.getElementById("overlayMessage").innerHTML = 
-                '<div class="termination-screen">' +
-                '<p><strong style="color: #ff4757;">TIME IS UP! You must submit immediately.</strong></p>' +
-                '<p>Look for the <strong style="color: #0066cc;">SUBMIT</strong> button on the form below.</p>' +
-                '<p>It\'s usually <strong style="color: #0066cc;">blue</strong> and at the <strong>bottom</strong> of the form.</p>' +
-                '<p>Total violations: ' + examState.violations + '</p>' +
-                '<div class="termination-actions">' +
-                '<button class="termination-button" onclick="hideOverlayAndDisableEditing()" style="background: linear-gradient(45deg, #ff4757, #ff3742);">' +
-                'I Found the Submit Button' +
-                '</button>' +
-                '<button class="termination-button" onclick="forceFormSubmission()" style="background: linear-gradient(45deg, #28a745, #20c997);">' +
-                'Try Auto-Submit Again' +
-                '</button>' +
-                '</div>' +
-                '</div>';
-        }
-
-        function hideOverlayAndDisableEditing() {
-            document.getElementById("overlay").style.display = "none";
-            
-            // Try to disable form editing by making iframe read-only
-            try {
-                const iframe = document.getElementById("formFrame");
-                const iframeDoc = iframe.contentWindow.document;
-                
-                // Disable all form inputs
-                const inputs = iframeDoc.querySelectorAll('input, textarea, select');
-                inputs.forEach(input => {
-                    input.disabled = true;
-                    input.readOnly = true;
-                    input.style.backgroundColor = '#f0f0f0';
-                    input.style.color = '#666';
-                });
-                
-                console.log('Form inputs disabled for editing');
-            } catch (e) {
-                console.log('Could not disable form inputs due to CORS');
-            }
-            
-            // Show a persistent message
-            const warningDiv = document.createElement('div');
-            warningDiv.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                background: #ff4757;
-                color: white;
-                padding: 10px;
-                text-align: center;
-                font-weight: bold;
-                z-index: 15000;
-                font-size: 16px;
+        function showFinalResults() {
+            document.getElementById("overlayTitle").textContent = "✅ Exam Submitted Successfully";
+            document.getElementById("overlayMessage").innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <h3>Exam Complete!</h3>
+                    <p>Student: ${examState.studentData.name}</p>
+                    <p>Email: ${examState.studentData.email}</p>
+                    <p>Questions Answered: ${Object.keys(examState.responses).length}/${EXAM_QUESTIONS.length}</p>
+                    <p>Total Violations: ${examState.violations}</p>
+                    <p>Submission Time: ${new Date().toLocaleString()}</p>
+                    <br>
+                    <p style="color: #28a745; font-weight: bold;">Thank you for taking the exam!</p>
+                    <p>You may now close this window.</p>
+                </div>
             `;
-            warningDiv.innerHTML = '⚠️ TIME UP - SUBMIT IMMEDIATELY - NO MORE EDITING ALLOWED ⚠️';
-            document.body.appendChild(warningDiv);
-        }
-
-        function showFinalConfirmation() {
-            document.getElementById("timerBar").style.display = "none";
-            document.getElementById("overlay").style.display = "flex";
             
-            document.getElementById("overlayTitle").textContent = "🎉 Exam Complete";
-            document.getElementById("overlayMessage").innerHTML = 
-                '<div class="termination-screen">' +
-                '<p><strong>Your exam has been submitted successfully!</strong></p>' +
-                '<p>Exam session completed with ' + examState.violations + ' violation(s).</p>' +
-                '<p>You may now close this browser window.</p>' +
-                '<p style="color: #28a745; font-weight: bold;">Thank you for taking the exam!</p>' +
-                '</div>';
+            document.querySelector('.loading').style.display = 'none';
         }
 
-        function startMonitoring() {
-            // Mobile keyboard detection
-            if (examState.isMobile) {
-                // Detect virtual keyboard appearance on mobile
-                window.addEventListener('resize', () => {
-                    const currentHeight = window.innerHeight;
-                    const heightDifference = examState.initialViewportHeight - currentHeight;
-                    
-                    // If viewport shrunk significantly, keyboard is likely visible
-                    if (heightDifference > 150) {
-                        examState.keyboardVisible = true;
-                        console.log('Mobile keyboard detected as visible');
-                    } else {
-                        examState.keyboardVisible = false;
-                        console.log('Mobile keyboard detected as hidden');
-                    }
-                });
-                
-                // Track focus events to detect form field interaction
-                document.addEventListener('focusin', (e) => {
-                    if (e.target && (e.target.type === 'text' || e.target.type === 'email' || e.target.tagName === 'TEXTAREA')) {
-                        examState.keyboardVisible = true;
-                        examState.lastFocusTime = Date.now();
-                        console.log('Form field focused - keyboard likely visible');
-                    }
-                });
-                
-                document.addEventListener('focusout', () => {
-                    setTimeout(() => {
-                        examState.keyboardVisible = false;
-                        console.log('Form field unfocused - keyboard likely hidden');
-                    }, 300); // Small delay to handle focus transitions
-                });
+        function sendToServer(action, data) {
+            if (!CONFIG.ENABLE_SERVER_LOGGING || !CONFIG.WEBAPP_URL.includes('script.google.com')) {
+                console.log('Server logging disabled or invalid URL');
+                return;
             }
 
-            // Visibility change detection with mobile keyboard awareness
-            let hidden = "hidden";
-            if (typeof document.msHidden !== "undefined") hidden = "msHidden";
-            else if (typeof document.webkitHidden !== "undefined") hidden = "webkitHidden";
+            const payload = {
+                action: action,
+                studentData: examState.studentData,
+                sessionId: examState.sessionId,
+                timestamp: new Date().toISOString(),
+                browserInfo: navigator.userAgent,
+                examQuestions: EXAM_QUESTIONS, // Include question structure for context
+                ...data
+            };
 
-            document.addEventListener("visibilitychange", () => {
-                const now = Date.now();
-                examState.lastVisibilityChange = now;
-                
-                // Enhanced conditions for mobile
-                if (examState.examActive && 
-                    examState.formLoaded && 
-                    examState.formInteractionStarted && 
-                    document[hidden]) {
-                    
-                    // Mobile-specific checks
-                    if (examState.isMobile) {
-                        // Don't flag violations if keyboard is visible or was recently visible
-                        if (examState.keyboardVisible) {
-                            console.log('Mobile: Ignoring tab switch - keyboard is visible');
-                            return;
-                        }
-                        
-                        const timeSinceLastFocus = now - examState.lastFocusTime;
-                        // Don't flag if recent form interaction (keyboard might be animating)
-                        if (timeSinceLastFocus < 2000) {
-                            console.log('Mobile: Ignoring tab switch - recent form interaction');
-                            return;
-                        }
-                        
-                        // Additional check: only flag if truly hidden for a reasonable time
+            fetch(CONFIG.WEBAPP_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            }).catch(error => {
+                console.log('Error sending data to server:', error);
+            });
+        }
+
+        // Monitoring functions (simplified version from previous system)
+        function startMonitoring() {
+            // Mobile-friendly monitoring
+            if (examState.isMobile) {
+                // Basic mobile monitoring without aggressive violation detection
+                document.addEventListener("visibilitychange", () => {
+                    if (examState.examActive && document.hidden) {
                         setTimeout(() => {
-                            if (document[hidden] && 
-                                examState.lastVisibilityChange === now && 
-                                !examState.keyboardVisible &&
-                                examState.examActive) {
-                                recordViolation("Tab/window switch detected");
+                            if (document.hidden && examState.examActive && !examState.preventViolations) {
+                                recordViolation("Tab/window switch detected on mobile");
                             }
-                        }, 1000); // 1 second delay to confirm it's a real tab switch
-                    } else {
-                        // Desktop behavior - more immediate
+                        }, 2000);
+                    }
+                });
+
+                // Mobile keyboard detection
+                window.addEventListener('resize', () => {
+                    const heightDiff = window.screen.height - window.innerHeight;
+                    examState.keyboardVisible = heightDiff > 200;
+                    examState.preventViolations = examState.keyboardVisible;
+                });
+            } else {
+                // Desktop monitoring
+                document.addEventListener("visibilitychange", () => {
+                    if (examState.examActive && document.hidden) {
                         recordViolation("Tab/window switch detected");
                     }
-                }
-            });
+                });
 
-            // Fullscreen monitoring - disabled on mobile due to keyboard issues
-            if (!examState.isMobile) {
-                document.addEventListener('fullscreenchange', () => {
-                    if (examState.examActive && 
-                        examState.formLoaded && 
-                        examState.formInteractionStarted && 
-                        !document.fullscreenElement && 
-                        CONFIG.ENABLE_FULLSCREEN) {
-                        
-                        document.getElementById("fullscreenPrompt").style.display = "block";
-                        recordViolation("Exited fullscreen mode");
-                        setTimeout(() => {
-                            document.getElementById("fullscreenPrompt").style.display = "none";
-                        }, 3000);
+                window.addEventListener('blur', () => {
+                    if (examState.examActive) {
+                        recordViolation("Window lost focus");
                     }
                 });
             }
 
-            // Focus monitoring - much more careful on mobile
-            window.addEventListener('blur', () => {
-                if (examState.examActive && 
-                    examState.formLoaded && 
-                    examState.formInteractionStarted) {
-                    
-                    examState.lastFocusTime = Date.now();
-                    
-                    // On mobile, don't record focus violations due to keyboard behavior
-                    if (!examState.isMobile) {
-                        // Even on desktop, be less aggressive
-                        setTimeout(() => {
-                            if (examState.examActive && document.hidden && !examState.keyboardVisible) {
-                                recordViolation("Window lost focus");
-                            }
-                        }, 500);
-                    }
+            // Disable right-click
+            document.addEventListener('contextmenu', e => {
+                if (examState.examActive) {
+                    e.preventDefault();
+                    recordViolation('Right-click attempted');
                 }
             });
 
-            // Focus event to track when user interacts with form elements
-            window.addEventListener('focus', () => {
-                examState.lastFocusTime = Date.now();
-                if (examState.isMobile) {
-                    examState.keyboardVisible = false; // Reset keyboard state on window focus
+            // Disable common keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (!examState.examActive) return;
+                
+                const forbidden = ['F12', 'F11'];
+                const ctrlShiftKeys = ['I', 'J', 'K', 'C'];
+                const ctrlKeys = ['U', 'S', 'P', 'R'];
+                
+                if (forbidden.includes(e.key) || 
+                    (e.ctrlKey && e.shiftKey && ctrlShiftKeys.includes(e.key)) ||
+                    (e.ctrlKey && ctrlKeys.includes(e.key))) {
+                    e.preventDefault();
+                    recordViolation('Keyboard shortcut attempted: ' + e.key);
                 }
             });
-
-            // Mouse leave monitoring - disabled on mobile due to touch behavior
-            if (!examState.isMobile) {
-                document.addEventListener('mouseleave', () => {
-                    if (examState.examActive && 
-                        examState.formLoaded && 
-                        examState.formInteractionStarted) {
-                        // Only record if mouse actually leaves and stays out
-                        setTimeout(() => {
-                            if (examState.examActive && document.querySelector(':hover') === null) {
-                                recordViolation("Mouse left exam area");
-                            }
-                        }, 1000);
-                    }
-                });
-            }
         }
 
         function recordViolation(type) {
-            if (examState.terminated) return; // Don't record violations after termination
-            
-            // Filter out false violations on mobile
-            if (examState.isMobile) {
-                const mobileIgnorePatterns = [
-                    'Window lost focus',
-                    'Mouse left exam area',
-                    'focus'
-                ];
-                
-                if (mobileIgnorePatterns.some(pattern => type.toLowerCase().includes(pattern.toLowerCase()))) {
-                    console.log('Mobile: Ignoring violation -', type);
-                    return;
-                }
-                
-                // Extra check for tab switching on mobile
-                if (type.includes('Tab/window switch')) {
-                    // Don't flag if keyboard is or was recently visible
-                    if (examState.keyboardVisible) {
-                        console.log('Mobile: Ignoring tab switch - keyboard is visible');
-                        return;
-                    }
-                    
-                    const timeSinceLastFocus = Date.now() - examState.lastFocusTime;
-                    if (timeSinceLastFocus < 3000) { // 3 seconds grace period
-                        console.log('Mobile: Ignoring tab switch - recent keyboard activity');
-                        return;
-                    }
-                    
-                    // Check if page is actually hidden (real tab switch)
-                    if (!document.hidden) {
-                        console.log('Mobile: False tab switch detection ignored - page not hidden');
-                        return;
-                    }
-                }
-            }
+            if (examState.terminated || examState.preventViolations) return;
             
             examState.violations++;
             document.getElementById("violationNumber").textContent = examState.violations;
             
-            // Send to server
-            sendViolationToServer(type);
+            sendToServer('logViolation', {
+                violationType: type,
+                additionalInfo: 'Custom exam system violation'
+            });
             
-            console.log('Violation ' + examState.violations + ': ' + type + ' at ' + new Date().toISOString());
+            console.log('Violation ' + examState.violations + ': ' + type);
             
-            // Show warning (but not for form-related focus events or mobile-specific events)
-            const silentViolations = ['focus', 'Mouse left', 'Window lost focus'];
-            if (!silentViolations.some(pattern => type.toLowerCase().includes(pattern.toLowerCase()))) {
+            if (!type.toLowerCase().includes('focus') && !type.toLowerCase().includes('mouse')) {
                 alert(CONFIG.WARNING_MESSAGE);
             }
             
-            // End exam if too many violations
             if (examState.violations >= CONFIG.MAX_VIOLATIONS) {
                 document.getElementById("overlayTitle").textContent = "⛔ Exam Terminated";
-                document.getElementById("overlayMessage").innerHTML = '<div class="termination-screen"><p>Too many violations detected (' + examState.violations + ').</p><p>Your exam session has been terminated.</p><p>Please contact your instructor.</p></div>';
+                document.getElementById("overlayMessage").innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <p>Too many violations detected (${examState.violations}).</p>
+                        <p>Your exam session has been terminated.</p>
+                        <p>Please contact your instructor.</p>
+                    </div>
+                `;
                 endExam();
             }
         }
@@ -1176,49 +920,39 @@
             }
         }
 
-        // Initialize security when page loads
-        document.addEventListener('DOMContentLoaded', initSecurity);
+        function showError(message) {
+            const errorDiv = document.getElementById("errorMessage");
+            errorDiv.textContent = message;
+            errorDiv.style.display = "block";
+            setTimeout(() => {
+                errorDiv.style.display = "none";
+            }, 5000);
+        }
 
-        // Prevent leaving page
+        function showSuccess(message) {
+            const successDiv = document.getElementById("successMessage");
+            successDiv.textContent = message;
+            successDiv.style.display = "block";
+            setTimeout(() => {
+                successDiv.style.display = "none";
+            }, 3000);
+        }
+
+        // Prevent leaving page during exam
         window.addEventListener('beforeunload', function(e) {
-            if (examState.examActive && !examState.terminated) {
+            if (examState.examActive) {
                 e.preventDefault();
                 e.returnValue = 'Are you sure you want to leave the exam?';
                 return 'Are you sure you want to leave the exam?';
             }
         });
 
-        // Additional protection against developer tools
-        setInterval(() => {
-            if (examState.examActive && examState.formLoaded) {
-                const start = performance.now();
-                debugger;
-                const end = performance.now();
-                if (end - start > 100) {
-                    recordViolation("Developer tools detected");
-                }
-            }
-        }, 1000);
-
-        // Detect console access
-        let devtools = {
-            open: false,
-            orientation: null
-        };
-
-        const threshold = 160;
-
-        setInterval(() => {
-            if (examState.examActive && examState.formLoaded && (window.outerHeight - window.innerHeight > threshold || 
-                window.outerWidth - window.innerWidth > threshold)) {
-                if (!devtools.open) {
-                    devtools.open = true;
-                    recordViolation("Developer tools opened");
-                }
-            } else {
-                devtools.open = false;
-            }
-        }, 500);
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Custom Proctored Exam System Loaded');
+            console.log('Total Questions:', EXAM_QUESTIONS.length);
+            console.log('Duration:', CONFIG.DURATION_MINUTES, 'minutes');
+        });
     </script>
 </body>
 </html>
