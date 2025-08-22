@@ -16,7 +16,7 @@
             height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            overflow: hidden;
+            overflow-x: hidden; /* Allow vertical scrolling, prevent horizontal */
         }
 
         /* Prevent text selection and right-click */
@@ -88,15 +88,36 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh; /* Changed from height to min-height for mobile */
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             gap: 20px;
-            padding: 40px;
+            padding: 40px 20px; /* Added horizontal padding for mobile */
             border-radius: 20px;
             max-width: 500px;
-            margin: 0 auto;
+            margin: 20px auto; /* Added margin for mobile */
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow-y: auto; /* Allow scrolling within form */
+        }
+
+        /* Mobile responsive adjustments */
+        @media (max-width: 600px) {
+            #studentForm {
+                margin: 10px;
+                padding: 30px 15px;
+                border-radius: 15px;
+                max-width: none;
+                min-height: calc(100vh - 20px);
+            }
+            
+            #studentForm h2 {
+                font-size: 1.5em;
+            }
+            
+            .instructions {
+                font-size: 0.9em;
+            }
         }
 
         #studentForm h2 {
@@ -224,6 +245,45 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Termination screen styling */
+        .termination-screen {
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .termination-screen h2 {
+            color: #ff4757;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .termination-screen p {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .termination-actions {
+            margin-top: 30px;
+        }
+
+        .termination-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .termination-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -274,12 +334,12 @@
     <script>
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 30,
+            DURATION_MINUTES: 4,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 5,
-            FORM_URL: "https://docs.google.com/forms/d/1_od1_1W-0AypoyPmIYCTbpJmYiT-ShjQdBg8h5xsKjM/viewform", // Replace with your form URL
-            WEBAPP_URL: "https://script.google.com/macros/s/AKfycbxmyeTfB4q0exAA56Utuf8drOVd1_4CHNSKlFNkETdXy856bqssUhaFEIFfnQzCbYHTlA/exec", // Replace with your deployed script URL
+            FORM_URL: "https://docs.google.com/forms/d/1_od1_1W-0AypoyPmIYCTbpJmYiT-ShjQdBg8h5xsKjM/viewform",
+            WEBAPP_URL: "https://script.google.com/macros/s/AKfycbxmyeTfB4q0exAA56Utuf8drOVd1_4CHNSKlFNkETdXy856bqssUhaFEIFfnQzCbYHTlA/exec",
             ENABLE_FULLSCREEN: true,
             ENABLE_SERVER_LOGGING: true
         };
@@ -293,7 +353,9 @@
             startTime: null,
             studentData: {},
             examActive: false,
-            sessionId: null
+            sessionId: null,
+            formLoaded: false,
+            terminated: false
         };
 
         // Generate unique session ID
@@ -358,7 +420,7 @@
                     
                     e.preventDefault();
                     e.stopPropagation();
-                    recordViolation(`Keyboard shortcut attempted: ${e.ctrlKey ? 'Ctrl+' : ''}${e.shiftKey ? 'Shift+' : ''}${e.altKey ? 'Alt+' : ''}${e.key}`);
+                    recordViolation('Keyboard shortcut attempted: ' + (e.ctrlKey ? 'Ctrl+' : '') + (e.shiftKey ? 'Shift+' : '') + (e.altKey ? 'Alt+' : '') + e.key);
                     return false;
                 }
             });
@@ -423,10 +485,14 @@
             const iframe = document.getElementById("formFrame");
             let formUrl = CONFIG.FORM_URL;
             
-            // Add pre-fill parameters if your form supports them
-            // Example: formUrl += `?usp=pp_url&entry.123456=${encodeURIComponent(examState.studentData.name)}`;
-            
             iframe.src = formUrl;
+            
+            // Wait for form to load before starting strict monitoring
+            iframe.onload = function() {
+                setTimeout(() => {
+                    examState.formLoaded = true;
+                }, 2000); // Give form 2 seconds to fully render
+            };
         }
 
         function updateTimer() {
@@ -453,7 +519,10 @@
         }
 
         function endExam() {
+            if (examState.terminated) return; // Prevent double execution
+            
             examState.examActive = false;
+            examState.terminated = true;
             clearInterval(examState.timerInterval);
             clearTimeout(examState.autoSubmitTimer);
             
@@ -462,11 +531,10 @@
             // Log exam end
             sendViolationToServer('Exam ended');
             
-            // Log exam completion
             console.log("Exam ended for:", examState.studentData.name, 
                        "Violations:", examState.violations);
 
-            // Try to submit the form
+            // Try to submit the form automatically
             setTimeout(attemptFormSubmission, 2000);
         }
 
@@ -477,27 +545,58 @@
             try {
                 // Try to access iframe content (may fail due to CORS)
                 const iframeDoc = iframe.contentWindow.document;
-                const submitBtn = iframeDoc.querySelector('[type="submit"], [aria-label*="Submit"], div[role="button"]:contains("Submit")');
+                const submitBtn = iframeDoc.querySelector('div[role="button"][aria-label*="Submit"], input[type="submit"], button[type="submit"]');
                 
                 if (submitBtn) {
                     submitBtn.click();
                     submitted = true;
-                    document.getElementById("overlayMessage").textContent = "Form submitted successfully!";
+                    showTerminationSuccess();
                 }
             } catch (e) {
-                console.log("Cross-origin restriction, trying alternative method");
+                console.log("Cross-origin restriction, using fallback method");
             }
 
             if (!submitted) {
-                // Fallback: navigate to form response page
-                try {
-                    let formUrl = iframe.src.split("/viewform")[0];
-                    iframe.src = formUrl + "/formResponse";
-                    document.getElementById("overlayMessage").textContent = "Redirecting to submission page...";
-                } catch (e) {
-                    document.getElementById("overlayMessage").textContent = "Please submit your form manually if it hasn't been submitted.";
-                }
+                // Show manual submission instructions
+                showManualSubmissionInstructions();
             }
+        }
+
+        function showTerminationSuccess() {
+            document.getElementById("overlayTitle").textContent = "✅ Exam Submitted";
+            document.getElementById("overlayMessage").innerHTML = `
+                <div class="termination-screen">
+                    <p>Your exam has been submitted successfully!</p>
+                    <p>Total violations: ${examState.violations}</p>
+                    <p>You may now close this window.</p>
+                </div>
+            `;
+            
+            // Hide loading spinner
+            document.querySelector('.loading').style.display = 'none';
+        }
+
+        function showManualSubmissionInstructions() {
+            document.getElementById("overlayTitle").textContent = "📝 Please Submit Your Exam";
+            document.getElementById("overlayMessage").innerHTML = `
+                <div class="termination-screen">
+                    <p>Please click the Submit button below to complete your exam.</p>
+                    <p>Total violations: ${examState.violations}</p>
+                    <div class="termination-actions">
+                        <button class="termination-button" onclick="hideOverlayForSubmission()">
+                            Continue to Submit
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Hide loading spinner
+            document.querySelector('.loading').style.display = 'none';
+        }
+
+        function hideOverlayForSubmission() {
+            document.getElementById("overlay").style.display = "none";
+            // Allow user to submit manually
         }
 
         function startMonitoring() {
@@ -507,14 +606,15 @@
             else if (typeof document.webkitHidden !== "undefined") hidden = "webkitHidden";
 
             document.addEventListener("visibilitychange", () => {
-                if (examState.examActive && document[hidden]) {
+                // Only monitor after form has loaded and exam is active
+                if (examState.examActive && examState.formLoaded && document[hidden]) {
                     recordViolation("Tab/window switch detected");
                 }
             });
 
             // Fullscreen monitoring
             document.addEventListener('fullscreenchange', () => {
-                if (examState.examActive && !document.fullscreenElement && CONFIG.ENABLE_FULLSCREEN) {
+                if (examState.examActive && examState.formLoaded && !document.fullscreenElement && CONFIG.ENABLE_FULLSCREEN) {
                     document.getElementById("fullscreenPrompt").style.display = "block";
                     recordViolation("Exited fullscreen mode");
                     setTimeout(() => {
@@ -523,22 +623,24 @@
                 }
             });
 
-            // Focus monitoring
+            // Focus monitoring - only after form loads
             window.addEventListener('blur', () => {
-                if (examState.examActive) {
+                if (examState.examActive && examState.formLoaded) {
                     recordViolation("Window lost focus");
                 }
             });
 
-            // Mouse leave monitoring
+            // Mouse leave monitoring - only after form loads
             document.addEventListener('mouseleave', () => {
-                if (examState.examActive) {
+                if (examState.examActive && examState.formLoaded) {
                     recordViolation("Mouse left exam area");
                 }
             });
         }
 
         function recordViolation(type) {
+            if (examState.terminated) return; // Don't record violations after termination
+            
             examState.violations++;
             document.getElementById("violationNumber").textContent = examState.violations;
             
@@ -547,13 +649,21 @@
             
             console.log(`Violation ${examState.violations}: ${type} at ${new Date().toISOString()}`);
             
-            // Show warning
-            alert(CONFIG.WARNING_MESSAGE);
+            // Show warning (but not for form-related focus events)
+            if (!type.includes('focus') && !type.includes('Mouse left')) {
+                alert(CONFIG.WARNING_MESSAGE);
+            }
             
             // End exam if too many violations
             if (examState.violations >= CONFIG.MAX_VIOLATIONS) {
                 document.getElementById("overlayTitle").textContent = "⛔ Exam Terminated";
-                document.getElementById("overlayMessage").textContent = `Too many violations (${examState.violations}). Exam terminated.`;
+                document.getElementById("overlayMessage").innerHTML = `
+                    <div class="termination-screen">
+                        <p>Too many violations detected (${examState.violations}).</p>
+                        <p>Your exam session has been terminated.</p>
+                        <p>Please contact your instructor.</p>
+                    </div>
+                `;
                 endExam();
             }
         }
@@ -576,7 +686,7 @@
 
         // Prevent leaving page
         window.addEventListener('beforeunload', function(e) {
-            if (examState.examActive) {
+            if (examState.examActive && !examState.terminated) {
                 e.preventDefault();
                 e.returnValue = 'Are you sure you want to leave the exam?';
                 return 'Are you sure you want to leave the exam?';
@@ -585,7 +695,7 @@
 
         // Additional protection against developer tools
         setInterval(() => {
-            if (examState.examActive) {
+            if (examState.examActive && examState.formLoaded) {
                 const start = performance.now();
                 debugger;
                 const end = performance.now();
@@ -604,7 +714,7 @@
         const threshold = 160;
 
         setInterval(() => {
-            if (examState.examActive && (window.outerHeight - window.innerHeight > threshold || 
+            if (examState.examActive && examState.formLoaded && (window.outerHeight - window.innerHeight > threshold || 
                 window.outerWidth - window.innerWidth > threshold)) {
                 if (!devtools.open) {
                     devtools.open = true;
