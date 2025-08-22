@@ -334,7 +334,7 @@
     <script>
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 5,
+            DURATION_MINUTES: 2,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 5,
@@ -358,7 +358,10 @@
             terminated: false,
             isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
             lastFocusTime: 0,
-            formInteractionStarted: false
+            formInteractionStarted: false,
+            keyboardVisible: false,
+            initialViewportHeight: window.innerHeight,
+            lastVisibilityChange: 0
         };
 
         // Generate unique session ID
@@ -688,85 +691,223 @@
             // Try multiple methods to submit the form
             setTimeout(() => {
                 const iframe = document.getElementById("formFrame");
+                let submitSuccess = false;
                 
                 try {
-                    // Method 1: Try direct access to submit button
                     const iframeDoc = iframe.contentWindow.document;
-                    const submitButtons = [
-                        'div[role="button"][aria-label*="Submit"]',
+                    
+                    // Comprehensive list of Google Forms submit button selectors
+                    const submitSelectors = [
+                        // Primary Google Forms submit selectors
                         'div[role="button"][data-value="Submit"]',
+                        'div[role="button"][aria-label*="Submit"]',
+                        'div[role="button"][jsname="M2UYVd"]', // Common Google Forms jsname
+                        'div[role="button"][data-submit-type="0"]',
+                        'span:contains("Submit")',
+                        
+                        // Alternative selectors
                         'input[type="submit"]',
                         'button[type="submit"]',
+                        'div[role="button"][class*="submit"]',
+                        'div[role="button"][id*="submit"]',
+                        
+                        // More specific Google Forms patterns
+                        'div.freebirdFormviewerViewNavigationSubmitButton',
+                        'div.exportButtonContent',
+                        'div[jscontroller][role="button"]',
+                        'div[data-initial-value="Submit"]',
+                        
+                        // Text-based selectors (broader search)
                         'div[role="button"]:contains("Submit")',
-                        '[data-submit-type="0"]',
-                        'div[jsname][role="button"]'
+                        'div[role="button"]:contains("Send")',
+                        'div[role="button"]:contains("تأكيد")', // Arabic
+                        'div[role="button"]:contains("Enviar")', // Spanish
+                        'div[role="button"]:contains("Soumettre")', // French
                     ];
                     
-                    let submitted = false;
-                    for (const selector of submitButtons) {
-                        const btn = iframeDoc.querySelector(selector);
-                        if (btn) {
-                            btn.click();
-                            submitted = true;
-                            console.log('Form submitted using selector:', selector);
-                            break;
+                    console.log('Attempting to find submit button...');
+                    
+                    // Try each selector
+                    for (const selector of submitSelectors) {
+                        try {
+                            let elements;
+                            
+                            // Handle :contains() pseudo-selector manually
+                            if (selector.includes(':contains(')) {
+                                const baseSelector = selector.split(':contains(')[0];
+                                const searchText = selector.match(/:contains\("(.+?)"\)/)[1];
+                                elements = Array.from(iframeDoc.querySelectorAll(baseSelector)).filter(el => 
+                                    el.textContent.toLowerCase().includes(searchText.toLowerCase())
+                                );
+                            } else {
+                                elements = iframeDoc.querySelectorAll(selector);
+                            }
+                            
+                            if (elements.length > 0) {
+                                const submitBtn = elements[0];
+                                console.log('Found submit button using selector:', selector);
+                                console.log('Button text:', submitBtn.textContent);
+                                console.log('Button HTML:', submitBtn.outerHTML.substring(0, 200));
+                                
+                                // Try multiple click methods
+                                submitBtn.click();
+                                submitBtn.dispatchEvent(new MouseEvent('click', {
+                                    bubbles: true,
+                                    cancelable: true,
+                                    view: window
+                                }));
+                                
+                                submitSuccess = true;
+                                break;
+                            }
+                        } catch (selectorError) {
+                            console.log('Selector failed:', selector, selectorError.message);
                         }
                     }
                     
-                    if (submitted) {
-                        // Success - show confirmation
-                        setTimeout(() => {
-                            timerBar.innerHTML = '<strong>✅ Exam submitted successfully!</strong>';
-                            setTimeout(() => {
-                                showFinalConfirmation();
-                            }, 2000);
-                        }, 1000);
-                    } else {
-                        // Method 2: Try simulating Enter key on form
+                    // If no specific submit button found, try alternative methods
+                    if (!submitSuccess) {
+                        console.log('No submit button found, trying alternative methods...');
+                        
+                        // Method 1: Look for any button with submit-like text
+                        const allButtons = Array.from(iframeDoc.querySelectorAll('div[role="button"], button, input[type="button"]'));
+                        const submitKeywords = ['submit', 'send', 'finish', 'complete', 'done', 'enviar', 'soumettre'];
+                        
+                        for (const btn of allButtons) {
+                            const text = btn.textContent.toLowerCase().trim();
+                            if (submitKeywords.some(keyword => text.includes(keyword))) {
+                                console.log('Found potential submit button by text:', text);
+                                btn.click();
+                                btn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+                                submitSuccess = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Method 2: Try form submission event
+                    if (!submitSuccess) {
+                        console.log('Trying form submission event...');
                         const forms = iframeDoc.querySelectorAll('form');
                         if (forms.length > 0) {
                             const form = forms[0];
-                            const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
-                            form.dispatchEvent(submitEvent);
                             
-                            setTimeout(() => {
-                                timerBar.innerHTML = '<strong>✅ Exam submitted via form event!</strong>';
-                                setTimeout(showFinalConfirmation, 2000);
-                            }, 1000);
-                        } else {
-                            // Fallback - direct user to submit manually
-                            showManualSubmitFallback();
+                            // Try multiple form submission methods
+                            try {
+                                form.submit();
+                                submitSuccess = true;
+                            } catch (e) {
+                                // Try dispatching submit event
+                                form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                                submitSuccess = true;
+                            }
+                        }
+                    }
+                    
+                    // Method 3: Simulate Enter key on the form
+                    if (!submitSuccess) {
+                        console.log('Trying Enter key simulation...');
+                        const focusableElements = iframeDoc.querySelectorAll('input, textarea, select, button, div[role="button"]');
+                        if (focusableElements.length > 0) {
+                            const lastElement = focusableElements[focusableElements.length - 1];
+                            lastElement.focus();
+                            
+                            const enterEvent = new KeyboardEvent('keydown', {
+                                key: 'Enter',
+                                code: 'Enter',
+                                keyCode: 13,
+                                which: 13,
+                                bubbles: true
+                            });
+                            
+                            lastElement.dispatchEvent(enterEvent);
+                            document.dispatchEvent(enterEvent);
+                            submitSuccess = true;
                         }
                     }
                     
                 } catch (corsError) {
-                    console.log('CORS prevents form access, showing manual instructions');
-                    showManualSubmitFallback();
+                    console.log('CORS prevents form access:', corsError.message);
+                    submitSuccess = false;
+                }
+                
+                // Handle success or failure
+                if (submitSuccess) {
+                    console.log('Submit attempt completed');
+                    setTimeout(() => {
+                        timerBar.innerHTML = '<strong>✅ Submit attempt completed!</strong>';
+                        setTimeout(() => {
+                            showFinalConfirmation();
+                        }, 2000);
+                    }, 1000);
+                } else {
+                    console.log('All submit methods failed');
+                    showAdvancedManualSubmit();
                 }
             }, 500);
         }
 
-        function showManualSubmitFallback() {
+        function showAdvancedManualSubmit() {
             document.getElementById("timerBar").style.display = "none";
             document.getElementById("overlay").style.display = "flex";
             
-            document.getElementById("overlayTitle").textContent = "⚠️ Manual Submission Required";
+            document.getElementById("overlayTitle").textContent = "⚠️ Please Click Submit Now";
             document.getElementById("overlayMessage").innerHTML = 
                 '<div class="termination-screen">' +
-                '<p><strong>Please look for the Submit button on the form below and click it.</strong></p>' +
-                '<p>The Submit button is usually blue and located at the bottom of the form.</p>' +
+                '<p><strong style="color: #ff4757;">TIME IS UP! You must submit immediately.</strong></p>' +
+                '<p>Look for the <strong style="color: #0066cc;">SUBMIT</strong> button on the form below.</p>' +
+                '<p>It\'s usually <strong style="color: #0066cc;">blue</strong> and at the <strong>bottom</strong> of the form.</p>' +
                 '<p>Total violations: ' + examState.violations + '</p>' +
                 '<div class="termination-actions">' +
-                '<button class="termination-button" onclick="hideOverlayForManualSubmission()">' +
-                'I\'ll Submit Manually' +
+                '<button class="termination-button" onclick="hideOverlayAndDisableEditing()" style="background: linear-gradient(45deg, #ff4757, #ff3742);">' +
+                'I Found the Submit Button' +
+                '</button>' +
+                '<button class="termination-button" onclick="forceFormSubmission()" style="background: linear-gradient(45deg, #28a745, #20c997);">' +
+                'Try Auto-Submit Again' +
                 '</button>' +
                 '</div>' +
                 '</div>';
         }
 
-        function hideOverlayForManualSubmission() {
+        function hideOverlayAndDisableEditing() {
             document.getElementById("overlay").style.display = "none";
-            // Keep timer bar hidden since exam time is up
+            
+            // Try to disable form editing by making iframe read-only
+            try {
+                const iframe = document.getElementById("formFrame");
+                const iframeDoc = iframe.contentWindow.document;
+                
+                // Disable all form inputs
+                const inputs = iframeDoc.querySelectorAll('input, textarea, select');
+                inputs.forEach(input => {
+                    input.disabled = true;
+                    input.readOnly = true;
+                    input.style.backgroundColor = '#f0f0f0';
+                    input.style.color = '#666';
+                });
+                
+                console.log('Form inputs disabled for editing');
+            } catch (e) {
+                console.log('Could not disable form inputs due to CORS');
+            }
+            
+            // Show a persistent message
+            const warningDiv = document.createElement('div');
+            warningDiv.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: #ff4757;
+                color: white;
+                padding: 10px;
+                text-align: center;
+                font-weight: bold;
+                z-index: 15000;
+                font-size: 16px;
+            `;
+            warningDiv.innerHTML = '⚠️ TIME UP - SUBMIT IMMEDIATELY - NO MORE EDITING ALLOWED ⚠️';
+            document.body.appendChild(warningDiv);
         }
 
         function showFinalConfirmation() {
@@ -784,49 +925,103 @@
         }
 
         function startMonitoring() {
-            // Visibility change detection
+            // Mobile keyboard detection
+            if (examState.isMobile) {
+                // Detect virtual keyboard appearance on mobile
+                window.addEventListener('resize', () => {
+                    const currentHeight = window.innerHeight;
+                    const heightDifference = examState.initialViewportHeight - currentHeight;
+                    
+                    // If viewport shrunk significantly, keyboard is likely visible
+                    if (heightDifference > 150) {
+                        examState.keyboardVisible = true;
+                        console.log('Mobile keyboard detected as visible');
+                    } else {
+                        examState.keyboardVisible = false;
+                        console.log('Mobile keyboard detected as hidden');
+                    }
+                });
+                
+                // Track focus events to detect form field interaction
+                document.addEventListener('focusin', (e) => {
+                    if (e.target && (e.target.type === 'text' || e.target.type === 'email' || e.target.tagName === 'TEXTAREA')) {
+                        examState.keyboardVisible = true;
+                        examState.lastFocusTime = Date.now();
+                        console.log('Form field focused - keyboard likely visible');
+                    }
+                });
+                
+                document.addEventListener('focusout', () => {
+                    setTimeout(() => {
+                        examState.keyboardVisible = false;
+                        console.log('Form field unfocused - keyboard likely hidden');
+                    }, 300); // Small delay to handle focus transitions
+                });
+            }
+
+            // Visibility change detection with mobile keyboard awareness
             let hidden = "hidden";
             if (typeof document.msHidden !== "undefined") hidden = "msHidden";
             else if (typeof document.webkitHidden !== "undefined") hidden = "webkitHidden";
 
             document.addEventListener("visibilitychange", () => {
+                const now = Date.now();
+                examState.lastVisibilityChange = now;
+                
                 // Enhanced conditions for mobile
                 if (examState.examActive && 
                     examState.formLoaded && 
                     examState.formInteractionStarted && 
                     document[hidden]) {
                     
-                    // On mobile, add additional checks to prevent false positives
+                    // Mobile-specific checks
                     if (examState.isMobile) {
-                        const timeSinceLastFocus = Date.now() - examState.lastFocusTime;
-                        // Only record violation if it's been more than 1 second since last focus event
-                        if (timeSinceLastFocus > 1000) {
-                            recordViolation("Tab/window switch detected");
+                        // Don't flag violations if keyboard is visible or was recently visible
+                        if (examState.keyboardVisible) {
+                            console.log('Mobile: Ignoring tab switch - keyboard is visible');
+                            return;
                         }
+                        
+                        const timeSinceLastFocus = now - examState.lastFocusTime;
+                        // Don't flag if recent form interaction (keyboard might be animating)
+                        if (timeSinceLastFocus < 2000) {
+                            console.log('Mobile: Ignoring tab switch - recent form interaction');
+                            return;
+                        }
+                        
+                        // Additional check: only flag if truly hidden for a reasonable time
+                        setTimeout(() => {
+                            if (document[hidden] && 
+                                examState.lastVisibilityChange === now && 
+                                !examState.keyboardVisible &&
+                                examState.examActive) {
+                                recordViolation("Tab/window switch detected");
+                            }
+                        }, 1000); // 1 second delay to confirm it's a real tab switch
                     } else {
+                        // Desktop behavior - more immediate
                         recordViolation("Tab/window switch detected");
                     }
                 }
             });
 
-            // Fullscreen monitoring - less strict on mobile
-            document.addEventListener('fullscreenchange', () => {
-                if (examState.examActive && 
-                    examState.formLoaded && 
-                    examState.formInteractionStarted && 
-                    !document.fullscreenElement && 
-                    CONFIG.ENABLE_FULLSCREEN) {
-                    
-                    // On mobile, fullscreen might exit when keyboard appears
-                    if (!examState.isMobile) {
+            // Fullscreen monitoring - disabled on mobile due to keyboard issues
+            if (!examState.isMobile) {
+                document.addEventListener('fullscreenchange', () => {
+                    if (examState.examActive && 
+                        examState.formLoaded && 
+                        examState.formInteractionStarted && 
+                        !document.fullscreenElement && 
+                        CONFIG.ENABLE_FULLSCREEN) {
+                        
                         document.getElementById("fullscreenPrompt").style.display = "block";
                         recordViolation("Exited fullscreen mode");
                         setTimeout(() => {
                             document.getElementById("fullscreenPrompt").style.display = "none";
                         }, 3000);
                     }
-                }
-            });
+                });
+            }
 
             // Focus monitoring - much more careful on mobile
             window.addEventListener('blur', () => {
@@ -836,11 +1031,11 @@
                     
                     examState.lastFocusTime = Date.now();
                     
-                    // On mobile, don't record focus violations as they happen frequently with form interactions
+                    // On mobile, don't record focus violations due to keyboard behavior
                     if (!examState.isMobile) {
                         // Even on desktop, be less aggressive
                         setTimeout(() => {
-                            if (examState.examActive && document.hidden) {
+                            if (examState.examActive && document.hidden && !examState.keyboardVisible) {
                                 recordViolation("Window lost focus");
                             }
                         }, 500);
@@ -851,6 +1046,9 @@
             // Focus event to track when user interacts with form elements
             window.addEventListener('focus', () => {
                 examState.lastFocusTime = Date.now();
+                if (examState.isMobile) {
+                    examState.keyboardVisible = false; // Reset keyboard state on window focus
+                }
             });
 
             // Mouse leave monitoring - disabled on mobile due to touch behavior
@@ -886,10 +1084,25 @@
                     return;
                 }
                 
-                // Extra check for tab switching on mobile - only if truly switching
-                if (type.includes('Tab/window switch') && !document.hidden) {
-                    console.log('Mobile: False tab switch detection ignored');
-                    return;
+                // Extra check for tab switching on mobile
+                if (type.includes('Tab/window switch')) {
+                    // Don't flag if keyboard is or was recently visible
+                    if (examState.keyboardVisible) {
+                        console.log('Mobile: Ignoring tab switch - keyboard is visible');
+                        return;
+                    }
+                    
+                    const timeSinceLastFocus = Date.now() - examState.lastFocusTime;
+                    if (timeSinceLastFocus < 3000) { // 3 seconds grace period
+                        console.log('Mobile: Ignoring tab switch - recent keyboard activity');
+                        return;
+                    }
+                    
+                    // Check if page is actually hidden (real tab switch)
+                    if (!document.hidden) {
+                        console.log('Mobile: False tab switch detection ignored - page not hidden');
+                        return;
+                    }
                 }
             }
             
