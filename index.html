@@ -445,7 +445,7 @@
     <script>
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 2,
+            DURATION_MINUTES: 30,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 5,
@@ -850,65 +850,364 @@
             });
         }
 
-        // Monitoring functions (simplified version from previous system)
+        // Monitoring functions with enhanced detection
         function startMonitoring() {
-            // Mobile-friendly monitoring
+            console.log('Starting monitoring system...');
+            
+            // Mobile-friendly monitoring with better detection
             if (examState.isMobile) {
-                // Basic mobile monitoring without aggressive violation detection
-                document.addEventListener("visibilitychange", () => {
-                    if (examState.examActive && document.hidden) {
-                        setTimeout(() => {
-                            if (document.hidden && examState.examActive && !examState.preventViolations) {
-                                recordViolation("Tab/window switch detected on mobile");
-                            }
-                        }, 2000);
-                    }
-                });
-
-                // Mobile keyboard detection
-                window.addEventListener('resize', () => {
-                    const heightDiff = window.screen.height - window.innerHeight;
-                    examState.keyboardVisible = heightDiff > 200;
-                    examState.preventViolations = examState.keyboardVisible;
-                });
+                console.log('Mobile monitoring enabled');
+                setupMobileMonitoring();
             } else {
-                // Desktop monitoring
-                document.addEventListener("visibilitychange", () => {
-                    if (examState.examActive && document.hidden) {
-                        recordViolation("Tab/window switch detected");
-                    }
-                });
-
-                window.addEventListener('blur', () => {
-                    if (examState.examActive) {
-                        recordViolation("Window lost focus");
-                    }
-                });
+                console.log('Desktop monitoring enabled');
+                setupDesktopMonitoring();
             }
-
+            
+            // Universal monitoring (works on both mobile and desktop)
+            setupUniversalMonitoring();
+            
+            // Enhanced developer tools detection
+            setupDeveloperToolsDetection();
+        }
+        
+        function setupMobileMonitoring() {
+            // Mobile keyboard detection
+            window.addEventListener('resize', () => {
+                const heightDiff = window.screen.height - window.innerHeight;
+                examState.keyboardVisible = heightDiff > 200;
+                examState.preventViolations = examState.keyboardVisible;
+                
+                if (examState.keyboardVisible) {
+                    console.log('Mobile keyboard detected');
+                } else {
+                    console.log('Mobile keyboard hidden');
+                }
+            });
+            
+            // Mobile-specific visibility change
+            document.addEventListener("visibilitychange", () => {
+                if (examState.examActive && document.hidden && !examState.preventViolations) {
+                    console.log('Mobile tab switch detected');
+                    setTimeout(() => {
+                        if (document.hidden && examState.examActive && !examState.preventViolations) {
+                            recordViolation("Mobile tab/app switch detected");
+                        }
+                    }, 1500); // Longer delay for mobile
+                }
+            });
+        }
+        
+        function setupDesktopMonitoring() {
+            // Desktop visibility change (immediate)
+            document.addEventListener("visibilitychange", () => {
+                if (examState.examActive && document.hidden) {
+                    console.log('Desktop tab switch detected');
+                    recordViolation("Tab switched or window minimized");
+                }
+            });
+            
+            // Window focus/blur
+            window.addEventListener('blur', () => {
+                if (examState.examActive) {
+                    console.log('Window lost focus');
+                    recordViolation("Window lost focus");
+                }
+            });
+            
+            window.addEventListener('focus', () => {
+                if (examState.examActive) {
+                    console.log('Window regained focus');
+                }
+            });
+            
+            // Fullscreen monitoring
+            document.addEventListener('fullscreenchange', () => {
+                if (examState.examActive && !document.fullscreenElement && CONFIG.ENABLE_FULLSCREEN) {
+                    console.log('Exited fullscreen');
+                    recordViolation("Exited fullscreen mode");
+                    
+                    // Show fullscreen prompt
+                    showFullscreenPrompt();
+                }
+            });
+        }
+        
+        function setupUniversalMonitoring() {
+            console.log('Setting up universal monitoring...');
+            
             // Disable right-click
             document.addEventListener('contextmenu', e => {
                 if (examState.examActive) {
                     e.preventDefault();
+                    console.log('Right-click attempted');
                     recordViolation('Right-click attempted');
+                    return false;
                 }
             });
-
-            // Disable common keyboard shortcuts
+            
+            // Enhanced keyboard shortcut detection
             document.addEventListener('keydown', function(e) {
                 if (!examState.examActive) return;
                 
-                const forbidden = ['F12', 'F11'];
-                const ctrlShiftKeys = ['I', 'J', 'K', 'C'];
-                const ctrlKeys = ['U', 'S', 'P', 'R'];
+                console.log('Key pressed:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Shift:', e.shiftKey);
                 
-                if (forbidden.includes(e.key) || 
-                    (e.ctrlKey && e.shiftKey && ctrlShiftKeys.includes(e.key)) ||
-                    (e.ctrlKey && ctrlKeys.includes(e.key))) {
+                const forbidden = ['F12', 'F11', 'F5', 'F1'];
+                const ctrlShiftKeys = ['I', 'J', 'K', 'C', 'U'];
+                const ctrlKeys = ['U', 'S', 'P', 'R', 'T', 'N', 'W', 'A'];
+                const altKeys = ['Tab', 'F4'];
+                
+                let violationDetected = false;
+                let violationType = '';
+                
+                if (forbidden.includes(e.key)) {
+                    violationType = 'Forbidden key attempted: ' + e.key;
+                    violationDetected = true;
+                } else if (e.ctrlKey && e.shiftKey && ctrlShiftKeys.includes(e.key)) {
+                    violationType = 'Developer tools shortcut attempted: Ctrl+Shift+' + e.key;
+                    violationDetected = true;
+                } else if (e.ctrlKey && ctrlKeys.includes(e.key)) {
+                    violationType = 'Prohibited shortcut attempted: Ctrl+' + e.key;
+                    violationDetected = true;
+                } else if (e.altKey && altKeys.includes(e.key)) {
+                    violationType = 'Alt shortcut attempted: Alt+' + e.key;
+                    violationDetected = true;
+                }
+                
+                if (violationDetected) {
                     e.preventDefault();
-                    recordViolation('Keyboard shortcut attempted: ' + e.key);
+                    e.stopPropagation();
+                    console.log('Keyboard violation detected:', violationType);
+                    recordViolation(violationType);
+                    return false;
                 }
             });
+            
+            // Copy/Cut detection
+            document.addEventListener('copy', e => {
+                if (examState.examActive) {
+                    console.log('Copy attempted');
+                    recordViolation('Text copied to clipboard');
+                }
+            });
+            
+            document.addEventListener('cut', e => {
+                if (examState.examActive) {
+                    console.log('Cut attempted');
+                    recordViolation('Text cut to clipboard');
+                }
+            });
+            
+            // Disable text selection outside of input fields
+            document.addEventListener('selectstart', e => {
+                if (examState.examActive && !isInputElement(e.target)) {
+                    e.preventDefault();
+                    console.log('Text selection attempted outside input fields');
+                    recordViolation('Attempted to select text outside input areas');
+                }
+            });
+            
+            // Mouse leave detection (desktop only)
+            if (!examState.isMobile) {
+                document.addEventListener('mouseleave', () => {
+                    if (examState.examActive) {
+                        console.log('Mouse left exam area');
+                        recordViolation('Mouse cursor left exam area');
+                    }
+                });
+            }
+        }
+        
+        function setupDeveloperToolsDetection() {
+            console.log('Setting up developer tools detection...');
+            
+            // Method 1: Console detection
+            let devtools = { open: false };
+            const threshold = 160;
+            
+            setInterval(() => {
+                if (!examState.examActive) return;
+                
+                if (window.outerHeight - window.innerHeight > threshold || 
+                    window.outerWidth - window.innerWidth > threshold) {
+                    if (!devtools.open) {
+                        devtools.open = true;
+                        console.log('Developer tools opened (size detection)');
+                        recordViolation("Developer tools opened - window size change");
+                    }
+                } else {
+                    devtools.open = false;
+                }
+            }, 500);
+            
+            // Method 2: Debugger detection
+            setInterval(() => {
+                if (!examState.examActive) return;
+                
+                const start = performance.now();
+                debugger; // This will pause if dev tools are open
+                const end = performance.now();
+                
+                if (end - start > 100) {
+                    console.log('Developer tools detected (debugger method)');
+                    recordViolation("Developer tools detected - debugger pause");
+                }
+            }, 1000);
+            
+            // Method 3: Console function override
+            const originalLog = console.log;
+            console.log = function(...args) {
+                if (examState.examActive) {
+                    recordViolation("Console accessed during exam");
+                }
+                return originalLog.apply(console, args);
+            };
+        }
+        
+        function recordViolation(type) {
+            if (examState.terminated) return;
+            
+            console.log('VIOLATION RECORDED:', type);
+            
+            // Mobile-specific filtering
+            if (examState.isMobile && examState.preventViolations) {
+                console.log('Mobile violation filtered out:', type);
+                return;
+            }
+            
+            examState.violations++;
+            document.getElementById("violationNumber").textContent = examState.violations;
+            
+            // Send to server
+            sendToServer('logViolation', {
+                violationType: type,
+                additionalInfo: 'Real-time violation detection',
+                deviceInfo: examState.isMobile ? 'Mobile Device' : 'Desktop Device'
+            });
+            
+            console.log('Violation ' + examState.violations + ': ' + type);
+            
+            // Show alert for most violations (except minor ones)
+            const minorViolations = ['Mouse cursor left', 'Window lost focus'];
+            if (!minorViolations.some(minor => type.toLowerCase().includes(minor.toLowerCase()))) {
+                // Show prominent warning
+                showViolationAlert(type);
+            }
+            
+            // Check if exam should be terminated
+            if (examState.violations >= CONFIG.MAX_VIOLATIONS) {
+                console.log('Maximum violations reached, terminating exam');
+                terminateExam();
+            }
+        }
+        
+        function showViolationAlert(violationType) {
+            // Create custom alert overlay
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 0; left: 0; right: 0; bottom: 0;
+                background: rgba(255, 0, 0, 0.9);
+                color: white;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 25000;
+                font-size: 1.5em;
+                text-align: center;
+            `;
+            
+            alertDiv.innerHTML = `
+                <div style="max-width: 500px; padding: 40px;">
+                    <h2 style="color: #ffff00; margin-bottom: 20px;">⚠️ VIOLATION DETECTED ⚠️</h2>
+                    <p style="margin-bottom: 20px;"><strong>${violationType}</strong></p>
+                    <p style="margin-bottom: 20px;">${CONFIG.WARNING_MESSAGE}</p>
+                    <p style="margin-bottom: 30px;">Violation ${examState.violations} of ${CONFIG.MAX_VIOLATIONS}</p>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="padding: 15px 30px; font-size: 1em; background: #fff; color: #000; border: none; border-radius: 5px; cursor: pointer;">
+                        I UNDERSTAND - CONTINUE EXAM
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(alertDiv);
+            
+            // Auto-remove after 10 seconds if not clicked
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 10000);
+        }
+        
+        function showFullscreenPrompt() {
+            const promptDiv = document.createElement('div');
+            promptDiv.style.cssText = `
+                position: fixed;
+                top: 20px; right: 20px;
+                background: rgba(255, 107, 107, 0.95);
+                color: white;
+                padding: 15px;
+                border-radius: 10px;
+                z-index: 15000;
+                font-weight: bold;
+                max-width: 300px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            `;
+            
+            promptDiv.innerHTML = `
+                <p>⚠️ Please return to fullscreen mode!</p>
+                <button onclick="requestFullscreen(); this.parentElement.remove();" 
+                        style="margin-top: 10px; padding: 8px 15px; background: white; color: #ff6b6b; border: none; border-radius: 5px; cursor: pointer;">
+                    Return to Fullscreen
+                </button>
+            `;
+            
+            document.body.appendChild(promptDiv);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                if (promptDiv.parentElement) {
+                    promptDiv.remove();
+                }
+            }, 5000);
+        }
+        
+        function terminateExam() {
+            examState.examActive = false;
+            examState.terminated = true;
+            clearInterval(examState.timerInterval);
+            clearTimeout(examState.autoSubmitTimer);
+            clearInterval(examState.autoSaveInterval);
+            
+            document.getElementById("timerBar").style.display = "none";
+            document.getElementById("overlay").style.display = "flex";
+            
+            document.getElementById("overlayTitle").textContent = "⛔ Exam Terminated";
+            document.getElementById("overlayMessage").innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #ff4757;">
+                    <h2 style="color: #ff4757; margin-bottom: 20px;">Exam Terminated Due to Violations</h2>
+                    <p style="font-size: 1.2em; margin-bottom: 15px;">Total Violations: <strong>${examState.violations}</strong></p>
+                    <p style="margin-bottom: 15px;">Maximum allowed: ${CONFIG.MAX_VIOLATIONS}</p>
+                    <p style="margin-bottom: 30px;">This incident has been reported to your instructor.</p>
+                    <p style="color: #ff6b6b; font-weight: bold;">Please contact your instructor immediately.</p>
+                </div>
+            `;
+            
+            // Hide loading spinner
+            const loader = document.querySelector('.loading');
+            if (loader) loader.style.display = 'none';
+            
+            // Send termination notice
+            sendToServer('logViolation', {
+                violationType: 'EXAM TERMINATED - Maximum violations exceeded',
+                additionalInfo: `Student exceeded ${CONFIG.MAX_VIOLATIONS} violations and exam was automatically terminated`
+            });
+        }
+        
+        function isInputElement(element) {
+            const inputTypes = ['INPUT', 'TEXTAREA', 'SELECT'];
+            return inputTypes.includes(element.tagName);
         }
 
         function recordViolation(type) {
