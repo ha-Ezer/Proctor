@@ -631,6 +631,7 @@
                             placeholder="${question.placeholder || 'Enter your answer here...'}"
                             onchange="saveResponse('${question.id}', this.value)"
                             oninput="saveResponse('${question.id}', this.value)"
+                            onpaste="handlePaste(event, '${question.id}')"
                         ></textarea>
                     `;
                 } else if (question.type === 'text') {
@@ -641,6 +642,7 @@
                             placeholder="${question.placeholder || 'Enter your answer here...'}"
                             onchange="saveResponse('${question.id}', this.value)"
                             oninput="saveResponse('${question.id}', this.value)"
+                            onpaste="handlePaste(event, '${question.id}')"
                         />
                     `;
                 }
@@ -648,6 +650,22 @@
                 questionDiv.innerHTML = questionHTML;
                 container.appendChild(questionDiv);
             });
+        }
+
+        function handlePaste(event, questionId) {
+            // Record paste violation
+            if (examState.examActive) {
+                const pastedText = (event.clipboardData || window.clipboardData).getData('text');
+                recordViolation('Text pasted in question ' + questionId + ' (length: ' + pastedText.length + ' chars)');
+                
+                // Optional: prevent paste entirely (uncomment next line to block pasting)
+                // event.preventDefault();
+                
+                // Optional: show warning
+                setTimeout(() => {
+                    alert('⚠️ WARNING: Pasting detected and logged. Please type your answers manually.');
+                }, 100);
+            }
         }
 
         function selectChoice(questionId, choiceIndex) {
@@ -963,11 +981,49 @@
             }
         });
 
+        // Debug function - remove in production
+        function testLocalSubmission() {
+            if (!window.location.hostname.includes('github.io')) {
+                console.log('=== TESTING LOCAL SUBMISSION ===');
+                
+                // Simulate student data
+                examState.studentData = { name: 'Local Test Student', email: 'local@test.com' };
+                examState.sessionId = 'local_test_' + Date.now();
+                examState.responses = {
+                    q1: 2,
+                    q2: 'This is a test response',
+                    q3: 1,
+                    q4: 'Longer test response for textarea'
+                };
+                
+                console.log('Student data:', examState.studentData);
+                console.log('Responses:', examState.responses);
+                console.log('Questions:', EXAM_QUESTIONS);
+                
+                // Test the submission
+                sendToServer('submitExam', {
+                    submissionType: 'Local test submission',
+                    responses: examState.responses,
+                    examQuestions: EXAM_QUESTIONS,
+                    completionTime: new Date().toISOString()
+                });
+                
+                console.log('Test submission sent - check Apps Script logs');
+            }
+        }
+
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Custom Proctored Exam System Loaded');
             console.log('Total Questions:', EXAM_QUESTIONS.length);
             console.log('Duration:', CONFIG.DURATION_MINUTES, 'minutes');
+            console.log('WebApp URL:', CONFIG.WEBAPP_URL);
+            
+            // Add test function to global scope for easy access
+            window.testLocalSubmission = testLocalSubmission;
+            
+            // For debugging - uncomment this line to auto-test on local development
+            // if (!window.location.hostname.includes('github.io')) testLocalSubmission();
         });
     </script>
 </body>
