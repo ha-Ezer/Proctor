@@ -445,10 +445,10 @@
     <script>
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 30,
+            DURATION_MINUTES: 2,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
-            MAX_VIOLATIONS: 5,
+            MAX_VIOLATIONS: 7,
             WEBAPP_URL: "https://script.google.com/macros/s/AKfycbzcVC6Cg2jjIYbURmeV-0gqq7fmDFwA5pWd9T7H-Tjdf1r84gQw4gKiJJgDr_30TeR9Ow/exec", // Your Apps Script URL
             ENABLE_FULLSCREEN: true,
             ENABLE_SERVER_LOGGING: true,
@@ -536,7 +536,10 @@
             isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
             lastFocusTime: 0,
             preventViolations: false,
-            keyboardVisible: false
+            keyboardVisible: false,
+            lastViolationTime: 0, // Prevent spam violations
+            violationCooldown: 2000, // 2 seconds between similar violations
+            recentViolations: new Set() // Track recent violations to prevent duplicates
         };
 
         function generateSessionId() {
@@ -850,223 +853,90 @@
             });
         }
 
-        // Monitoring functions with enhanced detection
+        // FIXED - Simple and reliable monitoring system
         function startMonitoring() {
-            console.log('Starting monitoring system...');
+            console.log('Starting FIXED monitoring system...');
             
-            // Mobile-friendly monitoring with better detection
-            if (examState.isMobile) {
-                console.log('Mobile monitoring enabled');
-                setupMobileMonitoring();
-            } else {
-                console.log('Desktop monitoring enabled');
-                setupDesktopMonitoring();
-            }
-            
-            // Universal monitoring (works on both mobile and desktop)
-            setupUniversalMonitoring();
-            
-            // Enhanced developer tools detection
-            setupDeveloperToolsDetection();
-        }
-        
-        function setupMobileMonitoring() {
-            // Mobile keyboard detection
-            window.addEventListener('resize', () => {
-                const heightDiff = window.screen.height - window.innerHeight;
-                examState.keyboardVisible = heightDiff > 200;
-                examState.preventViolations = examState.keyboardVisible;
-                
-                if (examState.keyboardVisible) {
-                    console.log('Mobile keyboard detected');
-                } else {
-                    console.log('Mobile keyboard hidden');
-                }
-            });
-            
-            // Mobile-specific visibility change
-            document.addEventListener("visibilitychange", () => {
-                if (examState.examActive && document.hidden && !examState.preventViolations) {
-                    console.log('Mobile tab switch detected');
-                    setTimeout(() => {
-                        if (document.hidden && examState.examActive && !examState.preventViolations) {
-                            recordViolation("Mobile tab/app switch detected");
-                        }
-                    }, 1500); // Longer delay for mobile
-                }
-            });
-        }
-        
-        function setupDesktopMonitoring() {
-            // Desktop visibility change (immediate)
+            // Simple tab switching detection
             document.addEventListener("visibilitychange", () => {
                 if (examState.examActive && document.hidden) {
-                    console.log('Desktop tab switch detected');
-                    recordViolation("Tab switched or window minimized");
+                    recordViolation("Tab/window switch detected");
                 }
             });
             
-            // Window focus/blur
-            window.addEventListener('blur', () => {
-                if (examState.examActive) {
-                    console.log('Window lost focus');
-                    recordViolation("Window lost focus");
-                }
-            });
+            // Simple window focus detection (desktop only)
+            if (!examState.isMobile) {
+                window.addEventListener('blur', () => {
+                    if (examState.examActive) {
+                        recordViolation("Window lost focus");
+                    }
+                });
+            }
             
-            window.addEventListener('focus', () => {
-                if (examState.examActive) {
-                    console.log('Window regained focus');
-                }
-            });
-            
-            // Fullscreen monitoring
-            document.addEventListener('fullscreenchange', () => {
-                if (examState.examActive && !document.fullscreenElement && CONFIG.ENABLE_FULLSCREEN) {
-                    console.log('Exited fullscreen');
-                    recordViolation("Exited fullscreen mode");
-                    
-                    // Show fullscreen prompt
-                    showFullscreenPrompt();
-                }
-            });
-        }
-        
-        function setupUniversalMonitoring() {
-            console.log('Setting up universal monitoring...');
-            
-            // Disable right-click
+            // Right-click prevention
             document.addEventListener('contextmenu', e => {
                 if (examState.examActive) {
                     e.preventDefault();
-                    console.log('Right-click attempted');
                     recordViolation('Right-click attempted');
                     return false;
                 }
             });
             
-            // Enhanced keyboard shortcut detection
+            // SIMPLIFIED keyboard detection (no loops)
             document.addEventListener('keydown', function(e) {
                 if (!examState.examActive) return;
-                
-                console.log('Key pressed:', e.key, 'Ctrl:', e.ctrlKey, 'Alt:', e.altKey, 'Shift:', e.shiftKey);
-                
-                const forbidden = ['F12', 'F11', 'F5', 'F1'];
-                const ctrlShiftKeys = ['I', 'J', 'K', 'C', 'U'];
-                const ctrlKeys = ['U', 'S', 'P', 'R', 'T', 'N', 'W', 'A'];
-                const altKeys = ['Tab', 'F4'];
                 
                 let violationDetected = false;
                 let violationType = '';
                 
-                if (forbidden.includes(e.key)) {
-                    violationType = 'Forbidden key attempted: ' + e.key;
+                // Only check specific dangerous combinations
+                if (e.key === 'F12') {
+                    violationType = 'F12 Developer Tools attempted';
                     violationDetected = true;
-                } else if (e.ctrlKey && e.shiftKey && ctrlShiftKeys.includes(e.key)) {
-                    violationType = 'Developer tools shortcut attempted: Ctrl+Shift+' + e.key;
+                } else if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                    violationType = 'Ctrl+Shift+I Developer Tools attempted';
                     violationDetected = true;
-                } else if (e.ctrlKey && ctrlKeys.includes(e.key)) {
-                    violationType = 'Prohibited shortcut attempted: Ctrl+' + e.key;
+                } else if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+                    violationType = 'Ctrl+Shift+J Console attempted';
                     violationDetected = true;
-                } else if (e.altKey && altKeys.includes(e.key)) {
-                    violationType = 'Alt shortcut attempted: Alt+' + e.key;
+                } else if (e.ctrlKey && e.key === 'U') {
+                    violationType = 'Ctrl+U View Source attempted';
                     violationDetected = true;
                 }
                 
                 if (violationDetected) {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('Keyboard violation detected:', violationType);
                     recordViolation(violationType);
                     return false;
                 }
             });
             
-            // Copy/Cut detection
-            document.addEventListener('copy', e => {
-                if (examState.examActive) {
-                    console.log('Copy attempted');
-                    recordViolation('Text copied to clipboard');
-                }
-            });
+            // REMOVED: All developer tools detection loops that were causing issues
+            // REMOVED: Console override that caused infinite recursion
+            // REMOVED: Complex monitoring that triggered multiple times
             
-            document.addEventListener('cut', e => {
-                if (examState.examActive) {
-                    console.log('Cut attempted');
-                    recordViolation('Text cut to clipboard');
-                }
-            });
-            
-            // Disable text selection outside of input fields
-            document.addEventListener('selectstart', e => {
-                if (examState.examActive && !isInputElement(e.target)) {
-                    e.preventDefault();
-                    console.log('Text selection attempted outside input fields');
-                    recordViolation('Attempted to select text outside input areas');
-                }
-            });
-            
-            // Mouse leave detection (desktop only)
-            if (!examState.isMobile) {
-                document.addEventListener('mouseleave', () => {
-                    if (examState.examActive) {
-                        console.log('Mouse left exam area');
-                        recordViolation('Mouse cursor left exam area');
-                    }
-                });
-            }
-        }
-        
-        function setupDeveloperToolsDetection() {
-            console.log('Setting up developer tools detection...');
-            
-            // Method 1: Console detection
-            let devtools = { open: false };
-            const threshold = 160;
-            
-            setInterval(() => {
-                if (!examState.examActive) return;
-                
-                if (window.outerHeight - window.innerHeight > threshold || 
-                    window.outerWidth - window.innerWidth > threshold) {
-                    if (!devtools.open) {
-                        devtools.open = true;
-                        console.log('Developer tools opened (size detection)');
-                        recordViolation("Developer tools opened - window size change");
-                    }
-                } else {
-                    devtools.open = false;
-                }
-            }, 500);
-            
-            // Method 2: Debugger detection
-            setInterval(() => {
-                if (!examState.examActive) return;
-                
-                const start = performance.now();
-                debugger; // This will pause if dev tools are open
-                const end = performance.now();
-                
-                if (end - start > 100) {
-                    console.log('Developer tools detected (debugger method)');
-                    recordViolation("Developer tools detected - debugger pause");
-                }
-            }, 1000);
-            
-            // Method 3: Console function override
-            const originalLog = console.log;
-            console.log = function(...args) {
-                if (examState.examActive) {
-                    recordViolation("Console accessed during exam");
-                }
-                return originalLog.apply(console, args);
-            };
+            console.log('Monitoring system initialized with basic protection');
         }
         
         function recordViolation(type) {
             if (examState.terminated) return;
             
-            console.log('VIOLATION RECORDED:', type);
+            // ANTI-SPAM PROTECTION
+            const now = Date.now();
+            
+            // Prevent duplicate violations within cooldown period
+            const violationKey = type.substring(0, 30); // First 30 chars as key
+            if (examState.recentViolations.has(violationKey)) {
+                console.log('Duplicate violation blocked:', type);
+                return;
+            }
+            
+            // Check cooldown period
+            if (now - examState.lastViolationTime < examState.violationCooldown) {
+                console.log('Violation blocked due to cooldown:', type);
+                return;
+            }
             
             // Mobile-specific filtering
             if (examState.isMobile && examState.preventViolations) {
@@ -1074,31 +944,95 @@
                 return;
             }
             
+            // RECORD THE VIOLATION
             examState.violations++;
+            examState.lastViolationTime = now;
+            
+            // Add to recent violations set and auto-remove after cooldown
+            examState.recentViolations.add(violationKey);
+            setTimeout(() => {
+                examState.recentViolations.delete(violationKey);
+            }, examState.violationCooldown);
+            
+            console.log('LEGITIMATE VIOLATION #' + examState.violations + ':', type);
+            
+            // Update UI
             document.getElementById("violationNumber").textContent = examState.violations;
             
-            // Send to server
+            // Send to server (with rate limiting)
             sendToServer('logViolation', {
                 violationType: type,
-                additionalInfo: 'Real-time violation detection',
+                additionalInfo: 'Fixed monitoring system - legitimate violation',
                 deviceInfo: examState.isMobile ? 'Mobile Device' : 'Desktop Device'
             });
             
-            console.log('Violation ' + examState.violations + ': ' + type);
-            
-            // Show alert for most violations (except minor ones)
-            const minorViolations = ['Mouse cursor left', 'Window lost focus'];
-            if (!minorViolations.some(minor => type.toLowerCase().includes(minor.toLowerCase()))) {
-                // Show prominent warning
-                showViolationAlert(type);
+            // Show warning (simplified)
+            if (!type.toLowerCase().includes('focus')) {
+                showSimpleViolationWarning(type);
             }
             
-            // Check if exam should be terminated
+            // Check termination
             if (examState.violations >= CONFIG.MAX_VIOLATIONS) {
                 console.log('Maximum violations reached, terminating exam');
-                terminateExam();
+                endExam();
             }
         }
+        
+        // EMERGENCY RESET FUNCTION
+        function resetViolationSystem() {
+            console.log('RESETTING VIOLATION SYSTEM...');
+            
+            // Reset violation count
+            examState.violations = 0;
+            examState.lastViolationTime = 0;
+            examState.recentViolations.clear();
+            
+            // Update display
+            document.getElementById("violationNumber").textContent = "0";
+            
+            // Clear any existing alerts
+            const alerts = document.querySelectorAll('[style*="position: fixed"]');
+            alerts.forEach(alert => {
+                if (alert.innerHTML.includes('VIOLATION') || alert.innerHTML.includes('WARNING')) {
+                    alert.remove();
+                }
+            });
+            
+            console.log('Violation system reset - violations cleared');
+            alert('Violation count has been reset to 0. The monitoring system has been fixed.');
+        }
+        
+        function showSimpleViolationWarning(violationType) {
+            // Simple alert instead of complex overlay to avoid triggering more violations
+            alert(`⚠️ VIOLATION DETECTED: ${violationType}\n\nThis has been recorded. Violation ${examState.violations} of ${CONFIG.MAX_VIOLATIONS}.\n\nPlease follow exam rules carefully.`);
+        }
+
+        // EMERGENCY RESET FUNCTION
+        function resetViolationSystem() {
+            console.log('RESETTING VIOLATION SYSTEM...');
+            
+            // Reset violation count
+            examState.violations = 0;
+            examState.lastViolationTime = 0;
+            examState.recentViolations.clear();
+            
+            // Update display
+            document.getElementById("violationNumber").textContent = "0";
+            
+            // Clear any existing alerts
+            const alerts = document.querySelectorAll('[style*="position: fixed"]');
+            alerts.forEach(alert => {
+                if (alert.innerHTML.includes('VIOLATION') || alert.innerHTML.includes('WARNING')) {
+                    alert.remove();
+                }
+            });
+            
+            console.log('Violation system reset - violations cleared');
+            alert('Violation count has been reset to 0. The monitoring system has been fixed.');
+        }
+        
+        // Add reset function to global scope for emergency use
+        window.resetViolationSystem = resetViolationSystem;
         
         function showViolationAlert(violationType) {
             // Create custom alert overlay
@@ -1311,6 +1245,42 @@
             }
         }
 
+        // Test violation logging function
+        function testViolationLogging() {
+            console.log('=== TESTING VIOLATION LOGGING ===');
+            
+            if (!examState.studentData || !examState.studentData.name) {
+                examState.studentData = { name: 'Test Student', email: 'test@example.com' };
+                examState.sessionId = 'test_session_' + Date.now();
+                examState.examActive = true;
+                console.log('Set up test student data');
+            }
+            
+            console.log('Current student data:', examState.studentData);
+            console.log('Session ID:', examState.sessionId);
+            console.log('Exam active:', examState.examActive);
+            console.log('Web app URL:', CONFIG.WEBAPP_URL);
+            
+            // Test sending a violation
+            recordViolation('Test violation - manual trigger');
+            
+            console.log('Test violation sent - check both browser network tab and Apps Script logs');
+        }
+
+        // Check configuration function
+        function checkConfiguration() {
+            console.log('=== CONFIGURATION CHECK ===');
+            console.log('WEBAPP_URL:', CONFIG.WEBAPP_URL);
+            console.log('ENABLE_SERVER_LOGGING:', CONFIG.ENABLE_SERVER_LOGGING);
+            console.log('Is valid Google Script URL:', CONFIG.WEBAPP_URL.includes('script.google.com'));
+            console.log('Current exam state:', {
+                examActive: examState.examActive,
+                studentData: examState.studentData,
+                sessionId: examState.sessionId,
+                violations: examState.violations
+            });
+        }
+
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Custom Proctored Exam System Loaded');
@@ -1318,11 +1288,16 @@
             console.log('Duration:', CONFIG.DURATION_MINUTES, 'minutes');
             console.log('WebApp URL:', CONFIG.WEBAPP_URL);
             
-            // Add test function to global scope for easy access
+            // Add test functions to global scope for easy access
             window.testLocalSubmission = testLocalSubmission;
+            window.testViolationLogging = testViolationLogging;
+            window.checkConfiguration = checkConfiguration;
             
-            // For debugging - uncomment this line to auto-test on local development
-            // if (!window.location.hostname.includes('github.io')) testLocalSubmission();
+            console.log('Debug functions available:');
+            console.log('- testViolationLogging() - test violation logging');
+            console.log('- testLocalSubmission() - test exam submission');
+            console.log('- checkConfiguration() - check current config');
+            console.log('- resetViolationSystem() - reset violation count');
         });
     </script>
 </body>
