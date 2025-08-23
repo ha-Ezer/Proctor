@@ -1,11 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custom Proctored Exam System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* ========== GLOBAL STYLES ========== */
+        :root {
+            --primary: #4a6cf7;
+            --primary-dark: #3b5be3;
+            --secondary: #764ba2;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #ff4757;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray: #6c757d;
+            --body-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,8 +33,10 @@
         body, html {
             height: 100%;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--body-bg);
             overflow-x: hidden;
+            color: var(--dark);
+            line-height: 1.6;
         }
 
         /* Prevent text selection and right-click */
@@ -37,234 +57,337 @@
             user-select: text;
         }
 
+        /* ========== LAYOUT COMPONENTS ========== */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--success), #20c997);
+            color: white;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ========== TIMER BAR ========== */
         #timerBar {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            background: linear-gradient(90deg, #ff6b6b, #ee5a52);
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
             color: white;
             padding: 15px;
             text-align: center;
-            font-size: 1.3em;
+            font-size: 1.2em;
             font-weight: bold;
             z-index: 10000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            border-bottom: 3px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         }
 
         #timerBar.warning {
-            animation: pulse 1s infinite;
-            background: linear-gradient(90deg, #ff4757, #ff3742);
+            background: linear-gradient(90deg, #ff9a3d, var(--danger));
+            animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+            50% { opacity: 0.8; }
         }
 
-        .exam-container {
-            display: none;
-            margin-top: 70px;
-            padding: 20px;
-            min-height: calc(100vh - 70px);
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
-            display: none;
+        .violation-count {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-left: 20px;
+            font-size: 0.9em;
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            font-size: 2em;
-            color: white;
-            z-index: 20000;
-            text-align: center;
+            gap: 6px;
         }
 
-        .overlay h2 {
-            margin-bottom: 20px;
-            color: #ff6b6b;
+        .violation-count i {
+            font-size: 1.1em;
         }
 
+        /* ========== STUDENT FORM ========== */
         #studentForm {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            gap: 20px;
             padding: 40px 20px;
-            border-radius: 20px;
-            max-width: 500px;
-            margin: 20px auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow-y: auto;
         }
 
-        @media (max-width: 600px) {
-            #studentForm {
-                margin: 10px;
-                padding: 30px 15px;
-                border-radius: 15px;
-                max-width: none;
-                min-height: calc(100vh - 20px);
-            }
-        }
-
-        #studentForm h2 {
-            color: #333;
-            margin-bottom: 20px;
+        #studentForm .card {
+            width: 100%;
+            max-width: 540px;
+            padding: 40px;
             text-align: center;
         }
 
-        #studentForm input {
-            padding: 15px;
+        .form-header {
+            margin-bottom: 30px;
+        }
+
+        .form-header h2 {
+            font-size: 2.2em;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .form-header p {
+            color: var(--gray);
             font-size: 1.1em;
+        }
+
+        .form-group {
             width: 100%;
-            max-width: 300px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            background: rgba(255,255,255,0.9);
-        }
-
-        #studentForm input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        #studentForm button {
-            padding: 15px 30px;
-            font-size: 1.1em;
-            cursor: pointer;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        #studentForm button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        #studentForm button:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .instructions {
-            background: rgba(255, 235, 59, 0.1);
-            border: 2px solid #ffeb3b;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            max-width: 400px;
+            margin-bottom: 20px;
             text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 16px 18px;
+            font-size: 1em;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .form-check-input {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+        }
+
+        .form-check-label {
+            font-size: 0.95em;
+            color: var(--dark);
+        }
+
+        /* ========== INSTRUCTIONS ========== */
+        .instructions {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.2) 100%);
+            border: 2px solid rgba(255, 193, 7, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: left;
+            width: 100%;
         }
 
         .instructions h3 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .instructions ul {
-            color: #555;
-            padding-left: 20px;
-        }
-
-        .instructions li {
-            margin: 5px 0;
-        }
-
-        .checkbox-container {
+            color: #d39e00;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             gap: 10px;
-            max-width: 300px;
-            text-align: left;
+            font-size: 1.2em;
         }
 
-        .checkbox-container input[type="checkbox"] {
-            width: auto;
-            min-width: 20px;
+        .instructions ul {
+            color: #856404;
+            padding-left: 24px;
         }
 
-        .violation-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            margin-left: 20px;
-            font-size: 0.9em;
+        .instructions li {
+            margin: 10px 0;
+            line-height: 1.5;
         }
 
+        /* ========== EXAM CONTAINER ========== */
+        .exam-container {
+            display: none;
+            margin-top: 70px;
+            padding: 30px 20px;
+            min-height: calc(100vh - 70px);
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        /* ========== QUESTIONS ========== */
         .question {
             background: white;
-            margin: 20px 0;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            border-left: 5px solid #667eea;
+            margin: 25px 0;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--primary);
+            transition: var(--transition);
         }
 
-        .question h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 1.3em;
+        .question:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
 
         .question.required h3::after {
             content: " *";
-            color: #ff4757;
+            color: var(--danger);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .question h3 {
+            color: var(--dark);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .question-type {
+            background: var(--primary);
+            color: white;
+            font-size: 0.7em;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-left: 15px;
+            text-transform: uppercase;
+            font-weight: 600;
         }
 
         .question-image {
             max-width: 100%;
             max-height: 300px;
             object-fit: contain;
-            border-radius: 10px;
+            border-radius: 12px;
             margin: 15px 0;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .question input[type="text"], 
         .question textarea {
             width: 100%;
-            padding: 12px;
+            padding: 16px;
             font-size: 1em;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            transition: border-color 0.3s ease;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            transition: var(--transition);
             font-family: inherit;
             resize: vertical;
+            background: rgba(255, 255, 255, 0.8);
         }
 
         .question input[type="text"]:focus,
         .question textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
         }
 
         .question textarea {
-            min-height: 100px;
+            min-height: 120px;
         }
 
         .multiple-choice {
@@ -276,169 +399,292 @@
         .choice {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border: 2px solid #eee;
-            border-radius: 8px;
+            gap: 15px;
+            padding: 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.7);
         }
 
         .choice:hover {
             background: #f8f9fa;
-            border-color: #667eea;
+            border-color: var(--primary);
+            transform: translateY(-2px);
         }
 
         .choice input[type="radio"] {
-            margin: 0;
-            width: auto;
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
         }
 
         .choice.selected {
-            background: rgba(102, 126, 234, 0.1);
-            border-color: #667eea;
+            background: rgba(74, 108, 247, 0.1);
+            border-color: var(--primary);
         }
 
+        .choice-label {
+            flex: 1;
+            font-weight: 500;
+        }
+
+        /* ========== SUBMIT SECTION ========== */
         .submit-section {
             text-align: center;
             margin: 40px 0;
-            padding: 30px;
+            padding: 40px;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
         }
 
-        .submit-btn {
-            background: linear-gradient(45deg, #28a745, #20c997);
+        .submit-section h3 {
+            margin-bottom: 20px;
+            color: var(--dark);
+            font-size: 1.5em;
+        }
+
+        /* ========== MESSAGES ========== */
+        .message {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            display: none;
+            font-weight: 500;
+        }
+
+        .error-message {
+            background: rgba(220, 53, 69, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        .success-message {
+            background: rgba(40, 167, 69, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+
+        /* ========== OVERLAY ========== */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.92);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-size: 1.8em;
             color: white;
-            border: none;
-            padding: 20px 40px;
-            font-size: 1.2em;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            z-index: 20000;
+            text-align: center;
+            padding: 30px;
         }
 
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
-        }
-
-        .submit-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        .progress-bar {
+        .overlay-content {
+            max-width: 600px;
             width: 100%;
-            height: 8px;
-            background: #f0f0f0;
-            border-radius: 4px;
-            margin: 20px 0;
-            overflow: hidden;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            width: 0%;
-            transition: width 0.5s ease;
+        .overlay h2 {
+            margin-bottom: 25px;
+            color: white;
+            font-size: 2.2em;
+        }
+
+        .overlay p {
+            margin-bottom: 15px;
+            font-size: 0.8em;
+            opacity: 0.9;
         }
 
         .loading {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top-color: #fff;
+            border-top-color: white;
             animation: spin 1s ease-in-out infinite;
+            margin-top: 30px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        .error-message {
-            background: #ff4757;
+        /* ========== VIOLATION ALERT ========== */
+        .violation-alert {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 71, 87, 0.95);
             color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            display: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 25000;
+            text-align: center;
+            padding: 30px;
         }
 
-        .success-message {
-            background: #28a745;
-            color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 10px 0;
-            display: none;
+        .violation-content {
+            max-width: 500px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .violation-alert h2 {
+            color: #ffff00;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .violation-alert p {
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        /* ========== RESPONSIVE STYLES ========== */
+        @media (max-width: 768px) {
+            :root {
+                font-size: 14px;
+            }
+            
+            #studentForm .card {
+                padding: 30px 20px;
+            }
+            
+            .form-header h2 {
+                font-size: 1.8em;
+            }
+            
+            .question {
+                padding: 20px;
+            }
+            
+            .submit-section {
+                padding: 30px 20px;
+            }
+            
+            .violation-count {
+                margin-left: 10px;
+                padding: 4px 12px;
+            }
+            
+            #timerBar {
+                font-size: 1em;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-header {
+                flex-direction: column;
+            }
+            
+            .question-type {
+                align-self: flex-start;
+                margin: 10px 0 0 0;
+            }
+            
+            .violation-count {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
     <!-- Student Info Capture -->
     <div id="studentForm">
-        <h2>🎓 Custom Proctored Exam System</h2>
-        
-        <div class="instructions">
-            <h3>⚠️ Important Instructions:</h3>
-            <ul>
-                <li>Do not switch tabs or windows during the exam</li>
-                <li>Do not minimize the browser</li>
-                <li>Ensure stable internet connection</li>
-                <li>Answer all required questions marked with *</li>
-                <li>Your progress is automatically saved</li>
-                <li>Each violation will be recorded</li>
-            </ul>
-        </div>
+        <div class="card">
+            <div class="form-header">
+                <h2><i class="fas fa-graduation-cap"></i> Custom Proctored Exam</h2>
+                <p>Please enter your details to begin the examination</p>
+            </div>
+            
+            <div class="instructions">
+                <h3><i class="fas fa-exclamation-circle"></i> Important Instructions</h3>
+                <ul>
+                    <li>Do not switch tabs or windows during the exam</li>
+                    <li>Do not minimize the browser</li>
+                    <li>Ensure stable internet connection</li>
+                    <li>Answer all required questions marked with *</li>
+                    <li>Your progress is automatically saved</li>
+                    <li>Each violation will be recorded</li>
+                </ul>
+            </div>
 
-        <input type="text" id="studentName" placeholder="Full Name" required maxlength="100" />
-        <input type="email" id="studentEmail" placeholder="Email Address" required />
-        
-        <div class="checkbox-container">
-            <input type="checkbox" id="agreeTerms" required />
-            <label for="agreeTerms">I agree to the exam terms and conditions</label>
+            <div class="form-group">
+                <label for="studentName">Full Name</label>
+                <input type="text" id="studentName" class="form-control" placeholder="Enter your full name" required maxlength="100" />
+            </div>
+            
+            <div class="form-group">
+                <label for="studentEmail">Email Address</label>
+                <input type="email" id="studentEmail" class="form-control" placeholder="Enter your email address" required />
+            </div>
+            
+            <div class="form-check">
+                <input type="checkbox" id="agreeTerms" class="form-check-input" required />
+                <label for="agreeTerms" class="form-check-label">I agree to the exam terms and conditions</label>
+            </div>
+            
+            <button onclick="startExam()" id="startBtn" class="btn btn-primary">
+                <i class="fas fa-play-circle"></i> Start Exam
+            </button>
         </div>
-        
-        <button onclick="startExam()" id="startBtn">Start Exam</button>
     </div>
 
     <!-- Timer + Exam -->
     <div id="timerBar">
-        ⏳ Time remaining: <span id="timeLeft"></span>
-        <span id="violationCount" class="violation-count">Violations: <span id="violationNumber">0</span></span>
+        <i class="fas fa-clock"></i> Time remaining: <span id="timeLeft"></span>
+        <span id="violationCount" class="violation-count">
+            <i class="fas fa-exclamation-triangle"></i> Violations: <span id="violationNumber">0</span>
+        </span>
     </div>
     
     <div id="overlay" class="overlay">
-        <h2 id="overlayTitle">⏰ Time's Up!</h2>
-        <div id="overlayMessage">Submitting your exam automatically...</div>
-        <div class="loading"></div>
+        <div class="overlay-content">
+            <h2 id="overlayTitle"><i class="fas fa-hourglass-end"></i> Time's Up!</h2>
+            <div id="overlayMessage">Submitting your exam automatically...</div>
+            <div class="loading"></div>
+        </div>
     </div>
     
     <!-- Custom Exam Form -->
     <div id="examContainer" class="exam-container">
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-        
-        <div id="errorMessage" class="error-message"></div>
-        <div id="successMessage" class="success-message"></div>
-        
-        <!-- Questions will be dynamically generated here -->
-        <div id="questionsContainer"></div>
-        
-        <div class="submit-section">
-            <button class="submit-btn" onclick="submitExam()" id="submitExamBtn">
-                Submit Exam
-            </button>
+        <div class="container">
+            <div class="progress-container">
+                <div class="progress-info">
+                    <span>Exam Progress</span>
+                    <span id="progressPercentage">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+            
+            <div id="errorMessage" class="message error-message"></div>
+            <div id="successMessage" class="message success-message"></div>
+            
+            <!-- Questions will be dynamically generated here -->
+            <div id="questionsContainer"></div>
+            
+            <div class="submit-section">
+                <h3>Ready to submit your exam?</h3>
+                <p>Please review your answers before submission</p>
+                <button class="btn btn-success" onclick="submitExam()" id="submitExamBtn">
+                    <i class="fas fa-paper-plane"></i> Submit Exam
+                </button>
+            </div>
         </div>
     </div>
 
@@ -509,7 +755,7 @@
                 type: "multiple-choice",
                 question: "Which year did World War II end?",
                 required: true,
-                image: "https://via.placeholder.com/400x200/667eea/ffffff?text=Historical+Timeline", // Optional image
+                image: "https://media.istockphoto.com/id/539247835/photo/cleaning-face.jpg?s=612x612&w=0&k=20&c=z7YWRk2kaPJgk_99qdkhKKTyuMh9IRZHUx-LUE-j4LM=", // Optional image
                 options: [
                     "1944",
                     "1945",
@@ -610,7 +856,12 @@
                 questionDiv.className = `question ${question.required ? 'required' : ''}`;
                 questionDiv.setAttribute('data-question-id', question.id);
 
-                let questionHTML = `<h3>${index + 1}. ${question.question}</h3>`;
+                let questionHTML = `
+                    <div class="question-header">
+                        <h3>${index + 1}. ${question.question}</h3>
+                        <span class="question-type">${question.type}</span>
+                    </div>
+                `;
 
                 if (question.image) {
                     questionHTML += `<img src="${question.image}" alt="Question ${index + 1} image" class="question-image">`;
@@ -622,7 +873,7 @@
                         questionHTML += `
                             <div class="choice" onclick="selectChoice('${question.id}', ${optionIndex})">
                                 <input type="radio" name="${question.id}" value="${optionIndex}" id="${question.id}_${optionIndex}">
-                                <label for="${question.id}_${optionIndex}">${option}</label>
+                                <label for="${question.id}_${optionIndex}" class="choice-label">${option}</label>
                             </div>
                         `;
                     });
@@ -631,6 +882,7 @@
                     questionHTML += `
                         <textarea 
                             id="${question.id}" 
+                            class="form-control"
                             placeholder="${question.placeholder || 'Enter your answer here...'}"
                             onchange="saveResponse('${question.id}', this.value)"
                             oninput="saveResponse('${question.id}', this.value)"
@@ -642,6 +894,7 @@
                         <input 
                             type="text" 
                             id="${question.id}" 
+                            class="form-control"
                             placeholder="${question.placeholder || 'Enter your answer here...'}"
                             onchange="saveResponse('${question.id}', this.value)"
                             oninput="saveResponse('${question.id}', this.value)"
@@ -695,6 +948,7 @@
             const progress = (answeredQuestions / totalQuestions) * 100;
             
             document.getElementById("progressFill").style.width = progress + "%";
+            document.getElementById("progressPercentage").textContent = Math.round(progress) + "%";
         }
 
         function updateTimer() {
@@ -1007,173 +1261,6 @@
             alert(`⚠️ VIOLATION DETECTED: ${violationType}\n\nThis has been recorded. Violation ${examState.violations} of ${CONFIG.MAX_VIOLATIONS}.\n\nPlease follow exam rules carefully.`);
         }
 
-        // EMERGENCY RESET FUNCTION
-        function resetViolationSystem() {
-            console.log('RESETTING VIOLATION SYSTEM...');
-            
-            // Reset violation count
-            examState.violations = 0;
-            examState.lastViolationTime = 0;
-            examState.recentViolations.clear();
-            
-            // Update display
-            document.getElementById("violationNumber").textContent = "0";
-            
-            // Clear any existing alerts
-            const alerts = document.querySelectorAll('[style*="position: fixed"]');
-            alerts.forEach(alert => {
-                if (alert.innerHTML.includes('VIOLATION') || alert.innerHTML.includes('WARNING')) {
-                    alert.remove();
-                }
-            });
-            
-            console.log('Violation system reset - violations cleared');
-            alert('Violation count has been reset to 0. The monitoring system has been fixed.');
-        }
-        
-        // Add reset function to global scope for emergency use
-        window.resetViolationSystem = resetViolationSystem;
-        
-        function showViolationAlert(violationType) {
-            // Create custom alert overlay
-            const alertDiv = document.createElement('div');
-            alertDiv.style.cssText = `
-                position: fixed;
-                top: 0; left: 0; right: 0; bottom: 0;
-                background: rgba(255, 0, 0, 0.9);
-                color: white;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                z-index: 25000;
-                font-size: 1.5em;
-                text-align: center;
-            `;
-            
-            alertDiv.innerHTML = `
-                <div style="max-width: 500px; padding: 40px;">
-                    <h2 style="color: #ffff00; margin-bottom: 20px;">⚠️ VIOLATION DETECTED ⚠️</h2>
-                    <p style="margin-bottom: 20px;"><strong>${violationType}</strong></p>
-                    <p style="margin-bottom: 20px;">${CONFIG.WARNING_MESSAGE}</p>
-                    <p style="margin-bottom: 30px;">Violation ${examState.violations} of ${CONFIG.MAX_VIOLATIONS}</p>
-                    <button onclick="this.parentElement.parentElement.remove()" 
-                            style="padding: 15px 30px; font-size: 1em; background: #fff; color: #000; border: none; border-radius: 5px; cursor: pointer;">
-                        I UNDERSTAND - CONTINUE EXAM
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(alertDiv);
-            
-            // Auto-remove after 10 seconds if not clicked
-            setTimeout(() => {
-                if (alertDiv.parentElement) {
-                    alertDiv.remove();
-                }
-            }, 10000);
-        }
-        
-        function showFullscreenPrompt() {
-            const promptDiv = document.createElement('div');
-            promptDiv.style.cssText = `
-                position: fixed;
-                top: 20px; right: 20px;
-                background: rgba(255, 107, 107, 0.95);
-                color: white;
-                padding: 15px;
-                border-radius: 10px;
-                z-index: 15000;
-                font-weight: bold;
-                max-width: 300px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            `;
-            
-            promptDiv.innerHTML = `
-                <p>⚠️ Please return to fullscreen mode!</p>
-                <button onclick="requestFullscreen(); this.parentElement.remove();" 
-                        style="margin-top: 10px; padding: 8px 15px; background: white; color: #ff6b6b; border: none; border-radius: 5px; cursor: pointer;">
-                    Return to Fullscreen
-                </button>
-            `;
-            
-            document.body.appendChild(promptDiv);
-            
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                if (promptDiv.parentElement) {
-                    promptDiv.remove();
-                }
-            }, 5000);
-        }
-        
-        function terminateExam() {
-            examState.examActive = false;
-            examState.terminated = true;
-            clearInterval(examState.timerInterval);
-            clearTimeout(examState.autoSubmitTimer);
-            clearInterval(examState.autoSaveInterval);
-            
-            document.getElementById("timerBar").style.display = "none";
-            document.getElementById("overlay").style.display = "flex";
-            
-            document.getElementById("overlayTitle").textContent = "⛔ Exam Terminated";
-            document.getElementById("overlayMessage").innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #ff4757;">
-                    <h2 style="color: #ff4757; margin-bottom: 20px;">Exam Terminated Due to Violations</h2>
-                    <p style="font-size: 1.2em; margin-bottom: 15px;">Total Violations: <strong>${examState.violations}</strong></p>
-                    <p style="margin-bottom: 15px;">Maximum allowed: ${CONFIG.MAX_VIOLATIONS}</p>
-                    <p style="margin-bottom: 30px;">This incident has been reported to your instructor.</p>
-                    <p style="color: #ff6b6b; font-weight: bold;">Please contact your instructor immediately.</p>
-                </div>
-            `;
-            
-            // Hide loading spinner
-            const loader = document.querySelector('.loading');
-            if (loader) loader.style.display = 'none';
-            
-            // Send termination notice
-            sendToServer('logViolation', {
-                violationType: 'EXAM TERMINATED - Maximum violations exceeded',
-                additionalInfo: `Student exceeded ${CONFIG.MAX_VIOLATIONS} violations and exam was automatically terminated`
-            });
-        }
-        
-        function isInputElement(element) {
-            const inputTypes = ['INPUT', 'TEXTAREA', 'SELECT'];
-            return inputTypes.includes(element.tagName);
-        }
-
-        function recordViolation(type) {
-            if (examState.terminated || examState.preventViolations) return;
-            
-            examState.violations++;
-            document.getElementById("violationNumber").textContent = examState.violations;
-            
-            sendToServer('logViolation', {
-                violationType: type,
-                additionalInfo: 'Custom exam system violation'
-            });
-            
-            console.log('Violation ' + examState.violations + ': ' + type);
-            
-            if (!type.toLowerCase().includes('focus') && !type.toLowerCase().includes('mouse')) {
-                alert(CONFIG.WARNING_MESSAGE);
-            }
-            
-            if (examState.violations >= CONFIG.MAX_VIOLATIONS) {
-                document.getElementById("overlayTitle").textContent = "⛔ Exam Terminated";
-                document.getElementById("overlayMessage").innerHTML = `
-                    <div style="text-align: center; padding: 20px;">
-                        <p>Too many violations detected (${examState.violations}).</p>
-                        <p>Your exam session has been terminated.</p>
-                        <p>Please contact your instructor.</p>
-                    </div>
-                `;
-                endExam();
-            }
-        }
-
         function requestFullscreen() {
             const elem = document.documentElement;
             if (elem.requestFullscreen) {
@@ -1292,6 +1379,7 @@
             window.testLocalSubmission = testLocalSubmission;
             window.testViolationLogging = testViolationLogging;
             window.checkConfiguration = checkConfiguration;
+            window.resetViolationSystem = resetViolationSystem;
             
             console.log('Debug functions available:');
             console.log('- testViolationLogging() - test violation logging');
