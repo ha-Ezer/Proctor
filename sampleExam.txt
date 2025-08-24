@@ -1,0 +1,63 @@
+const EXAM_QUESTIONS = [
+            {
+                id: "q1",
+                type: "multiple-choice",
+                question: "The mixture of Sebum and Sweat is called.......",
+                required: false,
+                options: [
+                    "Londo",
+                    "Berlin", 
+                    "Paris",
+                    "Madrid"
+                ],
+                correctAnswer: 2
+            },
+            {
+                id: "q2", 
+                type: "text",
+                question: "Explain the process of photosynthesis in plants.",
+                required: true,
+                placeholder: "Enter your detailed explanation here..."
+            },
+            {
+                id: "q3",
+                type: "multiple-choice", 
+                question: "Which of the following is NOT a programming language?",
+                required: false,
+                options: [
+                    "Python",
+                    "JavaScript",
+                    "HTML", 
+                    "Java"
+                ],
+                correctAnswer: 2
+            },
+            {
+                id: "q4",
+                type: "textarea",
+                question: "Describe your experience with web development technologies.",
+                required: false,
+                placeholder: "Share your thoughts and experiences..."
+            },
+            {
+                id: "q5",
+                type: "text",
+                question: "What is 15 + 27?",
+                required: true,
+                placeholder: "Enter the numerical answer"
+            },
+            {
+                id: "q6",
+                type: "multiple-choice",
+                question: "Which year did World War II end?",
+                required: true,
+                image: "https://via.placeholder.com/400x200/667eea/ffffff?text=Historical+Timeline",
+                options: [
+                    "1944",
+                    "1945",
+                    "1946", 
+                    "1947"
+                ],
+                correctAnswer: 1
+            }
+        ];
