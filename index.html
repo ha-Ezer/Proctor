@@ -689,7 +689,7 @@
     <script>
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 60,
+            DURATION_MINUTES: 45,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 7,
@@ -704,64 +704,127 @@
             {
                 id: "q1",
                 type: "multiple-choice",
-                question: "What is the capital of France?",
-                required: true,
-                options: [
-                    "London",
-                    "Berlin", 
-                    "Paris",
-                    "Madrid"
-                ],
-                correctAnswer: 2
-            },
-            {
-                id: "q2", 
-                type: "text",
-                question: "Explain the process of photosynthesis in plants.",
-                required: true,
-                placeholder: "Enter your detailed explanation here..."
-            },
-            {
-                id: "q3",
-                type: "multiple-choice", 
-                question: "Which of the following is NOT a programming language?",
+                question: "The mixture of Sebum and Sweat is called.......",
                 required: false,
                 options: [
-                    "Python",
-                    "JavaScript",
-                    "HTML", 
-                    "Java"
+                    "Acid Mantle",
+                    "Histamine", 
+                    "Swebum",
+                    "Melanocytes"
+                ],
+                correctAnswer: 0
+            },
+            {
+                id: "q2",
+                type: "multiple-choice",
+                question: "The function of the above selected is to........ ",
+                required: false,
+                options: [
+                    "Enlarge the blood vessels",
+                    "Make the skin darker", 
+                    "Stop the growth of bacteria on the skin",
+                    "Make the skin oily"
                 ],
                 correctAnswer: 2
+            },
+            {
+                id: "q3", 
+                type: "multiple-choice",
+                question: "Tissues with similar structure and function group together to form......... ",
+                required: false,
+                options: [
+                    "Organs",
+                    "Systems", 
+                    "Cells",
+                    "Organisms"
+                ],
+                correctAnswer: 0
+                // placeholder: "Enter your detailed explanation here..."
             },
             {
                 id: "q4",
+                type: "text", 
+                question: "In your own words, describe briefly how an inflammation occurs in the body.",
+                required: false,
+                placeholder: "Type your brief explanation here...",            
+            },
+            {
+                id: "q5",
                 type: "textarea",
                 question: "Describe your experience with web development technologies.",
                 required: false,
                 placeholder: "Share your thoughts and experiences..."
             },
             {
-                id: "q5",
-                type: "text",
-                question: "What is 15 + 27?",
-                required: true,
-                placeholder: "Enter the numerical answer"
-            },
-            {
                 id: "q6",
                 type: "multiple-choice",
-                question: "Which year did World War II end?",
-                required: true,
-                image: "https://via.placeholder.com/400x200/667eea/ffffff?text=Historical+Timeline",
+                question: "The skin has _____________layers.",
+                required: false,
                 options: [
-                    "1944",
-                    "1945",
-                    "1946", 
-                    "1947"
+                    "1",
+                    "2", 
+                    "3",
+                    "4"
                 ],
-                correctAnswer: 1
-            }
+                correctAnswer: 2
+            },
+            {
+                id: "q7",
+                type: "multiple-choice",
+                question: "Your client changed from fair to dark skin when she got pregnant. What pigment is responsible for this change?",
+                required: false,
+                image: "https://www.boredpanda.com/blog/wp-content/uploads/2025/05/68219e14af109_generated-image.jpg",
+                options: [
+                    "Carotene",
+                    "Collagen",
+                    "Melanin", 
+                    "Fungbact A"
+                ],
+                correctAnswer: 2
+            },
+            {
+                id: "q8",
+                type: "text",
+                question: "Briefly describe how the preganancy could have caused the change in her skin tone.",
+                required: false,
+                placeholder: "Type your brief explanation here..."
+            },
+            {
+                id: "q9",
+                type: "text",
+                question: "Briefly describe one thing that happens when the upper part of the epidermis is removed by exfoliation?",
+                required: false,
+                placeholder: "Type your brief explanation here..."
+            },
+            {
+                id: "q10",
+                type: "multiple-choice",
+                question: "Antiperspirants..........",
+                required: false,
+                options: [
+                    "Kill the germs that cause body odor",
+                    "Close the blood vessels to prevent body odour",
+                    "Close the sweat pores to prevent body odour",
+                    "Restores the collagen fibres to prevent body odour."
+                ],
+                correctAnswer: 2
+
+            },
+            {
+                id: "q11",
+                type: "multiple-choice",
+                question: "Deodorants..........",
+                required: false,
+                options: [
+                    "Kill the germs that cause body odor",
+                    "Close the blood vessels to prevent body odour",
+                    "Close the sweat pores to prevent body odour",
+                    "Restores the collagen fibres to prevent body odour."
+                ],
+                correctAnswer: 0
+
+            },
+            
         ];
 
         let examState = {
@@ -1111,7 +1174,7 @@
             document.addEventListener('contextmenu', e => {
                 if (examState.examActive) {
                     e.preventDefault();
-                    recordViolation('Right-click attempted');
+                    recordViolation('Right-click/Long Press attempted');
                     return false;
                 }
             });
