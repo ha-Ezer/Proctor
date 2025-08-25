@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Proctored Exam System</title>
+    <title>No Exam in Session</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -37,29 +37,13 @@
             line-height: 1.6;
         }
 
-        /* Prevent text selection and right-click */
-        body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* Allow text selection in form elements */
-        input, textarea, select {
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
-        }
-
         .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 40px 20px;
         }
 
         .card {
@@ -70,11 +54,69 @@
             -webkit-backdrop-filter: blur(10px);
             overflow: hidden;
             transition: var(--transition);
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .status-icon {
+            font-size: 5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: rgba(74, 108, 247, 0.1);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-box ul {
+            color: var(--dark);
+            padding-left: 20px;
+        }
+
+        .info-box li {
+            margin: 10px 0;
+        }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
         }
 
         .btn {
-            display: inline-block;
-            padding: 15px 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
             font-size: 1.1em;
             font-weight: 600;
             text-align: center;
@@ -83,8 +125,6 @@
             border-radius: 12px;
             cursor: pointer;
             transition: var(--transition);
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
         .btn-primary {
@@ -98,1223 +138,141 @@
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
         }
 
-        .btn-success {
-            background: linear-gradient(45deg, var(--success), #20c997);
-            color: white;
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-        }
-
-        .btn-success:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
-        }
-
-        .btn:disabled {
-            background: var(--gray);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Timer Bar */
-        #timerBar {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: bold;
-            z-index: 10000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        #timerBar.warning {
-            background: linear-gradient(90deg, #ff9a3d, var(--danger));
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        .violation-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 6px 16px;
-            border-radius: 20px;
-            margin-left: 20px;
-            font-size: 0.9em;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .violation-count i {
-            font-size: 1.1em;
-        }
-
-        /* Student Form */
-        #studentForm {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
-
-        #studentForm .card {
-            width: 100%;
-            max-width: 540px;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .form-header {
-            margin-bottom: 30px;
-        }
-
-        .form-header h2 {
-            font-size: 2.2em;
+        .btn-outline {
+            background: transparent;
             color: var(--primary);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
+            border: 2px solid var(--primary);
         }
 
-        .form-header p {
-            color: var(--gray);
-            font-size: 1.1em;
-        }
-
-        .form-group {
-            width: 100%;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 16px 18px;
-            font-size: 1em;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            transition: var(--transition);
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
-        }
-
-        .form-check {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 25px 0;
-        }
-
-        .form-check-input {
-            width: 20px;
-            height: 20px;
-            accent-color: var(--primary);
-        }
-
-        .form-check-label {
-            font-size: 0.95em;
-            color: var(--dark);
-        }
-
-        /* Instructions */
-        .instructions {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.2) 100%);
-            border: 2px solid rgba(255, 193, 7, 0.3);
-            border-radius: 16px;
-            padding: 25px;
-            margin: 25px 0;
-            text-align: left;
-            width: 100%;
-        }
-
-        .instructions h3 {
-            color: #d39e00;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.2em;
-        }
-
-        .instructions ul {
-            color: #856404;
-            padding-left: 24px;
-        }
-
-        .instructions li {
-            margin: 10px 0;
-            line-height: 1.5;
-        }
-
-        /* Exam Container */
-        .exam-container {
-            display: none;
-            margin-top: 70px;
-            padding: 30px 20px;
-            min-height: calc(100vh - 70px);
-        }
-
-        .progress-container {
-            margin-bottom: 30px;
-        }
-
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: #e9ecef;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 5px;
-        }
-
-        /* Questions */
-        .question {
-            background: white;
-            margin: 25px 0;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid var(--primary);
-            transition: var(--transition);
-        }
-
-        .question:hover {
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .question.required h3::after {
-            content: " *";
-            color: var(--danger);
-        }
-
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .question h3 {
-            color: var(--dark);
-            margin-bottom: 15px;
-            font-size: 1.3em;
-            font-weight: 600;
-            flex: 1;
-        }
-
-        .question-type {
-            background: var(--primary);
-            color: white;
-            font-size: 0.7em;
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin-left: 15px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .question-image {
-            max-width: 100%;
-            max-height: 300px;
-            object-fit: contain;
-            border-radius: 12px;
-            margin: 15px 0;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .question input[type="text"], 
-        .question textarea {
-            width: 100%;
-            padding: 16px;
-            font-size: 1em;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            transition: var(--transition);
-            font-family: inherit;
-            resize: vertical;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .question input[type="text"]:focus,
-        .question textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
-        }
-
-        .question textarea {
-            min-height: 120px;
-        }
-
-        .multiple-choice {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .choice {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            background: rgba(255, 255, 255, 0.7);
-        }
-
-        .choice:hover {
-            background: #f8f9fa;
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .choice input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            accent-color: var(--primary);
-        }
-
-        .choice.selected {
+        .btn-outline:hover {
             background: rgba(74, 108, 247, 0.1);
-            border-color: var(--primary);
+            transform: translateY(-3px);
         }
 
-        .choice-label {
-            flex: 1;
-            font-weight: 500;
-        }
-
-        /* Submit Section */
-        .submit-section {
-            text-align: center;
-            margin: 40px 0;
-            padding: 40px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .submit-section h3 {
-            margin-bottom: 20px;
-            color: var(--dark);
-            font-size: 1.5em;
-        }
-
-        /* Messages */
-        .message {
-            padding: 16px 20px;
-            border-radius: 12px;
-            margin: 15px 0;
-            display: none;
-            font-weight: 500;
-        }
-
-        .error-message {
-            background: rgba(220, 53, 69, 0.1);
-            color: var(--danger);
-            border-left: 4px solid var(--danger);
-        }
-
-        .success-message {
-            background: rgba(40, 167, 69, 0.1);
-            color: var(--success);
-            border-left: 4px solid var(--success);
-        }
-
-        /* Overlay */
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.92);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            font-size: 1.8em;
-            color: white;
-            z-index: 20000;
-            text-align: center;
-            padding: 30px;
-        }
-
-        .overlay-content {
-            max-width: 600px;
-            width: 100%;
-        }
-
-        .overlay h2 {
-            margin-bottom: 25px;
-            color: white;
-            font-size: 2.2em;
-        }
-
-        .overlay p {
-            margin-bottom: 15px;
-            font-size: 0.8em;
-            opacity: 0.9;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
+        .countdown {
             margin-top: 30px;
+            font-size: 1.1rem;
+            color: var(--gray);
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .countdown span {
+            font-weight: 600;
+            color: var(--primary);
         }
 
-        /* Violation Alert */
-        .violation-alert {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 71, 87, 0.95);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 25000;
+        footer {
+            margin-top: 40px;
             text-align: center;
-            padding: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
         }
 
-        .violation-content {
-            max-width: 500px;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .violation-alert h2 {
-            color: #ffff00;
-            margin-bottom: 20px;
-            font-size: 2em;
-        }
-
-        .violation-alert p {
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-
-        /* Responsive Styles */
         @media (max-width: 768px) {
-            :root {
-                font-size: 14px;
-            }
-            
-            #studentForm .card {
+            .card {
                 padding: 30px 20px;
             }
             
-            .form-header h2 {
-                font-size: 1.8em;
+            h1 {
+                font-size: 2rem;
             }
             
-            .question {
-                padding: 20px;
+            p {
+                font-size: 1.1rem;
             }
             
-            .submit-section {
-                padding: 30px 20px;
-            }
-            
-            .violation-count {
-                margin-left: 10px;
-                padding: 4px 12px;
-            }
-            
-            #timerBar {
-                font-size: 1em;
-                padding: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .question-header {
+            .actions {
                 flex-direction: column;
+                align-items: center;
             }
             
-            .question-type {
-                align-self: flex-start;
-                margin: 10px 0 0 0;
-            }
-            
-            .violation-count {
-                display: none;
+            .btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Student Info Capture -->
-    <div id="studentForm">
+    <div class="container">
         <div class="card">
-            <div class="form-header">
-                <h2><i class="fas fa-graduation-cap"></i> Proctored Exam</h2>
-                <p>Please enter your details to begin the examination</p>
+            <div class="status-icon">
+                <i class="fas fa-calendar-check"></i>
             </div>
             
-            <div class="instructions">
-                <h3><i class="fas fa-exclamation-circle"></i> Important Instructions</h3>
+            <h1>No Exam Currently Scheduled</h1>
+            
+            <p>There is currently no exam or quiz in session. Please check back later or contact your instructor for more information.</p>
+            
+            <div class="info-box">
+                <h3><i class="fas fa-info-circle"></i> What to expect next:</h3>
                 <ul>
-                    <li>Do not switch tabs or windows during the exam</li>
-                    <li>Do not minimize the browser</li>
-                    <li>Ensure stable internet connection</li>
-                    <li>Answer all required questions marked with *</li>
-                    <li>Your progress is automatically saved</li>
-                    <li>Each violation of the above or any other form of cheating will be recorded</li>
+                    <li>Exams will appear here automatically when scheduled</li>
+                    <li>You'll receive notification when an exam is available</li>
+                    <li>Make sure your device meets the system requirements</li>
+                    <li>Have your student ID ready for verification</li>
                 </ul>
             </div>
-
-            <div class="form-group">
-                <label for="studentName">Full Name</label>
-                <input type="text" id="studentName" class="form-control" placeholder="Enter your full name" required maxlength="100" />
-            </div>
             
-            <div class="form-group">
-                <label for="studentEmail">Email Address</label>
-                <input type="email" id="studentEmail" class="form-control" placeholder="Enter your email address" required />
-            </div>
-            
-            <div class="form-check">
-                <input type="checkbox" id="agreeTerms" class="form-check-input" required />
-                <label for="agreeTerms" class="form-check-label">I agree to the exam terms and conditions</label>
-            </div>
-            
-            <button onclick="startExam()" id="startBtn" class="btn btn-primary">
-                <i class="fas fa-play-circle"></i> Start Exam
-            </button>
-        </div>
-    </div>
-
-    <!-- Timer + Exam -->
-    <div id="timerBar">
-        <i class="fas fa-clock"></i> Time remaining: <span id="timeLeft"></span>
-        <span id="violationCount" class="violation-count">
-            <i class="fas fa-exclamation-triangle"></i> Violations: <span id="violationNumber">0</span>
-        </span>
-    </div>
-    
-    <div id="overlay" class="overlay">
-        <div class="overlay-content">
-            <h2 id="overlayTitle"><i class="fas fa-hourglass-end"></i> Time's Up!</h2>
-            <div id="overlayMessage">Submitting your exam automatically...</div>
-            <div class="loading"></div>
-        </div>
-    </div>
-    
-    <!-- Custom Exam Form -->
-    <div id="examContainer" class="exam-container">
-        <div class="container">
-            <div class="progress-container">
-                <div class="progress-info">
-                    <span>Exam Progress</span>
-                    <span id="progressPercentage">0%</span>
-                </div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-            </div>
-            
-            <div id="errorMessage" class="message error-message"></div>
-            <div id="successMessage" class="message success-message"></div>
-            
-            <!-- Questions will be dynamically generated here -->
-            <div id="questionsContainer"></div>
-            
-            <div class="submit-section">
-                <h3>Ready to submit your exam?</h3>
-                <p>Please review your answers before submission</p>
-                <button class="btn btn-success" onclick="submitExam()" id="submitExamBtn">
-                    <i class="fas fa-paper-plane"></i> Submit Exam
+            <div class="actions">
+                <button class="btn btn-primary">
+                    <i class="fas fa-envelope"></i> Contact Instructor
+                </button>
+                <button class="btn btn-outline">
+                    <i class="fas fa-question-circle"></i> View Help Resources
                 </button>
             </div>
+            
+            <div class="countdown">
+                Next check for exams in: <span id="countdown">30</span> seconds
+            </div>
         </div>
+        
+        <footer>
+            <p>Proctored Exam System © 2023 | Secure Testing Environment</p>
+        </footer>
     </div>
 
     <script>
-        // ========== CONFIGURATION - UPDATE THESE VALUES ==========
-        const CONFIG = {
-            DURATION_MINUTES: 30,
-            WARNING_AT_MINUTES: 5,
-            WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
-            MAX_VIOLATIONS: 7,
-            WEBAPP_URL: "https://script.google.com/macros/s/AKfycbzcVC6Cg2jjIYbURmeV-0gqq7fmDFwA5pWd9T7H-Tjdf1r84gQw4gKiJJgDr_30TeR9Ow/exec",
-            ENABLE_FULLSCREEN: true,
-            ENABLE_SERVER_LOGGING: true,
-            AUTO_SAVE_INTERVAL: 30
-        };
-
-        // ========== EXAM QUESTIONS CONFIGURATION ==========
-        const EXAM_QUESTIONS = [
-            {
-                id: "q1",
-                type: "multiple-choice",
-                question: "The mixture of Sebum and Sweat is called.......",
-                required: false,
-                options: [
-                    "Acid Mantle",
-                    "Histamine", 
-                    "Swebum",
-                    "Melanocytes"
-                ],
-                correctAnswer: 0
-            },
-            {
-                id: "q2",
-                type: "multiple-choice",
-                question: "The function of the above selected is to........ ",
-                required: false,
-                options: [
-                    "Enlarge the blood vessels",
-                    "Make the skin darker", 
-                    "Stop the growth of bacteria on the skin",
-                    "Make the skin oily"
-                ],
-                correctAnswer: 2
-            },
-            {
-                id: "q3", 
-                type: "multiple-choice",
-                question: "Tissues with similar structure and function group together to form......... ",
-                required: false,
-                options: [
-                    "Organs",
-                    "Systems", 
-                    "Cells",
-                    "Organisms"
-                ],
-                correctAnswer: 0
-                // placeholder: "Enter your detailed explanation here..."
-            },
-            {
-                id: "q4",
-                type: "text", 
-                question: "In your own words, describe briefly how an inflammation occurs in the body.",
-                required: false,
-                placeholder: "Type your brief explanation here...",            
-            },
-            {
-                id: "q5",
-                type: "multiple-choice",
-                question: "Why do teenagers often have oily skin and acne?",
-                required: false,
-                options: [
-                    "They use too many skin products",
-                    "Hormonal imbalance causes this", 
-                    "They lack spiritual strength",
-                    "Germs from SHS dorms"
-                ],
-                correctAnswer: 1
-            },
-            {
-                id: "q6",
-                type: "multiple-choice",
-                question: "The skin has _____________layers.",
-                required: false,
-                options: [
-                    "1",
-                    "2", 
-                    "3",
-                    "4"
-                ],
-                correctAnswer: 2
-            },
-            {
-                id: "q7",
-                type: "multiple-choice",
-                question: "Your client changed from fair to dark skin when she got pregnant. What pigment is responsible for this change?",
-                required: false,
-                image: "https://www.boredpanda.com/blog/wp-content/uploads/2025/05/68219e14af109_generated-image.jpg",
-                options: [
-                    "Carotene",
-                    "Collagen",
-                    "Melanin", 
-                    "Fungbact A"
-                ],
-                correctAnswer: 2
-            },
-            {
-                id: "q8",
-                type: "text",
-                question: "Briefly describe how the preganancy could have caused the change in her skin tone.",
-                required: false,
-                placeholder: "Type your brief explanation here..."
-            },
-            {
-                id: "q9",
-                type: "text",
-                question: "Briefly describe one thing that happens when the upper part of the epidermis is removed by exfoliation?",
-                required: false,
-                placeholder: "Type your brief explanation here..."
-            },
-            {
-                id: "q10",
-                type: "multiple-choice",
-                question: "Antiperspirants..........",
-                required: false,
-                options: [
-                    "Kill the germs that cause body odor",
-                    "Close the blood vessels to prevent body odour",
-                    "Close the sweat pores to prevent body odour",
-                    "Restores the collagen fibres to prevent body odour."
-                ],
-                correctAnswer: 2
-
-            },
-            {
-                id: "q11",
-                type: "multiple-choice",
-                question: "Deodorants..........",
-                required: false,
-                options: [
-                    "Kill the germs that cause body odor",
-                    "Close the blood vessels to prevent body odour",
-                    "Close the sweat pores to prevent body odour",
-                    "Restores the collagen fibres to prevent body odour."
-                ],
-                correctAnswer: 0
-
-            },
+        // Simple countdown timer
+        let seconds = 30;
+        const countdownElement = document.getElementById('countdown');
+        
+        const countdown = setInterval(() => {
+            seconds--;
+            countdownElement.textContent = seconds;
             
-        ];
-
-        let examState = {
-            endTime: null,
-            timerInterval: null,
-            autoSubmitTimer: null,
-            autoSaveInterval: null,
-            violations: 0,
-            startTime: null,
-            studentData: {},
-            examActive: false,
-            sessionId: null,
-            terminated: false,
-            responses: {},
-            isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-            lastFocusTime: 0,
-            preventViolations: false,
-            keyboardVisible: false,
-            lastViolationTime: 0,
-            violationCooldown: 2000,
-            recentViolations: new Set()
-        };
-
-        function generateSessionId() {
-            return 'session_' + new Date().getTime() + '_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        function startExam() {
-            const name = document.getElementById("studentName").value.trim();
-            const email = document.getElementById("studentEmail").value.trim();
-            const agreed = document.getElementById("agreeTerms").checked;
-
-            if (!name || !email || !agreed) {
-                showError("Please fill all fields and agree to terms.");
-                return;
+            if (seconds <= 0) {
+                clearInterval(countdown);
+                // In a real application, this would check for new exams
+                console.log("Checking for new exams...");
+                seconds = 30;
+                countdownElement.textContent = seconds;
+                // Restart the countdown
+                setCountdown();
             }
-
-            if (!/\S+@\S+\.\S+/.test(email)) {
-                showError("Please enter a valid email address.");
-                return;
-            }
-
-            examState.studentData = { name, email };
-            examState.startTime = new Date();
-            examState.examActive = true;
-            examState.sessionId = generateSessionId();
-
-            // Request fullscreen
-            if (CONFIG.ENABLE_FULLSCREEN) {
-                requestFullscreen();
-            }
-
-            // Hide student form
-            document.getElementById("studentForm").style.display = "none";
-
-            // Show timer + exam
-            document.getElementById("timerBar").style.display = "block";
-            document.getElementById("examContainer").style.display = "block";
-
-            // Generate exam questions
-            generateQuestions();
-
-            // Start countdown
-            examState.endTime = Date.now() + CONFIG.DURATION_MINUTES * 60 * 1000;
-            examState.timerInterval = setInterval(updateTimer, 1000);
-            examState.autoSubmitTimer = setTimeout(endExam, CONFIG.DURATION_MINUTES * 60 * 1000);
-
-            // Start auto-save
-            examState.autoSaveInterval = setInterval(autoSaveProgress, CONFIG.AUTO_SAVE_INTERVAL * 1000);
-
-            // Start monitoring
-            startMonitoring();
-
-            // Log exam start
-            sendToServer('logViolation', {
-                violationType: 'Exam started',
-                additionalInfo: 'Custom exam system initialized'
-            });
-
-            console.log("Custom exam started for:", examState.studentData);
-        }
-
-        function generateQuestions() {
-            const container = document.getElementById("questionsContainer");
-            container.innerHTML = "";
-
-            EXAM_QUESTIONS.forEach((question, index) => {
-                const questionDiv = document.createElement("div");
-                questionDiv.className = `question ${question.required ? 'required' : ''}`;
-                questionDiv.setAttribute('data-question-id', question.id);
-
-                let questionHTML = `
-                    <div class="question-header">
-                        <h3>${index + 1}. ${question.question}</h3>
-                        <span class="question-type">${question.type}</span>
-                    </div>
-                `;
-
-                if (question.image) {
-                    questionHTML += `<img src="${question.image}" alt="Question ${index + 1} image" class="question-image">`;
-                }
-
-                if (question.type === 'multiple-choice') {
-                    questionHTML += '<div class="multiple-choice">';
-                    question.options.forEach((option, optionIndex) => {
-                        questionHTML += `
-                            <div class="choice" onclick="selectChoice('${question.id}', ${optionIndex})">
-                                <input type="radio" name="${question.id}" value="${optionIndex}" id="${question.id}_${optionIndex}">
-                                <label for="${question.id}_${optionIndex}" class="choice-label">${option}</label>
-                            </div>
-                        `;
-                    });
-                    questionHTML += '</div>';
-                } else if (question.type === 'textarea') {
-                    questionHTML += `
-                        <textarea 
-                            id="${question.id}" 
-                            class="form-control"
-                            placeholder="${question.placeholder || 'Enter your answer here...'}"
-                            onchange="saveResponse('${question.id}', this.value)"
-                            oninput="saveResponse('${question.id}', this.value)"
-                            onpaste="handlePaste(event, '${question.id}')"
-                        ></textarea>
-                    `;
-                } else if (question.type === 'text') {
-                    questionHTML += `
-                        <input 
-                            type="text" 
-                            id="${question.id}" 
-                            class="form-control"
-                            placeholder="${question.placeholder || 'Enter your answer here...'}"
-                            onchange="saveResponse('${question.id}', this.value)"
-                            oninput="saveResponse('${question.id}', this.value)"
-                            onpaste="handlePaste(event, '${question.id}')"
-                        />
-                    `;
-                }
-
-                questionDiv.innerHTML = questionHTML;
-                container.appendChild(questionDiv);
-            });
-        }
-
-        function handlePaste(event, questionId) {
-            if (examState.examActive) {
-                const pastedText = (event.clipboardData || window.clipboardData).getData('text');
-                recordViolation('Text pasted in question ' + questionId + ' (length: ' + pastedText.length + ' chars)');
+        }, 1000);
+        
+        function setCountdown() {
+            setInterval(() => {
+                seconds--;
+                countdownElement.textContent = seconds;
                 
-                setTimeout(() => {
-                    alert('⚠️ WARNING: Pasting detected and logged. Please type your answers manually.');
-                }, 100);
-            }
-        }
-
-        function selectChoice(questionId, choiceIndex) {
-            const choices = document.querySelectorAll(`[data-question-id="${questionId}"] .choice`);
-            choices.forEach((choice, index) => {
-                choice.classList.toggle('selected', index === choiceIndex);
-                const radio = choice.querySelector('input[type="radio"]');
-                radio.checked = index === choiceIndex;
-            });
-
-            saveResponse(questionId, choiceIndex);
-        }
-
-        function saveResponse(questionId, value) {
-            examState.responses[questionId] = value;
-            updateProgress();
-        }
-
-        function updateProgress() {
-            const totalQuestions = EXAM_QUESTIONS.length;
-            const answeredQuestions = Object.keys(examState.responses).length;
-            const progress = (answeredQuestions / totalQuestions) * 100;
-            
-            document.getElementById("progressFill").style.width = progress + "%";
-            document.getElementById("progressPercentage").textContent = Math.round(progress) + "%";
-        }
-
-        function updateTimer() {
-            let remaining = examState.endTime - Date.now();
-            
-            if (remaining <= 0) {
-                clearInterval(examState.timerInterval);
-                document.getElementById("timeLeft").textContent = "00:00";
-                endExam();
-                return;
-            }
-
-            let minutes = Math.floor(remaining / 60000);
-            let seconds = Math.floor((remaining % 60000) / 1000);
-            
-            const timeDisplay = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
-            document.getElementById("timeLeft").textContent = timeDisplay;
-
-            const timerBar = document.getElementById("timerBar");
-            if (minutes < CONFIG.WARNING_AT_MINUTES) {
-                timerBar.classList.add("warning");
-            }
-        }
-
-        function autoSaveProgress() {
-            if (!examState.examActive) return;
-
-            sendToServer('saveProgress', {
-                responses: examState.responses,
-                progress: (Object.keys(examState.responses).length / EXAM_QUESTIONS.length) * 100
-            });
-        }
-
-        function submitExam() {
-            if (!validateRequiredQuestions()) {
-                return;
-            }
-
-            if (confirm("Are you sure you want to submit your exam? This action cannot be undone.")) {
-                endExam(true);
-            }
-        }
-
-        function validateRequiredQuestions() {
-            const requiredQuestions = EXAM_QUESTIONS.filter(q => q.required);
-            const missingQuestions = [];
-
-            requiredQuestions.forEach(question => {
-                if (!examState.responses[question.id] && examState.responses[question.id] !== 0) {
-                    missingQuestions.push(question.question);
+                if (seconds <= 0) {
+                    console.log("Checking for new exams...");
+                    seconds = 30;
+                    countdownElement.textContent = seconds;
                 }
-            });
-
-            if (missingQuestions.length > 0) {
-                showError(`Please answer the following required questions:\n• ${missingQuestions.join('\n• ')}`);
-                
-                const firstMissing = requiredQuestions.find(q => !examState.responses[q.id] && examState.responses[q.id] !== 0);
-                if (firstMissing) {
-                    const element = document.querySelector(`[data-question-id="${firstMissing.id}"]`);
-                    if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        element.style.animation = 'pulse 2s';
-                    }
-                }
-                return false;
-            }
-
-            return true;
-        }
-
-        function endExam(manualSubmit = false) {
-            if (examState.terminated) return;
-            
-            examState.examActive = false;
-            examState.terminated = true;
-            clearInterval(examState.timerInterval);
-            clearTimeout(examState.autoSubmitTimer);
-            clearInterval(examState.autoSaveInterval);
-
-            document.getElementById("timerBar").style.display = "none";
-            document.getElementById("overlay").style.display = "flex";
-
-            const submissionType = manualSubmit ? 'Manual submission' : 'Time expired - auto submission';
-            
-            sendToServer('submitExam', {
-                submissionType: submissionType,
-                responses: examState.responses,
-                examQuestions: EXAM_QUESTIONS,
-                completionTime: new Date().toISOString()
-            });
-
-            setTimeout(() => {
-                showFinalResults();
-            }, 2000);
-        }
-
-        function showFinalResults() {
-            document.getElementById("overlayTitle").textContent = "✅ Exam Submitted Successfully";
-            document.getElementById("overlayMessage").innerHTML = `
-                <div style="text-align: center; padding: 20px;">
-                    <h3>Exam Complete!</h3>
-                    <p>Student: ${examState.studentData.name}</p>
-                    <p>Email: ${examState.studentData.email}</p>
-                    <p>Questions Answered: ${Object.keys(examState.responses).length}/${EXAM_QUESTIONS.length}</p>
-                    <p>Total Violations: ${examState.violations}</p>
-                    <p>Submission Time: ${new Date().toLocaleString()}</p>
-                    <br>
-                    <p style="color: #28a745; font-weight: bold;">Thank you for taking the exam!</p>
-                    <p>You may now close this window.</p>
-                </div>
-            `;
-            
-            document.querySelector('.loading').style.display = 'none';
-        }
-
-        function sendToServer(action, data) {
-            if (!CONFIG.ENABLE_SERVER_LOGGING || !CONFIG.WEBAPP_URL.includes('script.google.com')) {
-                console.log('Server logging disabled or invalid URL');
-                console.log('Would send:', action, data);
-                return;
-            }
-
-            const payload = {
-                action: action,
-                studentData: examState.studentData,
-                sessionId: examState.sessionId,
-                timestamp: new Date().toISOString(),
-                browserInfo: navigator.userAgent,
-                ...data
-            };
-
-            console.log('Sending to server:', payload);
-
-            fetch(CONFIG.WEBAPP_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => {
-                console.log('Server response received (no-cors mode)');
-            })
-            .catch(error => {
-                console.log('Error sending data to server:', error);
-                if (action === 'submitExam') {
-                    console.warn('Exam submission may have failed - please inform administrator');
-                }
-            });
-        }
-
-        function startMonitoring() {
-            console.log('Starting monitoring system...');
-            
-            document.addEventListener("visibilitychange", () => {
-                if (examState.examActive && document.hidden) {
-                    recordViolation("Tab/window switch detected");
-                }
-            });
-            
-            if (!examState.isMobile) {
-                window.addEventListener('blur', () => {
-                    if (examState.examActive) {
-                        recordViolation("Window lost focus");
-                    }
-                });
-            }
-            
-            document.addEventListener('contextmenu', e => {
-                if (examState.examActive) {
-                    e.preventDefault();
-                    recordViolation('Right-click/Long Press attempted');
-                    return false;
-                }
-            });
-            
-            document.addEventListener('keydown', function(e) {
-                if (!examState.examActive) return;
-                
-                let violationDetected = false;
-                let violationType = '';
-                
-                if (e.key === 'F12') {
-                    violationType = 'F12 Developer Tools attempted';
-                    violationDetected = true;
-                } else if (e.ctrlKey && e.shiftKey && e.key === 'I') {
-                    violationType = 'Ctrl+Shift+I Developer Tools attempted';
-                    violationDetected = true;
-                } else if (e.ctrlKey && e.shiftKey && e.key === 'J') {
-                    violationType = 'Ctrl+Shift+J Console attempted';
-                    violationDetected = true;
-                } else if (e.ctrlKey && e.key === 'U') {
-                    violationType = 'Ctrl+U View Source attempted';
-                    violationDetected = true;
-                }
-                
-                if (violationDetected) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    recordViolation(violationType);
-                    return false;
-                }
-            });
-            
-            console.log('Monitoring system initialized with basic protection');
+            }, 1000);
         }
         
-        function recordViolation(type) {
-            if (examState.terminated) return;
-            
-            const now = Date.now();
-            const violationKey = type.substring(0, 30);
-            
-            if (examState.recentViolations.has(violationKey)) {
-                console.log('Duplicate violation blocked:', type);
-                return;
-            }
-            
-            if (now - examState.lastViolationTime < examState.violationCooldown) {
-                console.log('Violation blocked due to cooldown:', type);
-                return;
-            }
-            
-            if (examState.isMobile && examState.preventViolations) {
-                console.log('Mobile violation filtered out:', type);
-                return;
-            }
-            
-            examState.violations++;
-            examState.lastViolationTime = now;
-            
-            examState.recentViolations.add(violationKey);
-            setTimeout(() => {
-                examState.recentViolations.delete(violationKey);
-            }, examState.violationCooldown);
-            
-            console.log('VIOLATION #' + examState.violations + ':', type);
-            
-            document.getElementById("violationNumber").textContent = examState.violations;
-            
-            sendToServer('logViolation', {
-                violationType: type,
-                additionalInfo: 'Monitoring system - legitimate violation',
-                deviceInfo: examState.isMobile ? 'Mobile Device' : 'Desktop Device'
-            });
-            
-            if (!type.toLowerCase().includes('focus')) {
-                showSimpleViolationWarning(type);
-            }
-            
-            if (examState.violations >= CONFIG.MAX_VIOLATIONS) {
-                console.log('Maximum violations reached, terminating exam');
-                endExam();
-            }
-        }
-        
-        function showSimpleViolationWarning(violationType) {
-            alert(`⚠️ VIOLATION DETECTED: ${violationType}\n\nThis has been recorded. Violation ${examState.violations} of ${CONFIG.MAX_VIOLATIONS}.\n\nPlease follow exam rules carefully.`);
-        }
-
-        function requestFullscreen() {
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen();
-            } else if (elem.mozRequestFullScreen) {
-                elem.mozRequestFullScreen();
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen();
-            } else if (elem.msRequestFullscreen) {
-                elem.msRequestFullscreen();
-            }
-        }
-
-        function showError(message) {
-            const errorDiv = document.getElementById("errorMessage");
-            errorDiv.textContent = message;
-            errorDiv.style.display = "block";
-            setTimeout(() => {
-                errorDiv.style.display = "none";
-            }, 5000);
-        }
-
-        function showSuccess(message) {
-            const successDiv = document.getElementById("successMessage");
-            successDiv.textContent = message;
-            successDiv.style.display = "block";
-            setTimeout(() => {
-                successDiv.style.display = "none";
-            }, 3000);
-        }
-
-        // Prevent leaving page during exam
-        window.addEventListener('beforeunload', function(e) {
-            if (examState.examActive) {
-                e.preventDefault();
-                e.returnValue = 'Are you sure you want to leave the exam?';
-                return 'Are you sure you want to leave the exam?';
-            }
+        // Simulate contact instructor button
+        document.querySelector('.btn-primary').addEventListener('click', function() {
+            alert('In a real application, this would open your email client to contact your instructor.');
         });
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Custom Proctored Exam System Loaded');
-            console.log('Total Questions:', EXAM_QUESTIONS.length);
-            console.log('Duration:', CONFIG.DURATION_MINUTES, 'minutes');
-            console.log('WebApp URL:', CONFIG.WEBAPP_URL);
+        
+        // Simulate help resources button
+        document.querySelector('.btn-outline').addEventListener('click', function() {
+            alert('Help resources would be displayed here.');
         });
     </script>
 </body>
