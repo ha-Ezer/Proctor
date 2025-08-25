@@ -55,7 +55,7 @@
             overflow: hidden;
             transition: var(--transition);
             width: 100%;
-            max-width: 600px;
+            max-width: 700px;
             padding: 40px;
             text-align: center;
         }
@@ -64,6 +64,12 @@
             font-size: 5rem;
             color: var(--primary);
             margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
 
         h1 {
@@ -102,6 +108,61 @@
 
         .info-box li {
             margin: 10px 0;
+        }
+
+        .contact-info {
+            background: rgba(40, 167, 69, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .contact-info h3 {
+            color: var(--success);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .contact-details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .contact-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-width: 200px;
+        }
+
+        .contact-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .contact-text {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .contact-subtext {
+            color: var(--gray);
+            font-size: 0.9rem;
         }
 
         .actions {
@@ -153,6 +214,10 @@
             margin-top: 30px;
             font-size: 1.1rem;
             color: var(--gray);
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            display: inline-block;
         }
 
         .countdown span {
@@ -178,6 +243,11 @@
             
             p {
                 font-size: 1.1rem;
+            }
+            
+            .contact-details {
+                flex-direction: column;
+                gap: 20px;
             }
             
             .actions {
@@ -207,19 +277,41 @@
                 <h3><i class="fas fa-info-circle"></i> What to expect next:</h3>
                 <ul>
                     <li>Exams will appear here automatically when scheduled</li>
-                    <li>You'll receive notification when an exam is available</li>
+                    <li>You'll rbe notified when the exam is ready</li>
                     <li>Make sure your device meets the system requirements</li>
-                    <li>Have your student ID ready for verification</li>
                 </ul>
             </div>
             
+            <div class="contact-info">
+                <h3><i class="fas fa-user-graduate"></i> Contact Your Instructor</h3>
+                <p>If you have questions about upcoming exams, please contact:</p>
+                
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-text">ntimeben@gmail.com</div>
+                        <div class="contact-subtext">Email Address</div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-text">+233 36 624 0922</div>
+                        <div class="contact-subtext">Phone Number</div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="actions">
-                <button class="btn btn-primary">
-                    <i class="fas fa-envelope"></i> Contact Instructor
-                </button>
-                <button class="btn btn-outline">
-                    <i class="fas fa-question-circle"></i> View Help Resources
-                </button>
+                <a href="mailto:ntimeben@gmail.com" class="btn btn-primary">
+                    <i class="fas fa-envelope"></i> Email Instructor
+                </a>
+                <a href="tel:+233366240922" class="btn btn-outline">
+                    <i class="fas fa-phone"></i> Call Instructor
+                </a>
             </div>
             
             <div class="countdown">
@@ -264,16 +356,6 @@
                 }
             }, 1000);
         }
-        
-        // Simulate contact instructor button
-        document.querySelector('.btn-primary').addEventListener('click', function() {
-            alert('In a real application, this would open your email client to contact your instructor.');
-        });
-        
-        // Simulate help resources button
-        document.querySelector('.btn-outline').addEventListener('click', function() {
-            alert('Help resources would be displayed here.');
-        });
     </script>
 </body>
 </html>
