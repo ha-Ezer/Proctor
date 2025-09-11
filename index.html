@@ -689,7 +689,7 @@
     <script>
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 30,
+            DURATION_MINUTES: 25,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 5,
@@ -704,117 +704,115 @@
             {
                 id: "q1",
                 type: "multiple-choice",
-                question: "One functions of the hypodermis/Subcutaneous Layer is to..........",
+                question: "Which of these is NOT true about the circulatory system?",
                 required: false,
                 options: [
-                    "Make the skin oily",
-                    "To store fat", 
-                    "Produce sweat",
-                    "To Produce melanin"
+                    "The Arteries carry blood away from the heart",
+                    "The Veins carry blood to the heart", 
+                    "The Arteries carry blood toward the heart",
+                    "The Veins carry blood toward the heart"
                 ],
-                correctAnswer: 1
+                correctAnswer: 2
             },
             {
                 id: "q2",
                 type: "text",
-                question: "Briefly describe what makes a skin disorder infectious. ",
+                question: "Briefly describe what caused the deformation in this man's face ",
                 required: false,
+                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSi2SSkComQ67ykXanAo81w90Aw9y-MQxX7Lrv6cSP_a-ghhaFJ2QWwmGWzyanfz4nZJ2Q&usqp=CAU",
                 placeholder: "Type your brief explanation here..."
             },
             {
                 id: "q3", 
-                type: "multiple-choice",
-                question: "Which of these is a non-infectious skin disorder?",
+                type: "text",
+                question: "List one function of the skeletal system",
                 required: false,
-                options: [
-                    "Athlete's Foot",
-                    "Cold Sore", 
-                    "Boils",
-                    "Vitiligo"
-                ],
-                correctAnswer: 3
-                // placeholder: "Enter your detailed explanation here..."
+                placeholder: "Type your answer here..." 
             },
             {
                 id: "q4",
                 type: "text", 
-                question: "Your client has Acne Vulgaris. Why should they not often touch their face?",
+                question: "Your client has these lines on their foot. What is the main cause of this skin disorder",
                 required: false,
+                image: "https://www.geelongveinsskinlaser.com.au/wp-content/uploads/2024/10/Varicose-veins-1-600x600.jpg",
                 placeholder: "Type your brief explanation here...",            
             },
             {
                 id: "q5",
-                type: "multiple-choice",
-                question: "Which of these is not a sebaceous gland disorder?",
+                type: "text",
+                question: "In the Image below, which is the Flexor and which is the Extensor?",
                 required: false,
-                options: [
-                    "Rosacea",
-                    "Acne Vulgaris", 
-                    "Melanoma",
-                    "Seborrhea"
-                ],
-                correctAnswer: 2
+                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01js0q6n65e7ztn42f22xe45c3%2Fimg_0.webp?st=2025-09-10T23%3A02%3A52Z&se=2025-09-17T00%3A02%3A52Z&sks=b&skt=2025-09-10T23%3A02%3A52Z&ske=2025-09-17T00%3A02%3A52Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=fea36edb-a052-425e-a84a-436fdce0a7b4&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=ZG7P8%2BtRzilr%2FeBVMYtNSzhIft4SlfvBYF7z5xTVsxM%3D&az=oaivgprodscus",
+                placeholder: "Type your answer here...",
             },
             {
                 id: "q6",
                 type: "multiple-choice",
-                question: "The portrutions on the man's face are malignant melanomas.",
+                question: "The lines (A) running through the image below are called.......",
                 required: false,
-                image: "https://static.wixstatic.com/media/4a890b_43605718527241c5ba48022e0e29430e~mv2.jpg/v1/fill/w_499,h_333,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/4a890b_43605718527241c5ba48022e0e29430e~mv2.jpg",
+                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01js0qy9wvepa98hdw2jhw8r9k%2Fimg_0.webp?st=2025-09-10T23%3A02%3A52Z&se=2025-09-17T00%3A02%3A52Z&sks=b&skt=2025-09-10T23%3A02%3A52Z&ske=2025-09-17T00%3A02%3A52Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=fea36edb-a052-425e-a84a-436fdce0a7b4&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=voWJX76zi3u9S5BpT6iZx1FMcOmcpHVpxd3J6UsSFaw%3D&az=oaivgprodscus",
                 options: [
-                    "True",
-                    "False", 
+                    "Capillaries",
+                    "Sinuses",
+                    "Arterioles",
+                    "Sutures" 
                     
                 ],
-                correctAnswer: 1
+                correctAnswer: 3
             },
             {
                 id: "q7",
-                type: "multiple-choice",
-                question: "WHich of these parts of the ear would you NOT pierce due to the risk of complications?",
+                type: "text",
+                question: "In your own words, define circulation with respect to the human body?",
                 required: false,
-                options: [
-                    "Pinna",
-                    "Lobule",
-                    "Helix", 
-                    "Outer Ear"
-                ],
-                correctAnswer: 2
+                placeholder: "Type your answer here...",
             },
             {
                 id: "q8",
-                type: "text",
-                question: "What complication could arise from piercing the above selected part of the ear?",
+                type: "multiple-choice",
+                question: "All the following are true about Nails except",
                 required: false,
-                placeholder: "Type your brief answer here..."
+                options: [
+                    "Nails are made of the same protein as hair",
+                    "Nails are made up of the same protein as skin", 
+                    "Nails are made up of the same protein as bones",
+                    "The Nails grow from Stratum Germinativum"
+                ],
+                correctAnswer: 3
             },
             {
                 id: "q9",
-                type: "text",
-                question: "Name one function of hair on the human body.",
+                type: "multiple-choice",
+                question: "The main parts of the central nervous system are the brain and the.......",
                 required: false,
-                placeholder: "Type your answer here..."
+                options: [
+                    "Spinal cord",
+                    "Backbone", 
+                    "Stratum Germinativum",
+                    "Peripheral nerves"
+                ], 
+                correctAnswer: 0
             },
             {
                 id: "q10",
                 type: "multiple-choice",
-                question: "A hair bulb that is attached to the dermal papilla will",
+                question: "When we say a muscle is responsive, it means that Q.......",
                 required: false,
                 options: [
-                    "Will be more shiny than the rest",
-                    "Will Immediately stop growing",
-                    "Become gray hair",
-                    "Continue to grow hair"
+                    "The muscle reacts based on impulses from the hormones",
+                    "The muscle reacts based on impulses from the nerves",
+                    "The muscle reacts based on impulses from the blood",
+                    "The muscle reacts based on impulses from the skin"
                 ],
-                correctAnswer: 3
+                correctAnswer: 1
 
             },
             {
                 id: "q11",
                 type: "text",
-                question: "List two factors that positively/negatively affect hair growth",
+                question: "What is a Tendon?",
                 required: false,
-                placeholder: "Type your answers here..."
+                placeholder: "Type your answer here..."
 
             },
             
