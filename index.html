@@ -85,6 +85,7 @@
             transition: var(--transition);
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin: 5px;
         }
 
         .btn-primary {
@@ -109,11 +110,66 @@
             box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
         }
 
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--gray), #6c757d);
+            color: white;
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
         .btn:disabled {
             background: var(--gray);
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+        }
+
+        /* Recovery Dialog */
+        .recovery-dialog {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 30000;
+            padding: 20px;
+        }
+
+        .recovery-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .recovery-content h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .recovery-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .recovery-info div {
+            margin: 8px 0;
+            font-weight: 500;
+        }
+
+        .recovery-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
         }
 
         /* Timer Bar */
@@ -328,6 +384,11 @@
             color: var(--danger);
         }
 
+        .question.answered {
+            border-left-color: var(--success);
+            background: rgba(40, 167, 69, 0.02);
+        }
+
         .question-header {
             display: flex;
             justify-content: space-between;
@@ -464,6 +525,12 @@
             border-left: 4px solid var(--success);
         }
 
+        .info-message {
+            background: rgba(74, 108, 247, 0.1);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+
         /* Overlay */
         .overlay {
             position: fixed;
@@ -581,6 +648,15 @@
                 font-size: 1em;
                 padding: 12px;
             }
+
+            .recovery-content {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            .recovery-buttons {
+                flex-direction: column;
+            }
         }
 
         @media (max-width: 480px) {
@@ -600,6 +676,27 @@
     </style>
 </head>
 <body>
+    <!-- Progress Recovery Dialog -->
+    <div id="recoveryDialog" class="recovery-dialog" style="display: none;">
+        <div class="recovery-content">
+            <h3><i class="fas fa-history"></i> Previous Progress Found!</h3>
+            <p>We found your previous exam progress. Would you like to resume where you left off?</p>
+            
+            <div id="recoveryInfo" class="recovery-info">
+                <!-- Progress details will be populated here -->
+            </div>
+            
+            <div class="recovery-buttons">
+                <button onclick="resumeExam()" class="btn btn-success">
+                    <i class="fas fa-play"></i> Resume Exam
+                </button>
+                <button onclick="startFreshExam()" class="btn btn-secondary">
+                    <i class="fas fa-refresh"></i> Start Fresh
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Student Info Capture -->
     <div id="studentForm">
         <div class="card">
@@ -615,7 +712,8 @@
                     <li>Do not minimize the browser</li>
                     <li>Ensure stable internet connection</li>
                     <li>Answer all required questions marked with *</li>
-                    <li>Your progress is automatically saved</li>
+                    <li>Your progress is automatically saved every 30 seconds</li>
+                    <li>If you experience issues, refresh the page to recover your progress</li>
                     <li>Each violation of the above or any other form of cheating will be recorded</li>
                 </ul>
             </div>
@@ -632,6 +730,7 @@
             
             <!-- Error message display for student form -->
             <div id="loginErrorMessage" class="message error-message" style="margin: 15px 0;"></div>
+            <div id="loginInfoMessage" class="message info-message" style="margin: 15px 0;"></div>
             
             <div class="form-check">
                 <input type="checkbox" id="agreeTerms" class="form-check-input" required />
@@ -675,6 +774,7 @@
             
             <div id="errorMessage" class="message error-message"></div>
             <div id="successMessage" class="message success-message"></div>
+            <div id="infoMessage" class="message info-message"></div>
             
             <!-- Questions will be dynamically generated here -->
             <div id="questionsContainer"></div>
@@ -709,14 +809,16 @@
 
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 60,
+            DURATION_MINUTES: 50,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 5,
             WEBAPP_URL: "https://script.google.com/macros/s/AKfycbzcVC6Cg2jjIYbURmeV-0gqq7fmDFwA5pWd9T7H-Tjdf1r84gQw4gKiJJgDr_30TeR9Ow/exec",
             ENABLE_FULLSCREEN: true,
             ENABLE_SERVER_LOGGING: true,
-            AUTO_SAVE_INTERVAL: 30
+            AUTO_SAVE_INTERVAL: 30,
+            EXAM_VERSION: "v2.1", // Increment this when questions change
+            MIN_TIME_GUARANTEE: 5 // Minimum minutes always guaranteed
         };
 
         // ========== EXAM QUESTIONS CONFIGURATION ==========
@@ -825,223 +927,7 @@
                 required: false,
                 image: "https://videos.openai.com/vg-assets/assets%2Ftask_01js0ky6x2epprs4anvc941hyk%2Fimg_0.webp?st=2025-09-16T23%3A39%3A36Z&se=2025-09-23T00%3A39%3A36Z&sks=b&skt=2025-09-16T23%3A39%3A36Z&ske=2025-09-23T00%3A39%3A36Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=8b872fb2-b44b-4c1d-9ff6-1d4509d19e6e&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=%2FE9JKlrbZfzqlGMT43pZeDeHlWwsVMa9ISWvigzR4kA%3D&az=oaivgprodscus",
                 placeholder: "Type your answer here..."
-            },
-            {
-                id: "q11",
-                type: "text",
-                question: "Provide the name and function of the white tissue labelled A in the image below",
-                required: false,
-                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01k5ak22fwe4tvhpfy5g617588%2F1758070968_img_0.webp?st=2025-09-16T23%3A39%3A28Z&se=2025-09-23T00%3A39%3A28Z&sks=b&skt=2025-09-16T23%3A39%3A28Z&ske=2025-09-23T00%3A39%3A28Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=8b872fb2-b44b-4c1d-9ff6-1d4509d19e6e&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=pvfqSc6NSVnC3uSV5VU0AB3%2BxNG8sPMP25LmacvsQkE%3D&az=oaivgprodscus",
-                placeholder: "Type your answer here..."
-
-            },
-            {
-                id: "q12",
-                type: "multiple-choice",
-                question: "The following disadvantages can result from over-exposure to sunlight except",
-                required: false,
-                options: [
-                    "Darkening of the skin",
-                    "Skin Cancers", 
-                    "Disinfection of the skin",
-                    "Sunburn"
-                ],
-                correctAnswer: 2
-            },
-            {
-                id: "q13",
-                type: "multiple-choice",
-                question: "Antiperpirants....",
-                required: false,
-                options: [
-                    "Kill the germs that feed on sweating",
-                    "Protect us from the sun",
-                    "Close up the sweat pores",
-                    "Moisturize our armpits",
-                ],   
-                 correctAnswer: 2
-            },
-            {
-                type: "multiple-choice",
-                question: "Deodorants....",
-                required: false,
-                options: [
-                    "Kill the germs that feed on sweating",
-                    "Protect us from the sun",
-                    "Close up the sweat pores",
-                    "Moisturize our armpits",
-                ],   
-                 correctAnswer: 0
-            },
-            {
-                id: "q15",
-                type: "multiple-choice",
-                question: "Swebum is the acidic substance that protects the skin from germs",
-                required: false,
-                options: [
-                    "True",
-                    "False", 
-                ],
-                correctAnswer: 1
-            },
-            {
-                id: "q16",
-                type: "multiple-choice",
-                question: "The acidic substance that protects the skin from germs is produced by",
-                required: false,
-                options: [
-                    "Shiny mantle",
-                    "Swebum Cysts and Sweat Glands", 
-                    "Blood Capillaries and Sebaceous glands",
-                    "Sebaceous glands and Sweat glands  "
-                ],
-                correctAnswer: 3
-            },
-            {
-                id: "q17",
-                type: "text",
-                question: "There are three sections of the image below. A, B and C. Name any two functions of the lowest section labelled 'C'.",
-                required: false,
-                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01js0ky6x2epprs4anvc941hyk%2Fimg_0.webp?st=2025-09-16T23%3A39%3A36Z&se=2025-09-23T00%3A39%3A36Z&sks=b&skt=2025-09-16T23%3A39%3A36Z&ske=2025-09-23T00%3A39%3A36Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=8b872fb2-b44b-4c1d-9ff6-1d4509d19e6e&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=%2FE9JKlrbZfzqlGMT43pZeDeHlWwsVMa9ISWvigzR4kA%3D&az=oaivgprodscus",
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q18",
-                type: "text",
-                question: "List two examples of skin disorders caused by Viruses",
-                required: false,
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q19",
-                type: "text",
-                question: "List two examples of skin disorders caused by Fungi",
-                required: false,
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q20",
-                type: "text",
-                question: "List two examples of skin disorders caused by Bacteria",
-                required: false,
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q21",
-                type: "multiple-choice",
-                question: "Based on the anatomy and physiology course, the image attached is that of a.......",
-                required: false,
-                image: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVB6u5NSfBA1dVG9UtBsAGct_-gIdl-buhLV5nv8cm0T4DlqTflEaJxgUQgyD-xjeK8h1zqHSaJgf3_diMu-7kraut0V1MlbXj6axYx-RkSsy6_sSvPVvEW7SJrKI7FjshUxMkIEE6YVpuvwcXxU3CtaxE9ysqvXXjJSGQ?key=c8nbdp6esJiovKdeQjhCow",
-                options: [
-                    "Normal Mole",
-                    "Malignant Melanoma", 
-                    
-                ],
-                correctAnswer: 0
-            },
-            {
-                id: "q22",
-                type: "multiple-choice",
-                question: "After waxing a client's armpit, they report that the hair started growing after three days. You probably waxed while the armpit hair was in the _____________ stage.",
-                required: false,
-                options: [
-                    "Anagen",
-                    "Catagen", 
-                    "Telogen",
-                    "Hairlogen"
-                ],
-                correctAnswer: 0
-            },
-            {
-                id: "q23",
-                type: "multiple-choice",
-                question: "The hairs found on New born babies are called",
-                required: false,
-                options: [
-                    "Terminal hair",
-                    "Vellus Hairs", 
-                    "Lanugo Hairs",
-                    "Respiration"
-                ],
-                correctAnswer: 2
-            },
-            {
-                id: "q24",
-                type: "multiple-choice",
-                question: "The following are functions of the skin except",
-                required: false,
-                options: [
-                    "Protection",
-                    "Sensation", 
-                    "Vitamin D Production",
-                    "Respiration"
-                ],
-                correctAnswer: 3
-            },
-            {
-                id: "q25",
-                type: "text",
-                question: "What are the two main divisions of the Nervous system?",
-                required: false,
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q26",
-                type: "text",
-                question: "In the image below, what is the name of the lines labelled A",
-                required: false,
-                image: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVB3mBhrF_38bFwIBGVRX5YiRBdN72GRl4Caj3LoPf0k0JYKJ8mZIEKToAiEXkZLJavljnRM1GzP_xQrlCJA7BQ_Mq1xi1EEAeNf7N6mINQvxdVmvrbOFDLA26dsMubhtfa3rEoWsy4qzhYNmxH46Ju2nnYystOID-xm?key=c8nbdp6esJiovKdeQjhCow",
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q27",
-                type: "text",
-                question: "Briefly describe to a client why your massages are important to their skin",
-                required: false,
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q28",
-                type: "text",
-                question: "As she got pregnant, she got darker and darker. What is the science behind this transformation?",
-                required: false,
-                image: "https://cdn.legit.ng/images/1120/a6e874a17267c42b.jpeg?v=1",
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q29",
-                type: "text",
-                question: "The importance of wearing gloves, washing hands and wearing other protective equipment when handling clients is to.........",
-                required: false,
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q30",
-                type: "multiple-choice",
-                question: "This skin condition is not infectious",
-                required: false,
-                image: "https://varicose-veinclinic.com/hp/wp-content/uploads/2025/01/5250842d36f95f91130ba40195268aeb-1.jpg",
-                options: [
-                    "True",
-                    "False", 
-                ], 
-                correctAnswer: 0
-            },
-            {
-                id: "q31",
-                type: "multiple-choice",
-                question: "This is an example of a..........",
-                required: false,
-                image: "https://media.self.com/photos/5a0b694f02c0564411bbb878/4:3/w_1920,c_limit/Vitiligo-Wedding-Stress.jpg",
-                options: [
-                    "Fungal Infection",
-                    "Skin Cancer", 
-                    "Viral Infection",
-                    "Pigmentation Disorder"
-                ]
-                ,correctAnswer: 3
             }
-
         ];
 
         let examState = {
@@ -1062,25 +948,310 @@
             keyboardVisible: false,
             lastViolationTime: 0,
             violationCooldown: 2000,
-            recentViolations: new Set()
+            recentViolations: new Set(),
+            resuming: false,
+            urlProgressData: null
         };
+
+        // ========== URL-BASED PROGRESS ENCODING SYSTEM ==========
+        
+        function encodeProgressToURL(progressData) {
+            try {
+                const compressedData = {
+                    v: CONFIG.EXAM_VERSION,
+                    n: progressData.studentName,
+                    e: progressData.studentEmail,
+                    s: progressData.sessionId,
+                    st: progressData.startTime,
+                    et: progressData.endTime,
+                    r: progressData.responses,
+                    vio: progressData.violations,
+                    ls: Date.now() // last saved timestamp
+                };
+                
+                const encoded = btoa(JSON.stringify(compressedData));
+                const newUrl = window.location.pathname + '?ep=' + encoded;
+                
+                // Update URL without triggering page reload
+                window.history.replaceState({}, '', newUrl);
+                
+                console.log('Progress encoded to URL:', Object.keys(progressData.responses).length, 'responses saved');
+                return true;
+            } catch (error) {
+                console.warn('Failed to encode progress to URL:', error);
+                return false;
+            }
+        }
+
+        function decodeProgressFromURL() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const encoded = urlParams.get('ep');
+                
+                if (!encoded) {
+                    return null;
+                }
+                
+                const decoded = JSON.parse(atob(encoded));
+                
+                // Validate exam version
+                if (decoded.v !== CONFIG.EXAM_VERSION) {
+                    console.log('Exam version mismatch - URL has', decoded.v, 'current is', CONFIG.EXAM_VERSION);
+                    clearURLProgress();
+                    return null;
+                }
+                
+                // Validate data structure
+                if (!decoded.n || !decoded.e || !decoded.r || !decoded.st) {
+                    console.log('Invalid progress data structure');
+                    return null;
+                }
+                
+                console.log('Progress decoded from URL:', Object.keys(decoded.r).length, 'responses found');
+                return {
+                    studentName: decoded.n,
+                    studentEmail: decoded.e,
+                    sessionId: decoded.s,
+                    startTime: decoded.st,
+                    endTime: decoded.et,
+                    responses: decoded.r,
+                    violations: decoded.vio || 0,
+                    lastSaved: decoded.ls
+                };
+            } catch (error) {
+                console.warn('Failed to decode progress from URL:', error);
+                clearURLProgress();
+                return null;
+            }
+        }
+
+        function clearURLProgress() {
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+            console.log('URL progress cleared');
+        }
+
+        function saveProgressToURL() {
+            if (!examState.examActive || examState.terminated) return;
+            
+            const progressData = {
+                studentName: examState.studentData.name,
+                studentEmail: examState.studentData.email,
+                sessionId: examState.sessionId,
+                startTime: examState.startTime,
+                endTime: examState.endTime,
+                responses: examState.responses,
+                violations: examState.violations
+            };
+            
+            encodeProgressToURL(progressData);
+        }
+
+        function checkForURLProgress() {
+            const urlProgress = decodeProgressFromURL();
+            if (urlProgress) {
+                examState.urlProgressData = urlProgress;
+                console.log('URL progress found:', urlProgress);
+                return true;
+            }
+            return false;
+        }
+
+        // ========== PROGRESS RECOVERY FUNCTIONS ==========
+        
+        function showRecoveryDialog(progressData) {
+            const dialog = document.getElementById('recoveryDialog');
+            const infoDiv = document.getElementById('recoveryInfo');
+            
+            const answeredCount = Object.keys(progressData.responses).length;
+            const progressPercent = Math.round((answeredCount / EXAM_QUESTIONS.length) * 100);
+            const lastSavedTime = new Date(progressData.lastSaved).toLocaleString();
+            
+            // Calculate remaining time
+            const currentTime = Date.now();
+            const originalEndTime = progressData.endTime;
+            const remainingMs = originalEndTime - currentTime;
+            const remainingMinutes = Math.max(CONFIG.MIN_TIME_GUARANTEE, Math.floor(remainingMs / 60000));
+            
+            infoDiv.innerHTML = `
+                <div><strong>Student:</strong> ${progressData.studentName}</div>
+                <div><strong>Email:</strong> ${progressData.studentEmail}</div>
+                <div><strong>Progress:</strong> ${progressPercent}% (${answeredCount}/${EXAM_QUESTIONS.length} questions)</div>
+                <div><strong>Time Remaining:</strong> ~${remainingMinutes} minutes</div>
+                <div><strong>Violations:</strong> ${progressData.violations || 0}</div>
+                <div><strong>Last Saved:</strong> ${lastSavedTime}</div>
+            `;
+            
+            dialog.style.display = 'flex';
+        }
+
+        function resumeExam() {
+            const progressData = examState.urlProgressData;
+            if (!progressData) {
+                startFreshExam();
+                return;
+            }
+            
+            // Restore exam state
+            examState.resuming = true;
+            examState.studentData = { 
+                name: progressData.studentName, 
+                email: progressData.studentEmail 
+            };
+            examState.sessionId = progressData.sessionId;
+            examState.responses = progressData.responses;
+            examState.violations = progressData.violations || 0;
+            examState.startTime = new Date(progressData.startTime);
+            
+            // Calculate remaining time (ensure minimum time)
+            const currentTime = Date.now();
+            const originalEndTime = progressData.endTime;
+            const remainingMs = originalEndTime - currentTime;
+            const guaranteedMs = CONFIG.MIN_TIME_GUARANTEE * 60 * 1000;
+            const finalRemainingMs = Math.max(guaranteedMs, remainingMs);
+            
+            examState.endTime = currentTime + finalRemainingMs;
+            
+            // Hide recovery dialog
+            document.getElementById('recoveryDialog').style.display = 'none';
+            
+            // Populate student form
+            document.getElementById('studentName').value = progressData.studentName;
+            document.getElementById('studentEmail').value = progressData.studentEmail;
+            document.getElementById('agreeTerms').checked = true;
+            
+            // Start exam
+            continueExamAfterRecovery();
+            
+            showInfo(`Progress restored! ${Object.keys(progressData.responses).length}/${EXAM_QUESTIONS.length} questions recovered. Resuming exam...`);
+        }
+
+        function startFreshExam() {
+            document.getElementById('recoveryDialog').style.display = 'none';
+            clearURLProgress();
+            examState.urlProgressData = null;
+            showInfo("Starting fresh exam...");
+        }
+
+        function continueExamAfterRecovery() {
+            examState.examActive = true;
+            
+            // Request fullscreen
+            if (CONFIG.ENABLE_FULLSCREEN) {
+                requestFullscreen();
+            }
+            
+            // Hide student form
+            document.getElementById("studentForm").style.display = "none";
+            
+            // Show timer + exam
+            document.getElementById("timerBar").style.display = "block";
+            document.getElementById("examContainer").style.display = "block";
+            
+            // Generate exam questions
+            generateQuestions();
+            
+            // Restore responses in UI
+            restoreResponsesInUI();
+            
+            // Update progress display
+            updateProgress();
+            
+            // Start countdown with remaining time
+            examState.timerInterval = setInterval(updateTimer, 1000);
+            examState.autoSubmitTimer = setTimeout(endExam, examState.endTime - Date.now());
+            
+            // Start auto-save
+            examState.autoSaveInterval = setInterval(autoSaveProgress, CONFIG.AUTO_SAVE_INTERVAL * 1000);
+            
+            // Start monitoring
+            startMonitoring();
+            
+            // Log exam resume
+            sendToServer('logViolation', {
+                violationType: 'Exam resumed from URL progress',
+                additionalInfo: `Restored ${Object.keys(examState.responses).length} responses, ${examState.violations} violations`
+            });
+            
+            // Scroll to first unanswered question
+            setTimeout(() => {
+                scrollToNextUnanswered();
+            }, 1000);
+            
+            console.log("Exam resumed with progress:", examState);
+        }
+
+        function restoreResponsesInUI() {
+            Object.keys(examState.responses).forEach(questionId => {
+                const value = examState.responses[questionId];
+                const question = EXAM_QUESTIONS.find(q => q.id === questionId);
+                
+                if (!question) return;
+                
+                if (question.type === 'multiple-choice') {
+                    selectChoice(questionId, value);
+                } else {
+                    const element = document.getElementById(questionId);
+                    if (element) {
+                        element.value = value;
+                    }
+                }
+                
+                // Mark question as answered visually
+                const questionDiv = document.querySelector(`[data-question-id="${questionId}"]`);
+                if (questionDiv) {
+                    questionDiv.classList.add('answered');
+                }
+            });
+        }
+
+        function scrollToNextUnanswered() {
+            const answeredIds = Object.keys(examState.responses);
+            const nextUnanswered = EXAM_QUESTIONS.find(q => !answeredIds.includes(q.id));
+            
+            if (nextUnanswered) {
+                const element = document.querySelector(`[data-question-id="${nextUnanswered.id}"]`);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    element.style.animation = 'pulse 2s';
+                }
+            }
+        }
+
+        // ========== ENHANCED AUTO-SAVE WITH URL PERSISTENCE ==========
+        
+        function autoSaveProgress() {
+            if (!examState.examActive || examState.terminated) return;
+            
+            // Save to URL (immediate, works offline)
+            saveProgressToURL();
+            
+            // Save to server (network-dependent)
+            sendToServer('saveProgress', {
+                responses: examState.responses,
+                progress: (Object.keys(examState.responses).length / EXAM_QUESTIONS.length) * 100,
+                violations: examState.violations,
+                timeRemaining: Math.max(0, examState.endTime - Date.now())
+            });
+            
+            console.log('Auto-save completed:', Object.keys(examState.responses).length, 'responses');
+        }
+
+        // ========== ORIGINAL FUNCTIONS WITH ENHANCEMENTS ==========
 
         function generateSessionId() {
             return 'session_' + new Date().getTime() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
-        // ========== EMAIL VALIDATION FUNCTION ==========
         function isEmailAuthorized(email) {
             if (!email || typeof email !== 'string') {
                 console.log('Invalid email input:', email);
                 return false;
             }
             
-            // Convert to lowercase for case-insensitive comparison
             const emailLower = email.toLowerCase().trim();
             console.log('Checking email (lowercase):', emailLower);
             
-            // Check if email exists in authorized list (case-insensitive)
             const isAuthorized = AUTHORIZED_EMAILS.some(authorizedEmail => {
                 const authEmailLower = authorizedEmail.toLowerCase().trim();
                 console.log('Comparing with:', authEmailLower, 'Match:', authEmailLower === emailLower);
@@ -1091,7 +1262,6 @@
             return isAuthorized;
         }
 
-        // ========== ERROR DISPLAY FUNCTIONS FOR LOGIN FORM ==========
         function showLoginError(message) {
             console.log('Showing login error:', message);
             const errorDiv = document.getElementById("loginErrorMessage");
@@ -1099,14 +1269,24 @@
                 errorDiv.textContent = message;
                 errorDiv.style.display = "block";
                 
-                // Auto-hide after 8 seconds
                 setTimeout(() => {
                     errorDiv.style.display = "none";
                 }, 8000);
             } else {
                 console.error('Login error div not found');
-                // Fallback to alert
                 alert('Error: ' + message);
+            }
+        }
+
+        function showLoginInfo(message) {
+            const infoDiv = document.getElementById("loginInfoMessage");
+            if (infoDiv) {
+                infoDiv.textContent = message;
+                infoDiv.style.display = "block";
+                
+                setTimeout(() => {
+                    infoDiv.style.display = "none";
+                }, 5000);
             }
         }
 
@@ -1115,6 +1295,10 @@
             if (errorDiv) {
                 errorDiv.style.display = "none";
             }
+            const infoDiv = document.getElementById("loginInfoMessage");
+            if (infoDiv) {
+                infoDiv.style.display = "none";
+            }
         }
 
         function startExam() {
@@ -1122,7 +1306,6 @@
             const email = document.getElementById("studentEmail").value.trim();
             const agreed = document.getElementById("agreeTerms").checked;
 
-            // Clear any previous error messages
             clearLoginError();
 
             if (!name || !email || !agreed) {
@@ -1135,9 +1318,7 @@
                 return;
             }
 
-            // ========== CHECK AUTHORIZED EMAIL ==========
             console.log('Checking email authorization for:', email);
-            console.log('Available authorized emails:', AUTHORIZED_EMAILS);
             
             if (!isEmailAuthorized(email)) {
                 console.log('Email not authorized:', email);
@@ -1147,38 +1328,44 @@
             
             console.log('Email authorized, proceeding with exam...');
 
+            // Check if there's URL progress and it matches this student
+            if (examState.urlProgressData) {
+                const urlProgress = examState.urlProgressData;
+                if (urlProgress.studentName === name && urlProgress.studentEmail === email) {
+                    // Show recovery dialog
+                    showRecoveryDialog(urlProgress);
+                    return;
+                } else {
+                    // Different student - clear URL progress
+                    clearURLProgress();
+                    examState.urlProgressData = null;
+                }
+            }
+
+            // Start fresh exam
             examState.studentData = { name, email };
             examState.startTime = new Date();
             examState.examActive = true;
             examState.sessionId = generateSessionId();
 
-            // Request fullscreen
             if (CONFIG.ENABLE_FULLSCREEN) {
                 requestFullscreen();
             }
 
-            // Hide student form
             document.getElementById("studentForm").style.display = "none";
-
-            // Show timer + exam
             document.getElementById("timerBar").style.display = "block";
             document.getElementById("examContainer").style.display = "block";
 
-            // Generate exam questions
             generateQuestions();
 
-            // Start countdown
             examState.endTime = Date.now() + CONFIG.DURATION_MINUTES * 60 * 1000;
             examState.timerInterval = setInterval(updateTimer, 1000);
             examState.autoSubmitTimer = setTimeout(endExam, CONFIG.DURATION_MINUTES * 60 * 1000);
 
-            // Start auto-save
             examState.autoSaveInterval = setInterval(autoSaveProgress, CONFIG.AUTO_SAVE_INTERVAL * 1000);
 
-            // Start monitoring
             startMonitoring();
 
-            // Log exam start
             sendToServer('logViolation', {
                 violationType: 'Exam started',
                 additionalInfo: 'Custom exam system initialized'
@@ -1272,7 +1459,19 @@
 
         function saveResponse(questionId, value) {
             examState.responses[questionId] = value;
+            
+            // Mark question as answered
+            const questionDiv = document.querySelector(`[data-question-id="${questionId}"]`);
+            if (questionDiv) {
+                questionDiv.classList.add('answered');
+            }
+            
             updateProgress();
+            
+            // Trigger immediate URL save for important responses
+            if (!examState.resuming) {
+                saveProgressToURL();
+            }
         }
 
         function updateProgress() {
@@ -1304,15 +1503,6 @@
             if (minutes < CONFIG.WARNING_AT_MINUTES) {
                 timerBar.classList.add("warning");
             }
-        }
-
-        function autoSaveProgress() {
-            if (!examState.examActive) return;
-
-            sendToServer('saveProgress', {
-                responses: examState.responses,
-                progress: (Object.keys(examState.responses).length / EXAM_QUESTIONS.length) * 100
-            });
         }
 
         function submitExam() {
@@ -1370,8 +1560,12 @@
                 submissionType: submissionType,
                 responses: examState.responses,
                 examQuestions: EXAM_QUESTIONS,
-                completionTime: new Date().toISOString()
+                completionTime: new Date().toISOString(),
+                wasResumed: examState.resuming
             });
+
+            // Clear URL progress on successful submission
+            clearURLProgress();
 
             setTimeout(() => {
                 showFinalResults();
@@ -1388,6 +1582,7 @@
                     <p>Questions Answered: ${Object.keys(examState.responses).length}/${EXAM_QUESTIONS.length}</p>
                     <p>Total Violations: ${examState.violations}</p>
                     <p>Submission Time: ${new Date().toLocaleString()}</p>
+                    ${examState.resuming ? '<p style="color: #007bff;">✓ Progress was recovered and resumed</p>' : ''}
                     <br>
                     <p style="color: #28a745; font-weight: bold;">Thank you for taking the exam!</p>
                     <p>You may now close this window.</p>
@@ -1523,6 +1718,9 @@
             
             document.getElementById("violationNumber").textContent = examState.violations;
             
+            // Save violation count to URL immediately
+            saveProgressToURL();
+            
             sendToServer('logViolation', {
                 violationType: type,
                 additionalInfo: 'Monitoring system - legitimate violation',
@@ -1574,23 +1772,163 @@
             }, 3000);
         }
 
+        function showInfo(message) {
+            const infoDiv = document.getElementById("infoMessage");
+            if (infoDiv) {
+                infoDiv.textContent = message;
+                infoDiv.style.display = "block";
+                setTimeout(() => {
+                    infoDiv.style.display = "none";
+                }, 4000);
+            }
+        }
+
+        // ========== PAGE LIFECYCLE MANAGEMENT ==========
+        
         // Prevent leaving page during exam
         window.addEventListener('beforeunload', function(e) {
             if (examState.examActive) {
+                // Save progress before potential page unload
+                saveProgressToURL();
+                
                 e.preventDefault();
                 e.returnValue = 'Are you sure you want to leave the exam?';
                 return 'Are you sure you want to leave the exam?';
             }
         });
 
-        // Initialize when page loads
+        // Handle page visibility changes (mobile-friendly)
+        document.addEventListener('visibilitychange', function() {
+            if (examState.examActive) {
+                if (document.hidden) {
+                    // Page is hidden - save progress
+                    saveProgressToURL();
+                } else {
+                    // Page is visible again - could be recovery scenario
+                    console.log('Page became visible again');
+                }
+            }
+        });
+
+        // Handle page load and initialization
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Custom Proctored Exam System Loaded');
             console.log('Total Questions:', EXAM_QUESTIONS.length);
             console.log('Duration:', CONFIG.DURATION_MINUTES, 'minutes');
             console.log('WebApp URL:', CONFIG.WEBAPP_URL);
             console.log('Authorized Emails:', AUTHORIZED_EMAILS.length, 'emails configured');
+            console.log('Exam Version:', CONFIG.EXAM_VERSION);
+            
+            // Check for URL progress on page load
+            if (checkForURLProgress()) {
+                console.log('Previous progress detected in URL');
+                showLoginInfo("Previous exam progress detected. Please enter your details to check for recovery options.");
+            } else {
+                console.log('No previous progress found');
+            }
         });
+
+        // ========== UTILITY FUNCTIONS ==========
+        
+        function formatTimeRemaining(ms) {
+            const minutes = Math.floor(ms / 60000);
+            const seconds = Math.floor((ms % 60000) / 1000);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function generateProgressSummary() {
+            const answered = Object.keys(examState.responses).length;
+            const total = EXAM_QUESTIONS.length;
+            const percentage = Math.round((answered / total) * 100);
+            
+            return {
+                answered,
+                total,
+                percentage,
+                violations: examState.violations,
+                timeRemaining: examState.endTime ? Math.max(0, examState.endTime - Date.now()) : 0
+            };
+        }
+
+        // ========== ENHANCED ERROR HANDLING ==========
+        
+        window.addEventListener('error', function(e) {
+            console.error('Global error caught:', e.error);
+            
+            // If exam is active, save progress to prevent data loss
+            if (examState.examActive && !examState.terminated) {
+                saveProgressToURL();
+                console.log('Progress saved due to error');
+            }
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+            
+            // Save progress on promise rejections too
+            if (examState.examActive && !examState.terminated) {
+                saveProgressToURL();
+            }
+        });
+
+        // ========== MOBILE OPTIMIZATION ==========
+        
+        // Handle mobile keyboard visibility
+        if (examState.isMobile) {
+            window.addEventListener('resize', function() {
+                // Mobile keyboard detection
+                const heightRatio = window.innerHeight / window.screen.height;
+                examState.keyboardVisible = heightRatio < 0.75;
+                
+                if (examState.keyboardVisible) {
+                    examState.preventViolations = true;
+                } else {
+                    setTimeout(() => {
+                        examState.preventViolations = false;
+                    }, 1000);
+                }
+            });
+        }
+
+        // ========== DEBUGGING AND TESTING ==========
+        
+        function debugExamState() {
+            console.log('=== EXAM STATE DEBUG ===');
+            console.log('Exam Active:', examState.examActive);
+            console.log('Student:', examState.studentData);
+            console.log('Session ID:', examState.sessionId);
+            console.log('Responses:', Object.keys(examState.responses).length, 'of', EXAM_QUESTIONS.length);
+            console.log('Violations:', examState.violations);
+            console.log('Time Remaining:', examState.endTime ? formatTimeRemaining(examState.endTime - Date.now()) : 'N/A');
+            console.log('Is Mobile:', examState.isMobile);
+            console.log('URL Progress:', examState.urlProgressData ? 'Available' : 'None');
+            console.log('========================');
+        }
+
+        // Expose debug function globally for testing
+        window.debugExam = debugExamState;
+        
+        // Testing function for URL progress
+        window.testURLProgress = function() {
+            console.log('Testing URL progress system...');
+            const testProgress = {
+                studentName: 'Test Student',
+                studentEmail: 'test@example.com',
+                sessionId: 'test_session',
+                startTime: Date.now() - 900000, // 15 minutes ago
+                endTime: Date.now() + 1800000, // 30 minutes from now
+                responses: { q1: 'Test answer', q2: 1 },
+                violations: 2
+            };
+            
+            encodeProgressToURL(testProgress);
+            const decoded = decodeProgressFromURL();
+            console.log('Encoded and decoded successfully:', decoded);
+            return decoded;
+        };
+
+        console.log('🚀 Enhanced Exam System with URL Progress Persistence Ready!');
+        console.log('Debug functions available: debugExam(), testURLProgress()');
     </script>
 </body>
 </html>
