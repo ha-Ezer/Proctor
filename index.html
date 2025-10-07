@@ -792,18 +792,21 @@
     <script>
         // ========== AUTHORIZED STUDENT EMAILS - UPDATE THIS ARRAY ==========
         const AUTHORIZED_EMAILS = [
+            
+            "abenaaddobea97@gmail.com",
+            "agyemangbertha24@gmail.com",
+            "ednakalari@gmail.com",
+            "graceloveosei616@gmail.com",
+            "Nawaryaanuhu12@gmail.com",
+            "nelb67392@gmail.com",
             "san1di.bel@gmail.com",
-            "obaapakpanla@gmail.com", 
-            "ritanaadedeitqgoe@gmail.com",
-            "nawaryaanuhu12@gmail.com",
-            "gloriaakyena22@gmail.com",
-            "amuanthoinetteadzoa@gmail.com",
-            "theresaaklika7@gmail.com",
+            "Selmah.yassah90@gmail.com",
+            "Yamietease@gmail.com",
+            "nyarkoah2022@gmail.com",           
             "benedictal761@gmail.com",
-            "adizahmusah35@gmail.com",
             "Jemelafantah@gmail.com",
             "jemera99@iloud.com",
-            "victoriaquaicoe289@gmail.com",
+            
             "trialOne@test.edu",
             "demo@test.edu",
             // Add more authorized emails here
@@ -811,11 +814,11 @@
 
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 60,
+            DURATION_MINUTES: 20,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 7,
-            WEBAPP_URL: "https://script.google.com/macros/s/AKfycbzcVC6Cg2jjIYbURmeV-0gqq7fmDFwA5pWd9T7H-Tjdf1r84gQw4gKiJJgDr_30TeR9Ow/exec",
+            WEBAPP_URL: "https://script.google.com/macros/s/AKfycbxN8X84rBusDEdawpdtc6WjMsWPODePrVe1pqyJcnNw-DwKN21f-Y-bkpM23ssve82W/exec",
             ENABLE_FULLSCREEN: true,
             ENABLE_SERVER_LOGGING: true,
             AUTO_SAVE_INTERVAL: 30,
@@ -828,65 +831,26 @@
             {
                 id: "q1",
                 type: "text",
-                question: "Your client is an Albino, the trait that makes them an albino in found in one of the labelled structures below. Which is it?",
+                question: "Your client is as fair as their mother, the trait that made them like their mother is found in one of the labelled structures below. Which is it?",
                 required: false,
-                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01js0jbvstf1gs5acg2y3p9zkf%2Fimg_0.webp?st=2025-09-16T23%3A39%3A36Z&se=2025-09-23T00%3A39%3A36Z&sks=b&skt=2025-09-16T23%3A39%3A36Z&ske=2025-09-23T00%3A39%3A36Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=8b872fb2-b44b-4c1d-9ff6-1d4509d19e6e&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=B0WHoMTCEfCJrBgStum0Mg0LYwa9L%2FJII2ivTFTlwws%3D&az=oaivgprodscus",
+                image: "attachments/animal cell.webp",
                 placeholder: "Type your answer here..."
             },
             {
-                id: "q2",
-                type: "text",
-                question: "Briefly describe what caused the deformation in this man's face ",
-                required: false,
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSi2SSkComQ67ykXanAo81w90Aw9y-MQxX7Lrv6cSP_a-ghhaFJ2QWwmGWzyanfz4nZJ2Q&usqp=CAU",
-                placeholder: "Type your brief explanation here..."
-            },
-            {
-                id: "q3", 
+                id: "q2", 
                 type: "multiple-choice",
                 question: "The below below are all types of cells except........",
                 required: false,
                 options: [
                     "Macrophages",
                     "Mast cells",
-                    "Osteoblasts",
+                    "Melanocytes",
                     "Cellagen"
                 ],
                 correctAnswer: 3
-            },
+            },            
             {
-                id: "q4",
-                type: "text", 
-                question: "Your client has these lines on their foot. What is the main cause of this skin disorder",
-                required: false,
-                image: "https://www.geelongveinsskinlaser.com.au/wp-content/uploads/2024/10/Varicose-veins-1-600x600.jpg",
-                placeholder: "Type your brief explanation here...",            
-            },
-            {
-                id: "q5",
-                type: "text",
-                question: "In the Image below, which is the Flexor and which is the Extensor?",
-                required: false,
-                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01js0q6n65e7ztn42f22xe45c3%2Fimg_0.webp?st=2025-09-17T01%3A29%3A37Z&se=2025-09-23T02%3A29%3A37Z&sks=b&skt=2025-09-17T01%3A29%3A37Z&ske=2025-09-23T02%3A29%3A37Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=8b872fb2-b44b-4c1d-9ff6-1d4509d19e6e&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=8ocBizFOHgMrgwJdpMiBrSxBOPRQiZ2haVxgGt79bK0%3D&az=oaivgprodscus",
-                placeholder: "Type your answer here...",
-            },
-            {
-                id: "q6",
-                type: "multiple-choice",
-                question: "The lines (A) running through the image below are called.......",
-                required: false,
-                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01js0qy9wvepa98hdw2jhw8r9k%2Fimg_0.webp?st=2025-09-17T01%3A29%3A37Z&se=2025-09-23T02%3A29%3A37Z&sks=b&skt=2025-09-17T01%3A29%3A37Z&ske=2025-09-23T02%3A29%3A37Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=8b872fb2-b44b-4c1d-9ff6-1d4509d19e6e&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=oxjmD9VggPclnute%2BM%2BfdWN7fyWTT%2FB3mv7Y9CyzBgE%3D&az=oaivgprodscus",
-                options: [
-                    "Capillaries",
-                    "Sinuses",
-                    "Arterioles",
-                    "Sutures" 
-                    
-                ],
-                correctAnswer: 3
-            },
-            {
-                id: "q7",
+                id: "q3",
                 type: "multiple-choice",
                 question: "A group of tissues with similar function can come together to form all the following except",
                 required: false,
@@ -899,7 +863,7 @@
                 ,correctAnswer: 2
             },
             {
-                id: "q8",
+                id: "q4",
                 type: "multiple-choice",
                 question: "All the following are Acne Vulgaris, Pimples and oily skin are usually pertinent with adolescents. They are mostly caused by .............true about Nails except",
                 required: false,
@@ -912,7 +876,7 @@
                 correctAnswer: 1
             },
             {
-                id: "q9",
+                id: "q5",
                 type: "multiple-choice",
                 question: "The Dermis is NOT the layer of the skin we can easily see and touch",
                 required: false,
@@ -923,37 +887,15 @@
                 correctAnswer: 0
             },
             {
-                id: "q10",
+                id: "q6",
                 type: "text",
                 question: "There are three sections of the image below. A, B and C. Name any two structures in the section labelled B",
                 required: false,
-                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01js0ky6x2epprs4anvc941hyk%2Fimg_0.webp?st=2025-09-16T23%3A39%3A36Z&se=2025-09-23T00%3A39%3A36Z&sks=b&skt=2025-09-16T23%3A39%3A36Z&ske=2025-09-23T00%3A39%3A36Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=8b872fb2-b44b-4c1d-9ff6-1d4509d19e6e&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=%2FE9JKlrbZfzqlGMT43pZeDeHlWwsVMa9ISWvigzR4kA%3D&az=oaivgprodscus",
+                image: "attachments/skin cross section.webp",
                 placeholder: "Type your answer here..."
             },
             {
-                id: "q11",
-                type: "text",
-                question: "Provide the name and function of the white tissue labelled A in the image below",
-                required: false,
-                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01k5ak22fwe4tvhpfy5g617588%2F1758070968_img_0.webp?st=2025-09-16T23%3A39%3A28Z&se=2025-09-23T00%3A39%3A28Z&sks=b&skt=2025-09-16T23%3A39%3A28Z&ske=2025-09-23T00%3A39%3A28Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=8b872fb2-b44b-4c1d-9ff6-1d4509d19e6e&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=pvfqSc6NSVnC3uSV5VU0AB3%2BxNG8sPMP25LmacvsQkE%3D&az=oaivgprodscus",
-                placeholder: "Type your answer here..."
-
-            },
-            {
-                id: "q12",
-                type: "multiple-choice",
-                question: "The following disadvantages can result from over-exposure to sunlight except",
-                required: false,
-                options: [
-                    "Darkening of the skin",
-                    "Skin Cancers", 
-                    "Disinfection of the skin",
-                    "Sunburn"
-                ],
-                correctAnswer: 2
-            },
-            {
-                id: "q13",
+                id: "q7",
                 type: "multiple-choice",
                 question: "Antiperpirants....",
                 required: false,
@@ -966,6 +908,7 @@
                  correctAnswer: 2
             },
             {
+                id: "q8",
                 type: "multiple-choice",
                 question: "Deodorants....",
                 required: false,
@@ -978,7 +921,7 @@
                  correctAnswer: 0
             },
             {
-                id: "q15",
+                id: "q9",
                 type: "multiple-choice",
                 question: "Swebum is the acidic substance that protects the skin from germs",
                 required: false,
@@ -989,7 +932,7 @@
                 correctAnswer: 1
             },
             {
-                id: "q16",
+                id: "q10",
                 type: "multiple-choice",
                 question: "The acidic substance that protects the skin from germs is produced by",
                 required: false,
@@ -1002,149 +945,20 @@
                 correctAnswer: 3
             },
             {
-                id: "q17",
+                id: "q11",
                 type: "text",
-                question: "There are three sections of the image below. A, B and C. Name any two functions of the lowest section labelled 'C'.",
-                required: false,
-                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01js0ky6x2epprs4anvc941hyk%2Fimg_0.webp?st=2025-09-16T23%3A39%3A36Z&se=2025-09-23T00%3A39%3A36Z&sks=b&skt=2025-09-16T23%3A39%3A36Z&ske=2025-09-23T00%3A39%3A36Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=8b872fb2-b44b-4c1d-9ff6-1d4509d19e6e&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=%2FE9JKlrbZfzqlGMT43pZeDeHlWwsVMa9ISWvigzR4kA%3D&az=oaivgprodscus",
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q18",
-                type: "text",
-                question: "List two examples of skin disorders caused by Viruses",
+                question: "In your own words, briefly describe how inflammations occur",
                 required: false,
                 placeholder: "Type your answer here..."
             },
             {
-                id: "q19",
+                id: "q12",
                 type: "text",
-                question: "List two examples of skin disorders caused by Fungi",
+                question: "Why is it important to use gloves and ssanitizers when handling clients",
                 required: false,
                 placeholder: "Type your answer here..."
             },
-            {
-                id: "q20",
-                type: "text",
-                question: "List two examples of skin disorders caused by Bacteria",
-                required: false,
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q21",
-                type: "multiple-choice",
-                question: "Based on the anatomy and physiology course, the image attached is that of a.......",
-                required: false,
-                image: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVB6u5NSfBA1dVG9UtBsAGct_-gIdl-buhLV5nv8cm0T4DlqTflEaJxgUQgyD-xjeK8h1zqHSaJgf3_diMu-7kraut0V1MlbXj6axYx-RkSsy6_sSvPVvEW7SJrKI7FjshUxMkIEE6YVpuvwcXxU3CtaxE9ysqvXXjJSGQ?key=c8nbdp6esJiovKdeQjhCow",
-                options: [
-                    "Normal Mole",
-                    "Malignant Melanoma", 
-                    
-                ],
-                correctAnswer: 0
-            },
-            {
-                id: "q22",
-                type: "multiple-choice",
-                question: "After waxing a client's armpit, they report that the hair started growing after three days. You probably waxed while the armpit hair was in the _____________ stage.",
-                required: false,
-                options: [
-                    "Anagen",
-                    "Catagen", 
-                    "Telogen",
-                    "Hairlogen"
-                ],
-                correctAnswer: 0
-            },
-            {
-                id: "q23",
-                type: "multiple-choice",
-                question: "The hairs found on New born babies are called",
-                required: false,
-                options: [
-                    "Terminal hair",
-                    "Vellus Hairs", 
-                    "Lanugo Hairs",
-                    "Respiration"
-                ],
-                correctAnswer: 2
-            },
-            {
-                id: "q24",
-                type: "multiple-choice",
-                question: "The following are functions of the skin except",
-                required: false,
-                options: [
-                    "Protection",
-                    "Sensation", 
-                    "Vitamin D Production",
-                    "Respiration"
-                ],
-                correctAnswer: 3
-            },
-            {
-                id: "q25",
-                type: "text",
-                question: "What are the two main divisions of the Nervous system?",
-                required: false,
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q26",
-                type: "text",
-                question: "In the image below, what is the name of the lines labelled A",
-                required: false,
-                image: "https://lh7-rt.googleusercontent.com/formsz/AN7BsVB3mBhrF_38bFwIBGVRX5YiRBdN72GRl4Caj3LoPf0k0JYKJ8mZIEKToAiEXkZLJavljnRM1GzP_xQrlCJA7BQ_Mq1xi1EEAeNf7N6mINQvxdVmvrbOFDLA26dsMubhtfa3rEoWsy4qzhYNmxH46Ju2nnYystOID-xm?key=c8nbdp6esJiovKdeQjhCow",
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q27",
-                type: "text",
-                question: "Briefly describe to a client why your massages are important to their skin",
-                required: false,
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q28",
-                type: "text",
-                question: "As she got pregnant, she got darker and darker. What is the science behind this transformation?",
-                required: false,
-                image: "https://cdn.legit.ng/images/1120/a6e874a17267c42b.jpeg?v=1",
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q29",
-                type: "text",
-                question: "The importance of wearing gloves, washing hands and wearing other protective equipment when handling clients is to.........",
-                required: false,
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q30",
-                type: "multiple-choice",
-                question: "This skin condition is not infectious",
-                required: false,
-                image: "https://varicose-veinclinic.com/hp/wp-content/uploads/2025/01/5250842d36f95f91130ba40195268aeb-1.jpg",
-                options: [
-                    "True",
-                    "False", 
-                ], 
-                correctAnswer: 0
-            },
-            {
-                id: "q31",
-                type: "multiple-choice",
-                question: "This is an example of a..........",
-                required: false,
-                image: "https://media.self.com/photos/5a0b694f02c0564411bbb878/4:3/w_1920,c_limit/Vitiligo-Wedding-Stress.jpg",
-                options: [
-                    "Fungal Infection",
-                    "Skin Cancer", 
-                    "Viral Infection",
-                    "Pigmentation Disorder"
-                ]
-                ,correctAnswer: 3
-            }
+
 
         ];
 
