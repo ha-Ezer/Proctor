@@ -814,7 +814,7 @@
 
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 20,
+            DURATION_MINUTES: 22,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 7,
@@ -831,128 +831,113 @@
             {
                 id: "q1",
                 type: "multiple-choice",
-                question: "The image below is that of a Malignant Melanoma. True or False?",
+                question: "The Brain and Spinal Cord fall under the ......",
                 required: false,
-                image: "attachments/melanoma.webp",
                 options: [
-                    "True",
-                    "False"
-                ]
-                ,correctAnswer: 0
+                    "Autonomic nervous system",
+                    "Central Nervous system",
+                    "Peripheral nervous system",
+                    "Central Processing Unit",
+                    ]
+                ,correctAnswer: 1
             },
             {
                 id: "q2", 
-                type: "multiple-choice",
-                question: "The below below are all types of cells except........",
+                type: "text",
+                question: "With A and B, which is an Extensor and which is a Flexor",
+                image: "attachments/Extensor.png",
                 required: false,
-                options: [
-                    "Macrophages",
-                    "Mast cells",
-                    "Melanocytes",
-                    "Cellagen"
-                ],
-                correctAnswer: 3
+                placeholder: "Type your answer here..."
             },            
             {
                 id: "q3",
-                type: "text",
-                question: "The following are pigmentation disorders. Briefly describe the difference between them",
+                type: "multiple-choice",
+                question: "The white lines with arrows pointing at them are the…",
                 required: false,
-                image: "attachments/AlbinismVsVitiligo.png",
-                
-                placeholder: "Type your answer here..."
+                image: "attachments/Tendon.png",
+                options: [
+                    "Mast Cells",
+                    "Keloids",
+                    "Tendons",
+                    "Muscles",
+                ], 
+                correctAnswer: 2
             },
             {
                 id: "q4",
-                type: "text",
-                question: "Which of the above is infectious?",
+                type: "multiple-choice",
+                question: "The Cranial nerves that control the facial muscles, chewing, the tear glands and the neck movement are theWhat is the job of the above selected part",
                 required: false,
-                placeholder: "Type your answer here..."
+                options: [
+                    "5th, 6th and 7th cranial nerves",
+                    "5th, 8th and 10th cranial nerves",
+                    "5th, 7th and 11th cranial nerves",
+                    "6th, 10th and 11th cranial nerves",
+                ],
+                correctAnswer: 2            
             },
             {
                 id: "q5",
-                type: "multiple-choice",
-                question: "One of the below is not an infectious disease",
-                required: false,
-                options: [
-                    "Athletes Foot",
-                    "Impetigo",
-                    "Cold Sores",
-                    "Keloids" 
-                ], 
-                correctAnswer: 3
-            },
-            {
-                id: "q6",
                 type: "text",
-                question: "Briefly describe the cause of this growth on the ear",
+                question: "List two properties of muscles",
                 required: false,
-                image: "attachments/keloid.jpeg",
                 placeholder: "Type your answer here..."
             },
             {
-                id: "q7",
+                id: "q6",
                 type: "multiple-choice",
-                question: "One of the following best describes allergic reactions.....",
+                question: "One of the following statements are not true. Which is it?",
                 required: false,
                 options: [
-                    "The body negatively responds to germs",
-                    "The body negatively responds to the sun",
-                    "The body negatively responds to normally harmless substances",
-                    "The body negatively responds to Melanocytes",
+                    "Veins Carry blood to the heart",
+                    "Arteries carry blood away from the heart",
+                    "Capillaries are the smallest largest type of blood vessels",
+                    "Capillaries connect arteries to veins",
                 ],   
                  correctAnswer: 2
             },
             {
-                id: "q8",
-                type: "multiple-choice",
-                question: "In this stage, the hair grows fastest.",
+                id: "q7",
+                type: "text",
+                question: "What is one effect of massages on the lymphatic system?",
                 required: false,
-                options: [
-                    "Hairlogen Stage",
-                    "Cataten Stage",
-                    "Anagen Stage",
-                    "Telogen Stage",
-                ],   
-                 correctAnswer: 2
+                placeholder: "Type your answer here..."
+            },
+            {
+                id: "q8",
+                type: "text",
+                question: "Briefly describe what causes this disorder?",
+                required: false,
+                image: "attachments/Vericous Veins.jpeg",
+                placeholder: "Type your answer here..."
             },
             {
                 id: "q9",
                 type: "multiple-choice",
-                question: "A hair follicle that is attached to the Dermal Papilla will....",
+                question: "An infection can",
                 required: false,
                 options: [
-                    "Die immediately",
-                    "Continuwe to grow",
-                    "Start to reduce in height", 
-                    "Start to break off"
+                    "Make a lymph node shrink",
+                    "Make a Lymph Node disappear",
+                    "Make a Lymph Node swell", 
+                    "Make a Lymph Node become more powerful"
                 ],
-                correctAnswer: 1
+                correctAnswer: 2
             },
             {
                 id: "q10",
                 type: "multiple-choice",
-                question: "The protein Keratin makes up the hair, nails and skin",
+                question: "The essence of massages on the Lymphatic system is to.....",
                 required: false,
                 options: [
-                    "True",
-                    "False"
+                    "Direct the lymph to the nearest lymph node",
+                    "Direct the heart to pump more blood",
+                    "Direct the lymph to the subclavian vein",
+                    "Direct the blood to the lymph nodes",
                 ],
                 correctAnswer: 0
             },
-            {
-                id: "q11",
-                type: "multiple-choice",
-                question: "Babies are usually born with ...............",
-                required: false,
-                options: [
-                    "Vellus Hair",
-                    "Terminal Hair",
-                    "Lanugo Hair",
-
-                ],
-                correctAnswer: 2
-            },
+           
            
 
         ];
