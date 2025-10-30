@@ -814,7 +814,7 @@
 
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 22,
+            DURATION_MINUTES: 20,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 7,
@@ -831,111 +831,125 @@
             {
                 id: "q1",
                 type: "multiple-choice",
-                question: "The Brain and Spinal Cord fall under the ......",
+                question: "The mixture of Sebum and Sweat is called.......",
                 required: false,
                 options: [
-                    "Autonomic nervous system",
-                    "Central Nervous system",
-                    "Peripheral nervous system",
-                    "Central Processing Unit",
-                    ]
-                ,correctAnswer: 1
+                    "Acid Mantle",
+                    "Histamine", 
+                    "Swebum",
+                    "Melanocytes"
+                ],
+                correctAnswer: 0
             },
             {
-                id: "q2", 
-                type: "text",
-                question: "With A and B, which is an Extensor and which is a Flexor",
-                image: "attachments/Extensor.png",
-                required: false,
-                placeholder: "Type your answer here..."
-            },            
-            {
-                id: "q3",
+                id: "q2",
                 type: "multiple-choice",
-                question: "The white lines with arrows pointing at them are the…",
+                question: "The function of the above selected is to........ ",
                 required: false,
-                image: "attachments/Tendon.png",
                 options: [
-                    "Mast Cells",
-                    "Keloids",
-                    "Tendons",
-                    "Muscles",
-                ], 
+                    "Enlarge the blood vessels",
+                    "Make the skin darker", 
+                    "Stop the growth of bacteria on the skin",
+                    "Make the skin oily"
+                ],
                 correctAnswer: 2
             },
             {
-                id: "q4",
+                id: "q3", 
                 type: "multiple-choice",
-                question: "The Cranial nerves that control the facial muscles, chewing, the tear glands and the neck movement are theWhat is the job of the above selected part",
+                question: "Tissues with similar structure and function group together to form......... ",
                 required: false,
                 options: [
-                    "5th, 6th and 7th cranial nerves",
-                    "5th, 8th and 10th cranial nerves",
-                    "5th, 7th and 11th cranial nerves",
-                    "6th, 10th and 11th cranial nerves",
+                    "Organs",
+                    "Systems", 
+                    "Cells",
+                    "Organisms"
                 ],
-                correctAnswer: 2            
+                correctAnswer: 0
+                // placeholder: "Enter your detailed explanation here..."
+            },
+            {
+                id: "q4",
+                type: "text", 
+                question: "In your own words, describe briefly how an inflammation occurs in the body.",
+                required: false,
+                placeholder: "Type your brief explanation here...",            
             },
             {
                 id: "q5",
-                type: "text",
-                question: "List two properties of muscles",
+                type: "textarea",
+                question: "Describe your experience with web development technologies.",
                 required: false,
-                placeholder: "Type your answer here..."
+                placeholder: "Share your thoughts and experiences..."
             },
             {
                 id: "q6",
                 type: "multiple-choice",
-                question: "One of the following statements are not true. Which is it?",
+                question: "The skin has _____________layers.",
                 required: false,
                 options: [
-                    "Veins Carry blood to the heart",
-                    "Arteries carry blood away from the heart",
-                    "Capillaries are the smallest largest type of blood vessels",
-                    "Capillaries connect arteries to veins",
-                ],   
-                 correctAnswer: 2
-            },
-            {
-                id: "q7",
-                type: "text",
-                question: "What is one effect of massages on the lymphatic system?",
-                required: false,
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q8",
-                type: "text",
-                question: "Briefly describe what causes this disorder?",
-                required: false,
-                image: "attachments/Vericous Veins.jpeg",
-                placeholder: "Type your answer here..."
-            },
-            {
-                id: "q9",
-                type: "multiple-choice",
-                question: "An infection can",
-                required: false,
-                options: [
-                    "Make a lymph node shrink",
-                    "Make a Lymph Node disappear",
-                    "Make a Lymph Node swell", 
-                    "Make a Lymph Node become more powerful"
+                    "1",
+                    "2", 
+                    "3",
+                    "4"
                 ],
                 correctAnswer: 2
             },
             {
+                id: "q7",
+                type: "multiple-choice",
+                question: "Your client changed from fair to dark skin when she got pregnant. What pigment is responsible for this change?",
+                required: false,
+                image: "https://www.boredpanda.com/blog/wp-content/uploads/2025/05/68219e14af109_generated-image.jpg",
+                options: [
+                    "Carotene",
+                    "Collagen",
+                    "Melanin", 
+                    "Fungbact A"
+                ],
+                correctAnswer: 2
+            },
+            {
+                id: "q8",
+                type: "text",
+                question: "Briefly describe how the preganancy could have caused the change in her skin tone.",
+                required: false,
+                placeholder: "Type your brief explanation here..."
+            },
+            {
+                id: "q9",
+                type: "text",
+                question: "Briefly describe one thing that happens when the upper part of the epidermis is removed by exfoliation?",
+                required: false,
+                placeholder: "Type your brief explanation here..."
+            },
+            {
                 id: "q10",
                 type: "multiple-choice",
-                question: "The essence of massages on the Lymphatic system is to.....",
+                question: "Antiperspirants..........",
                 required: false,
                 options: [
-                    "Direct the lymph to the nearest lymph node",
-                    "Direct the heart to pump more blood",
-                    "Direct the lymph to the subclavian vein",
-                    "Direct the blood to the lymph nodes",
+                    "Kill the germs that cause body odor",
+                    "Close the blood vessels to prevent body odour",
+                    "Close the sweat pores to prevent body odour",
+                    "Restores the collagen fibres to prevent body odour."
+                ],
+                correctAnswer: 2
+
+            },
+            {
+                id: "q11",
+                type: "multiple-choice",
+                question: "Deodorants..........",
+                required: false,
+                options: [
+                    "Kill the germs that cause body odor",
+                    "Close the blood vessels to prevent body odour",
+                    "Close the sweat pores to prevent body odour",
+                    "Restores the collagen fibres to prevent body odour."
                 ],
                 correctAnswer: 0
+
             },
            
            
