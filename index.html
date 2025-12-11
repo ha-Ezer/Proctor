@@ -158,103 +158,105 @@
         const EXAM_QUESTIONS = [
     {
         id: "q1",
-        type: "text",
-        question: "The Scabies / Itch mites can infest the skin. Very briefly, describe a way they can be passed from one person to another",
+        type: "multiple-choice",
+        question: "One of the following best describes allergic reactions.....",
         required: false,
-        placeholder: "Type your brief explanation here..."
+        options: [
+            "The body negatively responds to germs",
+            "The body negatively responds to the sun",
+            "The body negatively responds to normally harmless substances",
+            "The body negatively responds to Melanocytes"
+        ],
+        correctAnswer: 2
     },
     {
         id: "q2",
-        type: "multiple-choice",
-        question: "Athlete's foot is a ................. disease.",
+        type: "text",
+        question: "Based on the anatomy and physiology course, is the image below that of a Normal Mole or a Malignant Melanoma? Briefly explain your answer.",
         required: false,
-        options: [
-            "Fungal disease",
-            "Viral Disease",
-            "Bacterial Disease",
-            "Sebaceous Gland"
-        ],
-        correctAnswer: 0
+        image: "[YOUR_IMAGE_PATH_HERE]",
+        placeholder: "Type your answer and explanation here..."
     },
     {
         id: "q3",
-        type: "multiple-choice",
-        question: "Which of the following statements is true about Sebaceous Gland Disorders?",
+        type: "text",
+        question: "Briefly describe the cause of this growth on the ear (Keloid)",
         required: false,
-        options: [
-            "They can be transferred to another through sexual intercourse",
-            "Are caused by excessive moisture",
-            "Are caused by exposure to fungal Spores",
-            "Can be passed down from parent to child"
-        ],
-        correctAnswer: 3
+        image: "attachments/melanoma.webp",
+        placeholder: "Type your explanation here..."
     },
     {
         id: "q4",
-        type: "text",
-        question: "For someone with these issues, why are they advised to not expose themselves to too much UV light?",
+        type: "multiple-choice",
+        question: "Which of these parts of the ear would you NOT pierce due to the risk of complications?",
         required: false,
-        image: "attachments/Freckles.jpeg",
-        placeholder: "Type your explanation here..."
+        options: [
+            "Pinna",
+            "Lobule",
+            "Helix",
+            "Outer Ear"
+        ],
+        correctAnswer: 2
     },
     {
         id: "q5",
         type: "text",
-        question: "List two Viral Diseases",
+        question: "List two factors that positively or negatively affect hair growth",
         required: false,
-        placeholder: "Type your answer here..."
+        placeholder: "Type your answers here..."
     },
     {
         id: "q6",
-        type: "text",
-        question: "A customer had Seborrhoea. Overtime, you noticed the affected parts of the skin started reddening. Briefly describe the issue",
-        required: false,
-        placeholder: "Type your brief explanation here..."
-    },
-    {
-        id: "q7",
         type: "multiple-choice",
-        question: "All the following are bacterial diseases except......",
+        question: "All the following are true about Nails except",
         required: false,
         options: [
-            "Carbuncles",
-            "Styes",
-            "Impetigo",
-            "Nail Ringworm"
+            "Nails are made of the same protein as hair",
+            "Nails are made up of the same protein as skin",
+            "Nails are made up of the same protein as bones",
+            "The Nails grow from Stratum Germinativum"
         ],
         correctAnswer: 3
     },
     {
+        id: "q7",
+        type: "multiple-choice",
+        question: "After waxing a client's armpit, they report that the hair started growing after three days. You probably waxed while the armpit hair was in the _____________ stage.",
+        required: false,
+        options: [
+            "Anagen",
+            "Catagen",
+            "Telogen",
+            "Hairlogen"
+        ],
+        correctAnswer: 0
+    },
+    {
         id: "q8",
         type: "text",
-        question: "What is the main difference between these two disorders?",
+        question: "A hair follicle that is attached to the Dermal Papilla will continue to grow. Explain why this is important for hair growth.",
         required: false,
-        image: "attachments/AlbinismVsVitiligo.png",
         placeholder: "Type your explanation here..."
     },
     {
         id: "q9",
         type: "multiple-choice",
-        question: "Vasodilation can be caused by...............",
+        question: "The cranial nerves responsible for facial expressions and chewing are the............",
         required: false,
         options: [
-            "Sebaceous Glands",
-            "Sweat Glands",
-            "Histamine",
-            "Moisture"
+            "5th and 6th Nerves",
+            "5th and 7th Nerves",
+            "7th and 11th Nerves",
+            "5th and 11th Nerves"
         ],
-        correctAnswer: 2
+        correctAnswer: 1
     },
     {
         id: "q10",
-        type: "multiple-choice",
-        question: "Infectious diseases are usually passed on parent to child",
+        type: "text",
+        question: "What are the two main divisions of the Nervous system?",
         required: false,
-        options: [
-            "True",
-            "False"
-        ],
-        correctAnswer: 1
+        placeholder: "Type your answer here..."
     }
 ];
 
