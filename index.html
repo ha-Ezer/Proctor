@@ -5,601 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Proctored Exam System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #4a6cf7;
-            --primary-dark: #3b5be3;
-            --secondary: #764ba2;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #ff4757;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --gray: #6c757d;
-            --body-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-            --transition: all 0.3s ease;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body, html {
-            height: 100%;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--body-bg);
-            overflow-x: hidden;
-            color: var(--dark);
-            line-height: 1.6;
-        }
-
-        /* Prevent text selection and right-click */
-        body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-touch-callout: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* Allow text selection in form elements */
-        input, textarea, select {
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
-            user-select: text;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            box-shadow: var(--card-shadow);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            overflow: hidden;
-            transition: var(--transition);
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 15px 30px;
-            font-size: 1.1em;
-            font-weight: 600;
-            text-align: center;
-            text-decoration: none;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-success {
-            background: linear-gradient(45deg, var(--success), #20c997);
-            color: white;
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-        }
-
-        .btn-success:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.4);
-        }
-
-        .btn:disabled {
-            background: var(--gray);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-
-        /* Timer Bar */
-        #timerBar {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 1.2em;
-            font-weight: bold;
-            z-index: 10000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        #timerBar.warning {
-            background: linear-gradient(90deg, #ff9a3d, var(--danger));
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-        }
-
-        .violation-count {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 6px 16px;
-            border-radius: 20px;
-            margin-left: 20px;
-            font-size: 0.9em;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .violation-count i {
-            font-size: 1.1em;
-        }
-
-        /* Student Form */
-        #studentForm {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 40px 20px;
-        }
-
-        #studentForm .card {
-            width: 100%;
-            max-width: 540px;
-            padding: 40px;
-            text-align: center;
-        }
-
-        .form-header {
-            margin-bottom: 30px;
-        }
-
-        .form-header h2 {
-            font-size: 2.2em;
-            color: var(--primary);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        .form-header p {
-            color: var(--gray);
-            font-size: 1.1em;
-        }
-
-        .form-group {
-            width: 100%;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 16px 18px;
-            font-size: 1em;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            transition: var(--transition);
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
-        }
-
-        .form-check {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 25px 0;
-        }
-
-        .form-check-input {
-            width: 20px;
-            height: 20px;
-            accent-color: var(--primary);
-        }
-
-        .form-check-label {
-            font-size: 0.95em;
-            color: var(--dark);
-        }
-
-        /* Instructions */
-        .instructions {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.2) 100%);
-            border: 2px solid rgba(255, 193, 7, 0.3);
-            border-radius: 16px;
-            padding: 25px;
-            margin: 25px 0;
-            text-align: left;
-            width: 100%;
-        }
-
-        .instructions h3 {
-            color: #d39e00;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.2em;
-        }
-
-        .instructions ul {
-            color: #856404;
-            padding-left: 24px;
-        }
-
-        .instructions li {
-            margin: 10px 0;
-            line-height: 1.5;
-        }
-
-        /* Exam Container */
-        .exam-container {
-            display: none;
-            margin-top: 70px;
-            padding: 30px 20px;
-            min-height: calc(100vh - 70px);
-        }
-
-        .progress-container {
-            margin-bottom: 30px;
-        }
-
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: #e9ecef;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            width: 0%;
-            transition: width 0.5s ease;
-            border-radius: 5px;
-        }
-
-        /* Questions */
-        .question {
-            background: white;
-            margin: 25px 0;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            border-left: 5px solid var(--primary);
-            transition: var(--transition);
-        }
-
-        .question:hover {
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .question.required h3::after {
-            content: " *";
-            color: var(--danger);
-        }
-
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-        }
-
-        .question h3 {
-            color: var(--dark);
-            margin-bottom: 15px;
-            font-size: 1.3em;
-            font-weight: 600;
-            flex: 1;
-        }
-
-        .question-type {
-            background: var(--primary);
-            color: white;
-            font-size: 0.7em;
-            padding: 4px 10px;
-            border-radius: 20px;
-            margin-left: 15px;
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .question-image {
-            max-width: 100%;
-            max-height: 300px;
-            object-fit: contain;
-            border-radius: 12px;
-            margin: 15px 0;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .question input[type="text"], 
-        .question textarea {
-            width: 100%;
-            padding: 16px;
-            font-size: 1em;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            transition: var(--transition);
-            font-family: inherit;
-            resize: vertical;
-            background: rgba(255, 255, 255, 0.8);
-        }
-
-        .question input[type="text"]:focus,
-        .question textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
-        }
-
-        .question textarea {
-            min-height: 120px;
-        }
-
-        .multiple-choice {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .choice {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            background: rgba(255, 255, 255, 0.7);
-        }
-
-        .choice:hover {
-            background: #f8f9fa;
-            border-color: var(--primary);
-            transform: translateY(-2px);
-        }
-
-        .choice input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            accent-color: var(--primary);
-        }
-
-        .choice.selected {
-            background: rgba(74, 108, 247, 0.1);
-            border-color: var(--primary);
-        }
-
-        .choice-label {
-            flex: 1;
-            font-weight: 500;
-        }
-
-        /* Submit Section */
-        .submit-section {
-            text-align: center;
-            margin: 40px 0;
-            padding: 40px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        }
-
-        .submit-section h3 {
-            margin-bottom: 20px;
-            color: var(--dark);
-            font-size: 1.5em;
-        }
-
-        /* Messages */
-        .message {
-            padding: 16px 20px;
-            border-radius: 12px;
-            margin: 15px 0;
-            display: none;
-            font-weight: 500;
-        }
-
-        .error-message {
-            background: rgba(220, 53, 69, 0.1);
-            color: var(--danger);
-            border-left: 4px solid var(--danger);
-        }
-
-        .success-message {
-            background: rgba(40, 167, 69, 0.1);
-            color: var(--success);
-            border-left: 4px solid var(--success);
-        }
-
-        /* Overlay */
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.92);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            font-size: 1.8em;
-            color: white;
-            z-index: 20000;
-            text-align: center;
-            padding: 30px;
-        }
-
-        .overlay-content {
-            max-width: 600px;
-            width: 100%;
-        }
-
-        .overlay h2 {
-            margin-bottom: 25px;
-            color: white;
-            font-size: 2.2em;
-        }
-
-        .overlay p {
-            margin-bottom: 15px;
-            font-size: 0.8em;
-            opacity: 0.9;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-            margin-top: 30px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Violation Alert */
-        .violation-alert {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255, 71, 87, 0.95);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 25000;
-            text-align: center;
-            padding: 30px;
-        }
-
-        .violation-content {
-            max-width: 500px;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .violation-alert h2 {
-            color: #ffff00;
-            margin-bottom: 20px;
-            font-size: 2em;
-        }
-
-        .violation-alert p {
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            :root {
-                font-size: 14px;
-            }
-            
-            #studentForm .card {
-                padding: 30px 20px;
-            }
-            
-            .form-header h2 {
-                font-size: 1.8em;
-            }
-            
-            .question {
-                padding: 20px;
-            }
-            
-            .submit-section {
-                padding: 30px 20px;
-            }
-            
-            .violation-count {
-                margin-left: 10px;
-                padding: 4px 12px;
-            }
-            
-            #timerBar {
-                font-size: 1em;
-                padding: 12px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .question-header {
-                flex-direction: column;
-            }
-            
-            .question-type {
-                align-self: flex-start;
-                margin: 10px 0 0 0;
-            }
-            
-            .violation-count {
-                display: none;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Progress Recovery Dialog -->
+    <div id="recoveryDialog" class="recovery-dialog hidden">
+        <div class="recovery-content">
+            <h3><i class="fas fa-history"></i> Previous Progress Found!</h3>
+            <p>We found your previous exam progress. Would you like to resume where you left off?</p>
+            
+            <div id="recoveryInfo" class="recovery-info">
+                <!-- Progress details will be populated here -->
+            </div>
+            
+            <div class="recovery-buttons">
+                <button onclick="resumeExam()" class="btn btn-success">
+                    <i class="fas fa-play"></i> Resume Exam
+                </button>
+                <button onclick="startFreshExam()" class="btn btn-secondary">
+                    <i class="fas fa-refresh"></i> Start Fresh
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Student Info Capture -->
     <div id="studentForm">
         <div class="card">
@@ -615,7 +44,8 @@
                     <li>Do not minimize the browser</li>
                     <li>Ensure stable internet connection</li>
                     <li>Answer all required questions marked with *</li>
-                    <li>Your progress is automatically saved</li>
+                    <li>Your progress is automatically saved every 30 seconds</li>
+                    <li>If you experience issues, refresh the page to recover your progress</li>
                     <li>Each violation of the above or any other form of cheating will be recorded</li>
                 </ul>
             </div>
@@ -629,6 +59,10 @@
                 <label for="studentEmail">Email Address</label>
                 <input type="email" id="studentEmail" class="form-control" placeholder="Enter your email address" required />
             </div>
+            
+            <!-- Error message display for student form -->
+            <div id="loginErrorMessage" class="message error-message"></div>
+            <div id="loginInfoMessage" class="message info-message"></div>
             
             <div class="form-check">
                 <input type="checkbox" id="agreeTerms" class="form-check-input" required />
@@ -672,6 +106,7 @@
             
             <div id="errorMessage" class="message error-message"></div>
             <div id="successMessage" class="message success-message"></div>
+            <div id="infoMessage" class="message info-message"></div>
             
             <!-- Questions will be dynamically generated here -->
             <div id="questionsContainer"></div>
@@ -687,136 +122,89 @@
     </div>
 
     <script>
+        // ========== AUTHORIZED STUDENT EMAILS - UPDATE THIS ARRAY ==========
+        const AUTHORIZED_EMAILS = [
+            
+            
+            "asemmartina780@gmail.com",
+            "dorpelydia@gmail.com",
+            "enyonamelle@gmail.com",
+            "euchindi.247@gmail.com",
+            "getrudecobbinah81@gmail.com",
+            "NawarYaanuhu12@gmail.com",
+            "nelb67392@gmail.com",
+            "ohenewaavictoria972@gmail.com",
+            "queenabelle12@gmail.com",
+            "safuraabdullah72@gmail.com",
+            "selasieosabutey@gmail.com",
+            "tedekubenedicta6@gmail.com",
+            "theresahkonaduarago@gmail.com",
+            "Victoriaquaicoe289@gmail.com",
+            
+            "trialOne@test.edu",
+            "demo@test.edu",
+            // Add more authorized emails here
+        ];
+
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 25,
-            WARNING_AT_MINUTES: 5,
+            DURATION_MINUTES: 60,
+            WARNING_AT_MINUTES: 10,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
-            MAX_VIOLATIONS: 5,
-            WEBAPP_URL: "https://script.google.com/macros/s/AKfycbzcVC6Cg2jjIYbURmeV-0gqq7fmDFwA5pWd9T7H-Tjdf1r84gQw4gKiJJgDr_30TeR9Ow/exec",
+            MAX_VIOLATIONS: 7,
+            WEBAPP_URL: "https://script.google.com/macros/s/AKfycbxgJ5EPkjKaoycwR6T-OUUZavYqKWWvVXieWUCLa0c36FkeHhUE4smIuSGxobDJ8ctxaQ/exec",
             ENABLE_FULLSCREEN: true,
             ENABLE_SERVER_LOGGING: true,
-            AUTO_SAVE_INTERVAL: 30
+            AUTO_SAVE_INTERVAL: 5,
+            EXAM_VERSION: "v2.1", // Increment this when questions change
+            MIN_TIME_GUARANTEE: 5 // Minimum minutes always guaranteed
         };
 
         // ========== EXAM QUESTIONS CONFIGURATION ==========
         const EXAM_QUESTIONS = [
-            {
-                id: "q1",
-                type: "multiple-choice",
-                question: "Which of these is NOT true about the circulatory system?",
-                required: false,
-                options: [
-                    "The Arteries carry blood away from the heart",
-                    "The Veins carry blood to the heart", 
-                    "The Arteries carry blood toward the heart",
-                    "The Veins carry blood toward the heart"
-                ],
-                correctAnswer: 2
-            },
-            {
-                id: "q2",
-                type: "text",
-                question: "Briefly describe what caused the deformation in this man's face ",
-                required: false,
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSi2SSkComQ67ykXanAo81w90Aw9y-MQxX7Lrv6cSP_a-ghhaFJ2QWwmGWzyanfz4nZJ2Q&usqp=CAU",
-                placeholder: "Type your brief explanation here..."
-            },
-            {
-                id: "q3", 
-                type: "text",
-                question: "List one function of the skeletal system",
-                required: false,
-                placeholder: "Type your answer here..." 
-            },
-            {
-                id: "q4",
-                type: "text", 
-                question: "Your client has these lines on their foot. What is the main cause of this skin disorder",
-                required: false,
-                image: "https://www.geelongveinsskinlaser.com.au/wp-content/uploads/2024/10/Varicose-veins-1-600x600.jpg",
-                placeholder: "Type your brief explanation here...",            
-            },
-            {
-                id: "q5",
-                type: "text",
-                question: "In the Image below, which is the Flexor and which is the Extensor?",
-                required: false,
-                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01js0q6n65e7ztn42f22xe45c3%2Fimg_0.webp?st=2025-09-10T23%3A02%3A52Z&se=2025-09-17T00%3A02%3A52Z&sks=b&skt=2025-09-10T23%3A02%3A52Z&ske=2025-09-17T00%3A02%3A52Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=fea36edb-a052-425e-a84a-436fdce0a7b4&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=ZG7P8%2BtRzilr%2FeBVMYtNSzhIft4SlfvBYF7z5xTVsxM%3D&az=oaivgprodscus",
-                placeholder: "Type your answer here...",
-            },
-            {
-                id: "q6",
-                type: "multiple-choice",
-                question: "The lines (A) running through the image below are called.......",
-                required: false,
-                image: "https://videos.openai.com/vg-assets/assets%2Ftask_01js0qy9wvepa98hdw2jhw8r9k%2Fimg_0.webp?st=2025-09-10T23%3A02%3A52Z&se=2025-09-17T00%3A02%3A52Z&sks=b&skt=2025-09-10T23%3A02%3A52Z&ske=2025-09-17T00%3A02%3A52Z&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skoid=fea36edb-a052-425e-a84a-436fdce0a7b4&skv=2019-02-02&sv=2018-11-09&sr=b&sp=r&spr=https%2Chttp&sig=voWJX76zi3u9S5BpT6iZx1FMcOmcpHVpxd3J6UsSFaw%3D&az=oaivgprodscus",
-                options: [
-                    "Capillaries",
-                    "Sinuses",
-                    "Arterioles",
-                    "Sutures" 
-                    
-                ],
-                correctAnswer: 3
-            },
-            {
-                id: "q7",
-                type: "text",
-                question: "In your own words, define circulation with respect to the human body?",
-                required: false,
-                placeholder: "Type your answer here...",
-            },
-            {
-                id: "q8",
-                type: "multiple-choice",
-                question: "All the following are true about Nails except",
-                required: false,
-                options: [
-                    "Nails are made of the same protein as hair",
-                    "Nails are made up of the same protein as skin", 
-                    "Nails are made up of the same protein as bones",
-                    "The Nails grow from Stratum Germinativum"
-                ],
-                correctAnswer: 3
-            },
-            {
-                id: "q9",
-                type: "multiple-choice",
-                question: "The main parts of the central nervous system are the brain and the.......",
-                required: false,
-                options: [
-                    "Spinal cord",
-                    "Backbone", 
-                    "Stratum Germinativum",
-                    "Peripheral nerves"
-                ], 
-                correctAnswer: 0
-            },
-            {
-                id: "q10",
-                type: "multiple-choice",
-                question: "When we say a muscle is responsive, it means that Q.......",
-                required: false,
-                options: [
-                    "The muscle reacts based on impulses from the hormones",
-                    "The muscle reacts based on impulses from the nerves",
-                    "The muscle reacts based on impulses from the blood",
-                    "The muscle reacts based on impulses from the skin"
-                ],
-                correctAnswer: 1
+    // MULTIPLE-CHOICE QUESTIONS (30 questions × 1 mark = 30 marks)
+    {
+        id: "q1",
+        type: "multiple-choice",
+        question: "The below are all types of cells except........",
+        required: false,
+        options: [
+            "Macrophages",
+            "Mast cells",
+            "Osteoblasts",
+            "Collagen"
+        ],
+        correctAnswer: 3
+    },
+    {
+        id: "q2",
+        type: "multiple-choice",
+        question: "Which continent are you from?",
+        required: false,
+        options: [
+            "Africa",
+            "Asia",
+            "Europe",
+            "Australia"
+        ],
+        correctAnswer: 0
+    },
+    {
+        id: "q3",
+        type: "multiple-choice",
+        question: "What continent is this",
+        required: false,
+        image: "https://eccoclimate.org/wp-content/uploads/2024/07/Aggiungi-corpo-del-testo-2-1024x1024.png",
+        options: [
+            "Africa",
+            "Asia",
+            "Europe",
+            "Australia"
+        ],
+        correctAnswer: 2
+    }
+];
 
-            },
-            {
-                id: "q11",
-                type: "text",
-                question: "What is a Tendon?",
-                required: false,
-                placeholder: "Type your answer here..."
-
-            },
-            
-        ];
 
         let examState = {
             endTime: null,
@@ -836,11 +224,357 @@
             keyboardVisible: false,
             lastViolationTime: 0,
             violationCooldown: 2000,
-            recentViolations: new Set()
+            recentViolations: new Set(),
+            resuming: false,
+            urlProgressData: null
         };
+
+        // ========== URL-BASED PROGRESS ENCODING SYSTEM ==========
+        
+        function encodeProgressToURL(progressData) {
+            try {
+                const compressedData = {
+                    v: CONFIG.EXAM_VERSION,
+                    n: progressData.studentName,
+                    e: progressData.studentEmail,
+                    s: progressData.sessionId,
+                    st: progressData.startTime,
+                    et: progressData.endTime,
+                    r: progressData.responses,
+                    vio: progressData.violations,
+                    ls: Date.now() // last saved timestamp
+                };
+                
+                const encoded = btoa(JSON.stringify(compressedData));
+                const newUrl = window.location.pathname + '?ep=' + encoded;
+                
+                // Update URL without triggering page reload
+                window.history.replaceState({}, '', newUrl);
+                
+                console.log('Progress encoded to URL:', Object.keys(progressData.responses).length, 'responses saved');
+                return true;
+            } catch (error) {
+                console.warn('Failed to encode progress to URL:', error);
+                return false;
+            }
+        }
+
+        function decodeProgressFromURL() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const encoded = urlParams.get('ep');
+                
+                if (!encoded) {
+                    return null;
+                }
+                
+                const decoded = JSON.parse(atob(encoded));
+                
+                // Validate exam version
+                if (decoded.v !== CONFIG.EXAM_VERSION) {
+                    console.log('Exam version mismatch - URL has', decoded.v, 'current is', CONFIG.EXAM_VERSION);
+                    clearURLProgress();
+                    return null;
+                }
+                
+                // Validate data structure
+                if (!decoded.n || !decoded.e || !decoded.r || !decoded.st) {
+                    console.log('Invalid progress data structure');
+                    return null;
+                }
+                
+                console.log('Progress decoded from URL:', Object.keys(decoded.r).length, 'responses found');
+                return {
+                    studentName: decoded.n,
+                    studentEmail: decoded.e,
+                    sessionId: decoded.s,
+                    startTime: decoded.st,
+                    endTime: decoded.et,
+                    responses: decoded.r,
+                    violations: decoded.vio || 0,
+                    lastSaved: decoded.ls
+                };
+            } catch (error) {
+                console.warn('Failed to decode progress from URL:', error);
+                clearURLProgress();
+                return null;
+            }
+        }
+
+        function clearURLProgress() {
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+            console.log('URL progress cleared');
+        }
+
+        function saveProgressToURL() {
+            if (!examState.examActive || examState.terminated) return;
+            
+            const progressData = {
+                studentName: examState.studentData.name,
+                studentEmail: examState.studentData.email,
+                sessionId: examState.sessionId,
+                startTime: examState.startTime,
+                endTime: examState.endTime,
+                responses: examState.responses,
+                violations: examState.violations
+            };
+            
+            encodeProgressToURL(progressData);
+        }
+
+        function checkForURLProgress() {
+            const urlProgress = decodeProgressFromURL();
+            if (urlProgress) {
+                examState.urlProgressData = urlProgress;
+                console.log('URL progress found:', urlProgress);
+                return true;
+            }
+            return false;
+        }
+
+        // ========== PROGRESS RECOVERY FUNCTIONS ==========
+        
+        function showRecoveryDialog(progressData) {
+            const dialog = document.getElementById('recoveryDialog');
+            const infoDiv = document.getElementById('recoveryInfo');
+            
+            const answeredCount = Object.keys(progressData.responses).length;
+            const progressPercent = Math.round((answeredCount / EXAM_QUESTIONS.length) * 100);
+            const lastSavedTime = new Date(progressData.lastSaved).toLocaleString();
+            
+            // Calculate remaining time
+            const currentTime = Date.now();
+            const originalEndTime = progressData.endTime;
+            const remainingMs = originalEndTime - currentTime;
+            const remainingMinutes = Math.max(CONFIG.MIN_TIME_GUARANTEE, Math.floor(remainingMs / 60000));
+            
+            infoDiv.innerHTML = `
+                <div><strong>Student:</strong> ${progressData.studentName}</div>
+                <div><strong>Email:</strong> ${progressData.studentEmail}</div>
+                <div><strong>Progress:</strong> ${progressPercent}% (${answeredCount}/${EXAM_QUESTIONS.length} questions)</div>
+                <div><strong>Time Remaining:</strong> ~${remainingMinutes} minutes</div>
+                <div><strong>Violations:</strong> ${progressData.violations || 0}</div>
+                <div><strong>Last Saved:</strong> ${lastSavedTime}</div>
+            `;
+            
+            dialog.classList.remove('hidden');
+        }
+
+        function resumeExam() {
+            const progressData = examState.urlProgressData;
+            if (!progressData) {
+                startFreshExam();
+                return;
+            }
+            
+            // Restore exam state
+            examState.resuming = true;
+            examState.studentData = { 
+                name: progressData.studentName, 
+                email: progressData.studentEmail 
+            };
+            examState.sessionId = progressData.sessionId;
+            examState.responses = progressData.responses;
+            examState.violations = progressData.violations || 0;
+            examState.startTime = new Date(progressData.startTime);
+            
+            // Calculate remaining time (ensure minimum time)
+            const currentTime = Date.now();
+            const originalEndTime = progressData.endTime;
+            const remainingMs = originalEndTime - currentTime;
+            const guaranteedMs = CONFIG.MIN_TIME_GUARANTEE * 60 * 1000;
+            const finalRemainingMs = Math.max(guaranteedMs, remainingMs);
+            
+            examState.endTime = currentTime + finalRemainingMs;
+            
+            // Hide recovery dialog
+            document.getElementById('recoveryDialog').classList.add('hidden');
+            
+            // Populate student form
+            document.getElementById('studentName').value = progressData.studentName;
+            document.getElementById('studentEmail').value = progressData.studentEmail;
+            document.getElementById('agreeTerms').checked = true;
+            
+            // Start exam
+            continueExamAfterRecovery();
+            
+            showInfo(`Progress restored! ${Object.keys(progressData.responses).length}/${EXAM_QUESTIONS.length} questions recovered. Resuming exam...`);
+        }
+
+        function startFreshExam() {
+            document.getElementById('recoveryDialog').style.display = 'none';
+            clearURLProgress();
+            examState.urlProgressData = null;
+            showInfo("Starting fresh exam...");
+        }
+
+        function continueExamAfterRecovery() {
+            examState.examActive = true;
+            
+            // Request fullscreen
+            if (CONFIG.ENABLE_FULLSCREEN) {
+                requestFullscreen();
+            }
+            
+            // Hide student form
+            document.getElementById("studentForm").style.display = "none";
+            
+            // Show timer + exam
+            document.getElementById("timerBar").style.display = "block";
+            document.getElementById("examContainer").style.display = "block";
+            
+            // Generate exam questions
+            generateQuestions();
+            
+            // Restore responses in UI
+            restoreResponsesInUI();
+            
+            // Update progress display
+            updateProgress();
+            
+            // Start countdown with remaining time
+            examState.timerInterval = setInterval(updateTimer, 1000);
+            examState.autoSubmitTimer = setTimeout(endExam, examState.endTime - Date.now());
+            
+            // Start auto-save
+            examState.autoSaveInterval = setInterval(autoSaveProgress, CONFIG.AUTO_SAVE_INTERVAL * 1000);
+            
+            // Start monitoring
+            startMonitoring();
+            
+            // Log exam resume
+            sendToServer('logViolation', {
+                violationType: 'Exam resumed from URL progress',
+                additionalInfo: `Restored ${Object.keys(examState.responses).length} responses, ${examState.violations} violations`
+            });
+            
+            // Scroll to first unanswered question
+            setTimeout(() => {
+                scrollToNextUnanswered();
+            }, 1000);
+            
+            console.log("Exam resumed with progress:", examState);
+        }
+
+        function restoreResponsesInUI() {
+            Object.keys(examState.responses).forEach(questionId => {
+                const value = examState.responses[questionId];
+                const question = EXAM_QUESTIONS.find(q => q.id === questionId);
+                
+                if (!question) return;
+                
+                if (question.type === 'multiple-choice') {
+                    selectChoice(questionId, value);
+                } else {
+                    const element = document.getElementById(questionId);
+                    if (element) {
+                        element.value = value;
+                    }
+                }
+                
+                // Mark question as answered visually
+                const questionDiv = document.querySelector(`[data-question-id="${questionId}"]`);
+                if (questionDiv) {
+                    questionDiv.classList.add('answered');
+                }
+            });
+        }
+
+        function scrollToNextUnanswered() {
+            const answeredIds = Object.keys(examState.responses);
+            const nextUnanswered = EXAM_QUESTIONS.find(q => !answeredIds.includes(q.id));
+            
+            if (nextUnanswered) {
+                const element = document.querySelector(`[data-question-id="${nextUnanswered.id}"]`);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    element.style.animation = 'pulse 2s';
+                }
+            }
+        }
+
+        // ========== ENHANCED AUTO-SAVE WITH URL PERSISTENCE ==========
+        
+        function autoSaveProgress() {
+            if (!examState.examActive || examState.terminated) return;
+            
+            // Save to URL (immediate, works offline)
+            saveProgressToURL();
+            
+            // Save to server (network-dependent)
+            sendToServer('saveProgress', {
+                responses: examState.responses,
+                progress: (Object.keys(examState.responses).length / EXAM_QUESTIONS.length) * 100,
+                violations: examState.violations,
+                timeRemaining: Math.max(0, examState.endTime - Date.now())
+            });
+            
+            console.log('Auto-save completed:', Object.keys(examState.responses).length, 'responses');
+        }
+
+        // ========== ORIGINAL FUNCTIONS WITH ENHANCEMENTS ==========
 
         function generateSessionId() {
             return 'session_' + new Date().getTime() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function isEmailAuthorized(email) {
+            if (!email || typeof email !== 'string') {
+                console.log('Invalid email input:', email);
+                return false;
+            }
+            
+            const emailLower = email.toLowerCase().trim();
+            console.log('Checking email (lowercase):', emailLower);
+            
+            const isAuthorized = AUTHORIZED_EMAILS.some(authorizedEmail => {
+                const authEmailLower = authorizedEmail.toLowerCase().trim();
+                console.log('Comparing with:', authEmailLower, 'Match:', authEmailLower === emailLower);
+                return authEmailLower === emailLower;
+            });
+            
+            console.log('Final authorization result:', isAuthorized);
+            return isAuthorized;
+        }
+
+        function showLoginError(message) {
+            console.log('Showing login error:', message);
+            const errorDiv = document.getElementById("loginErrorMessage");
+            if (errorDiv) {
+                errorDiv.textContent = message;
+                errorDiv.style.display = "block";
+                
+                setTimeout(() => {
+                    errorDiv.style.display = "none";
+                }, 8000);
+            } else {
+                console.error('Login error div not found');
+                alert('Error: ' + message);
+            }
+        }
+
+        function showLoginInfo(message) {
+            const infoDiv = document.getElementById("loginInfoMessage");
+            if (infoDiv) {
+                infoDiv.textContent = message;
+                infoDiv.style.display = "block";
+                
+                setTimeout(() => {
+                    infoDiv.style.display = "none";
+                }, 5000);
+            }
+        }
+
+        function clearLoginError() {
+            const errorDiv = document.getElementById("loginErrorMessage");
+            if (errorDiv) {
+                errorDiv.style.display = "none";
+            }
+            const infoDiv = document.getElementById("loginInfoMessage");
+            if (infoDiv) {
+                infoDiv.style.display = "none";
+            }
         }
 
         function startExam() {
@@ -848,48 +582,66 @@
             const email = document.getElementById("studentEmail").value.trim();
             const agreed = document.getElementById("agreeTerms").checked;
 
+            clearLoginError();
+
             if (!name || !email || !agreed) {
-                showError("Please fill all fields and agree to terms.");
+                showLoginError("Please fill all fields and agree to terms.");
                 return;
             }
 
             if (!/\S+@\S+\.\S+/.test(email)) {
-                showError("Please enter a valid email address.");
+                showLoginError("Please enter a valid email address.");
                 return;
             }
 
+            console.log('Checking email authorization for:', email);
+            
+            if (!isEmailAuthorized(email)) {
+                console.log('Email not authorized:', email);
+                showLoginError("You are not a recognized student of this class. Please contact your instructor if you believe this is an error.");
+                return;
+            }
+            
+            console.log('Email authorized, proceeding with exam...');
+
+            // Check if there's URL progress and it matches this student
+            if (examState.urlProgressData) {
+                const urlProgress = examState.urlProgressData;
+                if (urlProgress.studentName === name && urlProgress.studentEmail === email) {
+                    // Show recovery dialog
+                    showRecoveryDialog(urlProgress);
+                    return;
+                } else {
+                    // Different student - clear URL progress
+                    clearURLProgress();
+                    examState.urlProgressData = null;
+                }
+            }
+
+            // Start fresh exam
             examState.studentData = { name, email };
             examState.startTime = new Date();
             examState.examActive = true;
             examState.sessionId = generateSessionId();
 
-            // Request fullscreen
             if (CONFIG.ENABLE_FULLSCREEN) {
                 requestFullscreen();
             }
 
-            // Hide student form
             document.getElementById("studentForm").style.display = "none";
-
-            // Show timer + exam
             document.getElementById("timerBar").style.display = "block";
             document.getElementById("examContainer").style.display = "block";
 
-            // Generate exam questions
             generateQuestions();
 
-            // Start countdown
             examState.endTime = Date.now() + CONFIG.DURATION_MINUTES * 60 * 1000;
             examState.timerInterval = setInterval(updateTimer, 1000);
             examState.autoSubmitTimer = setTimeout(endExam, CONFIG.DURATION_MINUTES * 60 * 1000);
 
-            // Start auto-save
             examState.autoSaveInterval = setInterval(autoSaveProgress, CONFIG.AUTO_SAVE_INTERVAL * 1000);
 
-            // Start monitoring
             startMonitoring();
 
-            // Log exam start
             sendToServer('logViolation', {
                 violationType: 'Exam started',
                 additionalInfo: 'Custom exam system initialized'
@@ -983,7 +735,19 @@
 
         function saveResponse(questionId, value) {
             examState.responses[questionId] = value;
+            
+            // Mark question as answered
+            const questionDiv = document.querySelector(`[data-question-id="${questionId}"]`);
+            if (questionDiv) {
+                questionDiv.classList.add('answered');
+            }
+            
             updateProgress();
+            
+            // Trigger immediate URL save for important responses
+            if (!examState.resuming) {
+                saveProgressToURL();
+            }
         }
 
         function updateProgress() {
@@ -1012,18 +776,18 @@
             document.getElementById("timeLeft").textContent = timeDisplay;
 
             const timerBar = document.getElementById("timerBar");
-            if (minutes < CONFIG.WARNING_AT_MINUTES) {
+            
+            // Progressive color transitions based on time remaining
+            timerBar.classList.remove("warning", "critical");
+            
+            if (minutes < 5) {
+                // Critical: less than 5 minutes - red with intense pulse
+                timerBar.classList.add("critical");
+            } else if (minutes < CONFIG.WARNING_AT_MINUTES) {
+                // Warning: less than warning threshold - orange with pulse
                 timerBar.classList.add("warning");
             }
-        }
-
-        function autoSaveProgress() {
-            if (!examState.examActive) return;
-
-            sendToServer('saveProgress', {
-                responses: examState.responses,
-                progress: (Object.keys(examState.responses).length / EXAM_QUESTIONS.length) * 100
-            });
+            // Normal state: blue gradient (default in CSS)
         }
 
         function submitExam() {
@@ -1081,8 +845,12 @@
                 submissionType: submissionType,
                 responses: examState.responses,
                 examQuestions: EXAM_QUESTIONS,
-                completionTime: new Date().toISOString()
+                completionTime: new Date().toISOString(),
+                wasResumed: examState.resuming
             });
+
+            // Clear URL progress on successful submission
+            clearURLProgress();
 
             setTimeout(() => {
                 showFinalResults();
@@ -1099,6 +867,7 @@
                     <p>Questions Answered: ${Object.keys(examState.responses).length}/${EXAM_QUESTIONS.length}</p>
                     <p>Total Violations: ${examState.violations}</p>
                     <p>Submission Time: ${new Date().toLocaleString()}</p>
+                    ${examState.resuming ? '<p style="color: #007bff;">✓ Progress was recovered and resumed</p>' : ''}
                     <br>
                     <p style="color: #28a745; font-weight: bold;">Thank you for taking the exam!</p>
                     <p>You may now close this window.</p>
@@ -1234,6 +1003,9 @@
             
             document.getElementById("violationNumber").textContent = examState.violations;
             
+            // Save violation count to URL immediately
+            saveProgressToURL();
+            
             sendToServer('logViolation', {
                 violationType: type,
                 additionalInfo: 'Monitoring system - legitimate violation',
@@ -1285,22 +1057,163 @@
             }, 3000);
         }
 
+        function showInfo(message) {
+            const infoDiv = document.getElementById("infoMessage");
+            if (infoDiv) {
+                infoDiv.textContent = message;
+                infoDiv.style.display = "block";
+                setTimeout(() => {
+                    infoDiv.style.display = "none";
+                }, 4000);
+            }
+        }
+
+        // ========== PAGE LIFECYCLE MANAGEMENT ==========
+        
         // Prevent leaving page during exam
         window.addEventListener('beforeunload', function(e) {
             if (examState.examActive) {
+                // Save progress before potential page unload
+                saveProgressToURL();
+                
                 e.preventDefault();
                 e.returnValue = 'Are you sure you want to leave the exam?';
                 return 'Are you sure you want to leave the exam?';
             }
         });
 
-        // Initialize when page loads
+        // Handle page visibility changes (mobile-friendly)
+        document.addEventListener('visibilitychange', function() {
+            if (examState.examActive) {
+                if (document.hidden) {
+                    // Page is hidden - save progress
+                    saveProgressToURL();
+                } else {
+                    // Page is visible again - could be recovery scenario
+                    console.log('Page became visible again');
+                }
+            }
+        });
+
+        // Handle page load and initialization
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Custom Proctored Exam System Loaded');
             console.log('Total Questions:', EXAM_QUESTIONS.length);
             console.log('Duration:', CONFIG.DURATION_MINUTES, 'minutes');
             console.log('WebApp URL:', CONFIG.WEBAPP_URL);
+            console.log('Authorized Emails:', AUTHORIZED_EMAILS.length, 'emails configured');
+            console.log('Exam Version:', CONFIG.EXAM_VERSION);
+            
+            // Check for URL progress on page load
+            if (checkForURLProgress()) {
+                console.log('Previous progress detected in URL');
+                showLoginInfo("Previous exam progress detected. Please enter your details to check for recovery options.");
+            } else {
+                console.log('No previous progress found');
+            }
         });
+
+        // ========== UTILITY FUNCTIONS ==========
+        
+        function formatTimeRemaining(ms) {
+            const minutes = Math.floor(ms / 60000);
+            const seconds = Math.floor((ms % 60000) / 1000);
+            return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function generateProgressSummary() {
+            const answered = Object.keys(examState.responses).length;
+            const total = EXAM_QUESTIONS.length;
+            const percentage = Math.round((answered / total) * 100);
+            
+            return {
+                answered,
+                total,
+                percentage,
+                violations: examState.violations,
+                timeRemaining: examState.endTime ? Math.max(0, examState.endTime - Date.now()) : 0
+            };
+        }
+
+        // ========== ENHANCED ERROR HANDLING ==========
+        
+        window.addEventListener('error', function(e) {
+            console.error('Global error caught:', e.error);
+            
+            // If exam is active, save progress to prevent data loss
+            if (examState.examActive && !examState.terminated) {
+                saveProgressToURL();
+                console.log('Progress saved due to error');
+            }
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Unhandled promise rejection:', e.reason);
+            
+            // Save progress on promise rejections too
+            if (examState.examActive && !examState.terminated) {
+                saveProgressToURL();
+            }
+        });
+
+        // ========== MOBILE OPTIMIZATION ==========
+        
+        // Handle mobile keyboard visibility
+        if (examState.isMobile) {
+            window.addEventListener('resize', function() {
+                // Mobile keyboard detection
+                const heightRatio = window.innerHeight / window.screen.height;
+                examState.keyboardVisible = heightRatio < 0.75;
+                
+                if (examState.keyboardVisible) {
+                    examState.preventViolations = true;
+                } else {
+                    setTimeout(() => {
+                        examState.preventViolations = false;
+                    }, 1000);
+                }
+            });
+        }
+
+        // ========== DEBUGGING AND TESTING ==========
+        
+        function debugExamState() {
+            console.log('=== EXAM STATE DEBUG ===');
+            console.log('Exam Active:', examState.examActive);
+            console.log('Student:', examState.studentData);
+            console.log('Session ID:', examState.sessionId);
+            console.log('Responses:', Object.keys(examState.responses).length, 'of', EXAM_QUESTIONS.length);
+            console.log('Violations:', examState.violations);
+            console.log('Time Remaining:', examState.endTime ? formatTimeRemaining(examState.endTime - Date.now()) : 'N/A');
+            console.log('Is Mobile:', examState.isMobile);
+            console.log('URL Progress:', examState.urlProgressData ? 'Available' : 'None');
+            console.log('========================');
+        }
+
+        // Expose debug function globally for testing
+        window.debugExam = debugExamState;
+        
+        // Testing function for URL progress
+        window.testURLProgress = function() {
+            console.log('Testing URL progress system...');
+            const testProgress = {
+                studentName: 'Test Student',
+                studentEmail: 'test@example.com',
+                sessionId: 'test_session',
+                startTime: Date.now() - 900000, // 15 minutes ago
+                endTime: Date.now() + 1800000, // 30 minutes from now
+                responses: { q1: 'Test answer', q2: 1 },
+                violations: 2
+            };
+            
+            encodeProgressToURL(testProgress);
+            const decoded = decodeProgressFromURL();
+            console.log('Encoded and decoded successfully:', decoded);
+            return decoded;
+        };
+
+        console.log('🚀 Enhanced Exam System with URL Progress Persistence Ready!');
+        console.log('Debug functions available: debugExam(), testURLProgress()');
     </script>
 </body>
 </html>

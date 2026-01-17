@@ -1,0 +1,103 @@
+const EXAM_QUESTIONS = [
+    {
+        id: "q1",
+        type: "multiple-choice",
+        question: "The hairs found on newborn babies are called",
+        required: false,
+        options: [
+            "Terminal hair",
+            "Vellus Hairs",
+            "Lanugo Hairs",
+            "Cussons Hairs"
+        ],
+        correctAnswer: 2
+    },
+    {
+        id: "q2",
+        type: "text",
+        question: "Name three functions of the hair",
+        required: false,
+        placeholder: "Type your answer here..."
+    },
+    {
+        id: "q3",
+        type: "multiple-choice",
+        question: "The protein Keratin makes up the hair, nails and skin",
+        required: false,
+        options: [
+            "True",
+            "False"
+        ],
+        correctAnswer: 0
+    },
+    {
+        id: "q4",
+        type: "text",
+        question: "In the image below, what is the name of the white tissue labelled A?",
+        required: false,
+        image: "[YOUR_IMAGE_PATH_HERE]",
+        placeholder: "Type your answer here..."
+    },
+    {
+        id: "q5",
+        type: "multiple-choice",
+        question: "When we say a muscle is responsive, it means that........",
+        required: false,
+        options: [
+            "The muscle reacts based on impulses from the hormones",
+            "The muscle reacts based on impulses from the nerves",
+            "The muscle reacts based on impulses from the blood",
+            "The muscle reacts based on impulses from the skin"
+        ],
+        correctAnswer: 1
+    },
+    {
+        id: "q6",
+        type: "text",
+        question: "In the image below, which is the Flexor and which is the Extensor muscle?",
+        required: false,
+        image: "[YOUR_IMAGE_PATH_HERE]",
+        placeholder: "Type your answer here..."
+    },
+    {
+        id: "q7",
+        type: "multiple-choice",
+        question: "The lines (A) running through the image below are called.......",
+        required: false,
+        image: "[YOUR_IMAGE_PATH_HERE]",
+        options: [
+            "Capillaries",
+            "Sinuses",
+            "Arterioles",
+            "Sutures"
+        ],
+        correctAnswer: 3
+    },
+    {
+        id: "q8",
+        type: "text",
+        question: "Provide three shapes of bones",
+        required: false,
+        placeholder: "Type your answer here..."
+    },
+    {
+        id: "q9",
+        type: "multiple-choice",
+        question: "In this stage, the hair grows fastest.",
+        required: false,
+        options: [
+            "Hairlogen Stage",
+            "Catagen Stage",
+            "Anagen Stage",
+            "Telogen Stage"
+        ],
+        correctAnswer: 2
+    },
+    {
+        id: "q10",
+        type: "text",
+        question: "What is a Tendon?",
+        required: false,
+        placeholder: "Type your answer here..."
+    }
+];
