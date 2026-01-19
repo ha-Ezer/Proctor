@@ -150,8 +150,8 @@
 
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 60,
-            WARNING_AT_MINUTES: 10,
+            DURATION_MINUTES: 25,
+            WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 7,
             WEBAPP_URL: "https://script.google.com/macros/s/AKfycbxCOMFV4XNnGcW9tl-7TosiEAvJAiHglXBSjfu0NT-9REf4Ww7O8tEDTcf-ucygr167/exec",
@@ -164,46 +164,172 @@
 
         // ========== EXAM QUESTIONS CONFIGURATION ==========
         const EXAM_QUESTIONS = [
-    // MULTIPLE-CHOICE QUESTIONS (30 questions × 1 mark = 30 marks)
+    // MULTIPLE-CHOICE QUESTIONS (10 questions × 1 mark = 10 marks)
     {
         id: "q1",
         type: "multiple-choice",
-        question: "The below are all types of cells except........",
+        question: "Visible traits like hair color, skin color, and height are stored in one of the organelles of the cell. Which is it?",
         required: false,
         options: [
-            "Macrophages",
-            "Mast cells",
-            "Osteoblasts",
-            "Collagen"
+            "Mitochondrion",
+            "Ribosome",
+            "Nucleus",
+            "Lysosome"
         ],
-        correctAnswer: 3
+        correctAnswer: 2
     },
     {
         id: "q2",
         type: "multiple-choice",
-        question: "Which continent are you from?",
+        question: "The below are all types of cells except........",
         required: false,
         options: [
-            "Africa",
-            "Asia",
-            "Europe",
-            "Australia"
+            "Melanocytes",
+            "Macrophages",
+            "Collagen",
+            "Osteoblasts"
         ],
-        correctAnswer: 0
+        correctAnswer: 2
     },
     {
         id: "q3",
         type: "multiple-choice",
-        question: "What continent is this",
+        question: "There is/are ____________ layer(s) of the skin.",
         required: false,
-        image: "https://eccoclimate.org/wp-content/uploads/2024/07/Aggiungi-corpo-del-testo-2-1024x1024.png",
         options: [
-            "Africa",
-            "Asia",
-            "Europe",
-            "Australia"
+            "2",
+            "3",
+            "4",
+            "5"
+        ],
+        correctAnswer: 1
+    },
+    {
+        id: "q4",
+        type: "multiple-choice",
+        question: "The cells responsible for producing melanin in the skin are called........",
+        required: false,
+        options: [
+            "Keratinocytes",
+            "Melanocytes",
+            "Fibroblasts",
+            "Langerhans cells"
+        ],
+        correctAnswer: 1
+    },
+    {
+        id: "q5",
+        type: "multiple-choice",
+        question: "The skin cells in the epidermis move up the layers from bottom to top every four weeks. The production of new cells takes place in the...........",
+        required: false,
+        options: [
+            "Stratum Corneum",
+            "Stratum Lucidum",
+            "Stratum Granulosum",
+            "Stratum Germinativum"
+        ],
+        correctAnswer: 3
+    },
+    {
+        id: "q6",
+        type: "multiple-choice",
+        question: "Your client changed from fair to dark skin when she got pregnant. What pigment is responsible for this change?",
+        required: false,
+        image: "[YOUR_IMAGE_PATH_HERE]",
+        options: [
+            "Carotene",
+            "Collagen",
+            "Melanin",
+            "Hemoglobin"
         ],
         correctAnswer: 2
+    },
+    {
+        id: "q7",
+        type: "multiple-choice",
+        question: "Acne Vulgaris, Pimples and oily skin are usually pertinent with adolescents. They are mostly caused by..............",
+        required: false,
+        options: [
+            "Emotional Imbalance",
+            "Hormonal Imbalance",
+            "Spiritual Imbalance",
+            "Nutritional Deficiency"
+        ],
+        correctAnswer: 1
+    },
+    {
+        id: "q8",
+        type: "multiple-choice",
+        question: "Stretch marks are caused by.....",
+        required: false,
+        options: [
+            "Broken fibrin in the skin",
+            "Broken Collagen in the skin",
+            "Overproduction of Histamine",
+            "Excess Vitamin C"
+        ],
+        correctAnswer: 1
+    },
+    {
+        id: "q9",
+        type: "multiple-choice",
+        question: "All the following are differences between the cells in the Stratum Germinativum (lowest layer of the epidermis) and the Stratum Corneum (uppermost) except........",
+        required: false,
+        options: [
+            "Shape; one is flat and the other is rectangular",
+            "Cellular division; one divides and another does not divide",
+            "Alive; because they are both cells, they are alive",
+            "Keratinization; One has more keratin than the other"
+        ],
+        correctAnswer: 2
+    },
+    {
+        id: "q10",
+        type: "multiple-choice",
+        question: "The Dermis is NOT the layer of the skin we can easily see and touch",
+        required: false,
+        options: [
+            "True",
+            "False"
+        ],
+        correctAnswer: 0
+    },
+
+    // TEXT/SHORT ANSWER QUESTIONS (5 questions × 1 mark = 5 marks)
+    {
+        id: "q11",
+        type: "text",
+        question: "In your own words, what is a cell?",
+        required: false,
+        placeholder: "Type your answer here..."
+    },
+    {
+        id: "q12",
+        type: "text",
+        question: "Name the layer of the epidermis where melanin is produced",
+        required: false,
+        placeholder: "Type your answer here..."
+    },
+    {
+        id: "q13",
+        type: "text",
+        question: "Briefly explain one function of the skin.",
+        required: false,
+        placeholder: "Type your brief explanation here..."
+    },
+    {
+        id: "q14",
+        type: "text",
+        question: "Name one effect of hormonal changes on the skin",
+        required: false,
+        placeholder: "Type your answer here..."
+    },
+    {
+        id: "q15",
+        type: "text",
+        question: "What is the function of collagen fibres in the dermis?",
+        required: false,
+        placeholder: "Type your answer here..."
     }
 ];
 
