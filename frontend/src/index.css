@@ -1,0 +1,314 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS Variables from existing system */
+:root {
+  --primary-color: #0ea5e9;
+  --primary-hover: #0284c7;
+  --danger-color: #ef4444;
+  --danger-hover: #dc2626;
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --border-color: #e5e7eb;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+/* Base styles */
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+      'Droid Sans', 'Helvetica Neue', sans-serif;
+  }
+
+  * {
+    @apply border-gray-200;
+  }
+
+  button {
+    @apply transition-all duration-200;
+  }
+
+  input,
+  textarea {
+    @apply transition-all duration-200;
+  }
+}
+
+/* Custom components */
+@layer components {
+  /* Button styles */
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  }
+
+  .btn-danger {
+    @apply bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-lg shadow-md border border-gray-200 p-6;
+  }
+
+  /* Input styles */
+  .input {
+    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+
+  .input-error {
+    @apply border-danger-500 focus:ring-danger-500;
+  }
+
+  /* Textarea styles */
+  .textarea {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none;
+  }
+
+  /* Radio button styles */
+  .radio-option {
+    @apply flex items-start gap-3 p-4 border border-gray-300 rounded-lg cursor-pointer transition-all hover:border-primary-400 hover:bg-primary-50;
+  }
+
+  .radio-option.selected {
+    @apply border-primary-600 bg-primary-50;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    @apply w-full h-2 bg-gray-200 rounded-full overflow-hidden;
+  }
+
+  .progress-bar-fill {
+    @apply h-full bg-primary-600 transition-all duration-300;
+  }
+
+  /* Timer styles */
+  .timer {
+    @apply text-2xl font-bold tabular-nums;
+  }
+
+  .timer-normal {
+    @apply text-gray-900;
+  }
+
+  .timer-warning {
+    @apply text-warning-600;
+  }
+
+  .timer-danger {
+    @apply text-danger-600 animate-pulse;
+  }
+
+  /* Violation badge */
+  .violation-badge {
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  .violation-badge-low {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .violation-badge-medium {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  .violation-badge-high {
+    @apply bg-orange-100 text-orange-800;
+  }
+
+  .violation-badge-critical {
+    @apply bg-danger-100 text-danger-800 animate-pulse;
+  }
+
+  /* Question navigation */
+  .question-nav-item {
+    @apply w-10 h-10 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-all font-medium;
+  }
+
+  .question-nav-item.answered {
+    @apply bg-primary-100 border-primary-600 text-primary-700;
+  }
+
+  .question-nav-item.current {
+    @apply bg-primary-600 border-primary-600 text-white;
+  }
+
+  .question-nav-item.unanswered {
+    @apply bg-white border-gray-300 text-gray-700 hover:border-primary-400;
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  /* Animations */
+  .animate-shake {
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+
+  @keyframes shake {
+    10%,
+    90% {
+      transform: translate3d(-1px, 0, 0);
+    }
+    20%,
+    80% {
+      transform: translate3d(2px, 0, 0);
+    }
+    30%,
+    50%,
+    70% {
+      transform: translate3d(-4px, 0, 0);
+    }
+    40%,
+    60% {
+      transform: translate3d(4px, 0, 0);
+    }
+  }
+
+  /* Fade in animation */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Slide in animation */
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Disable text selection (for proctoring) */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Scrollbar styles */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded hover:bg-gray-400;
+  }
+}
+
+/* Print styles */
+@media print {
+  body {
+    @apply bg-white;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible for keyboard navigation */
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-primary-600;
+}
+
+/* Print Styles for PDF Export */
+@media print {
+  /* Hide non-essential elements */
+  header, nav, button, .no-print {
+    display: none !important;
+  }
+
+  /* Reset page breaks */
+  * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Page setup */
+  @page {
+    margin: 1cm;
+    size: A4;
+  }
+
+  body {
+    font-size: 10pt;
+    line-height: 1.4;
+  }
+
+  /* Ensure content fits */
+  .card {
+    page-break-inside: avoid;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+  }
+
+  /* Preserve colors in print */
+  .bg-success-50, .bg-success-100 {
+    background-color: #d1fae5 !important;
+  }
+
+  .bg-danger-50, .bg-danger-100 {
+    background-color: #fee2e2 !important;
+  }
+
+  .bg-blue-50 {
+    background-color: #eff6ff !important;
+  }
+
+  /* Print button styling */
+  .print-only {
+    display: block !important;
+  }
+}

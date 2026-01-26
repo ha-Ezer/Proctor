@@ -1,0 +1,1349 @@
+
+> proctor-backend@1.0.0 dev
+> nodemon --exec ts-node src/server.ts
+
+[33m[nodemon] 3.1.11[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: ts,json[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+✅ Environment variables validated
+
+========================================
+🎓 PROCTORED EXAM SYSTEM - BACKEND
+========================================
+Environment: development
+Server: http://localhost:3000
+Health Check: http://localhost:3000/health
+========================================
+✅ Database connection established
+📊 Query executed: { text: 'SELECT NOW()', duration: '31ms', rows: 1 }
+✅ Database connection: OK
+========================================
+
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 1,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 2,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 3,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 4,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 5,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 6,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 7,
+  max: 7,
+  shouldTerminate: true
+}
+Error completing session: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 663,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 03:42:38.752, 2026-01-18 04:41:48.433, 10850, completed, 0.00, 7, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 00:42:38.752737, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+❌ Error: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 663,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 03:42:38.752, 2026-01-18 04:41:48.433, 10850, completed, 0.00, 7, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 00:42:38.752737, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 8,
+  max: 7,
+  shouldTerminate: true
+}
+Error completing session: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 663,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 03:44:01.105, 2026-01-18 04:41:48.433, 10933, completed, 0.00, 8, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 00:44:01.105463, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+❌ Error: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 663,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 03:44:01.105, 2026-01-18 04:41:48.433, 10933, completed, 0.00, 8, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 00:44:01.105463, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 9,
+  max: 7,
+  shouldTerminate: true
+}
+Error completing session: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 663,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 03:56:21.983, 2026-01-18 04:41:48.433, 11674, completed, 0.00, 9, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 00:56:21.983731, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+❌ Error: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 663,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 03:56:21.983, 2026-01-18 04:41:48.433, 11674, completed, 0.00, 9, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 00:56:21.983731, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 10,
+  max: 7,
+  shouldTerminate: true
+}
+Error completing session: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:09:50.602, 2026-01-18 04:41:48.433, 12482, completed, 0.00, 10, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:09:50.602487, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+❌ Error: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:09:50.602, 2026-01-18 04:41:48.433, 12482, completed, 0.00, 10, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:09:50.602487, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 11,
+  max: 7,
+  shouldTerminate: true
+}
+Error completing session: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:10:10.892, 2026-01-18 04:41:48.433, 12502, completed, 0.00, 11, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:10:10.892567, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+❌ Error: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:10:10.892, 2026-01-18 04:41:48.433, 12502, completed, 0.00, 11, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:10:10.892567, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 12,
+  max: 7,
+  shouldTerminate: true
+}
+Error completing session: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:11:02.373, 2026-01-18 04:41:48.433, 12554, completed, 0.00, 12, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:11:02.373054, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+❌ Error: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:11:02.373, 2026-01-18 04:41:48.433, 12554, completed, 0.00, 12, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:11:02.373054, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 13,
+  max: 7,
+  shouldTerminate: true
+}
+Error completing session: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:12:01.147, 2026-01-18 04:41:48.433, 12613, completed, 0.00, 13, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:12:01.147288, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+❌ Error: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:12:01.147, 2026-01-18 04:41:48.433, 12613, completed, 0.00, 13, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:12:01.147288, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'right_click',
+  severity: 'low',
+  count: 14,
+  max: 7,
+  shouldTerminate: true
+}
+Error completing session: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:14:08.716, 2026-01-18 04:41:48.433, 12740, completed, 0.00, 14, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:14:08.716501, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+❌ Error: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:14:08.716, 2026-01-18 04:41:48.433, 12740, completed, 0.00, 14, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:14:08.716501, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 15,
+  max: 7,
+  shouldTerminate: true
+}
+Error completing session: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:15:04.668, 2026-01-18 04:41:48.433, 12796, completed, 0.00, 15, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:15:04.668321, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+❌ Error: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:15:04.668, 2026-01-18 04:41:48.433, 12796, completed, 0.00, 15, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:15:04.668321, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 16,
+  max: 7,
+  shouldTerminate: true
+}
+Error completing session: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:15:19.909, 2026-01-18 04:41:48.433, 12811, completed, 0.00, 16, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:15:19.909027, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+❌ Error: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:15:19.909, 2026-01-18 04:41:48.433, 12811, completed, 0.00, 16, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:15:19.909027, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 17,
+  max: 7,
+  shouldTerminate: true
+}
+Error completing session: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:15:49.553, 2026-01-18 04:41:48.433, 12841, completed, 0.00, 17, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:15:49.552988, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+❌ Error: error: new row for relation "exam_sessions" violates check constraint "exam_sessions_submission_type_check"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:206:22)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 664,
+  severity: 'ERROR',
+  code: '23514',
+  detail: 'Failing row contains (33fae1a6-1064-4580-885a-00f968bcfa84, session_1768696908432_k6af5xuyo, 47a5959a-8956-4e39-9e77-92f8afd06f8e, a1b2c3d4-e5f6-7890-abcd-ef1234567890, 2026-01-18 00:41:48.432244, 2026-01-18 04:15:49.553, 2026-01-18 04:41:48.433, 12841, completed, 0.00, 17, null, auto_violations, f, 0, Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537...., null, 2026-01-18 00:41:48.432244, 2026-01-18 01:15:49.552988, {}).',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'exam_sessions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'exam_sessions_submission_type_check',
+  file: 'execMain.c',
+  line: '2114',
+  routine: 'ExecConstraints'
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+✅ Environment variables validated
+
+========================================
+🎓 PROCTORED EXAM SYSTEM - BACKEND
+========================================
+Environment: development
+Server: http://localhost:3000
+Health Check: http://localhost:3000/health
+========================================
+✅ Database connection established
+📊 Query executed: { text: 'SELECT NOW()', duration: '37ms', rows: 1 }
+✅ Database connection: OK
+========================================
+
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+✅ Environment variables validated
+
+========================================
+🎓 PROCTORED EXAM SYSTEM - BACKEND
+========================================
+Environment: development
+Server: http://localhost:3000
+Health Check: http://localhost:3000/health
+========================================
+✅ Database connection established
+📊 Query executed: { text: 'SELECT NOW()', duration: '24ms', rows: 1 }
+✅ Database connection: OK
+========================================
+
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+✅ Environment variables validated
+
+========================================
+🎓 PROCTORED EXAM SYSTEM - BACKEND
+========================================
+Environment: development
+Server: http://localhost:3000
+Health Check: http://localhost:3000/health
+========================================
+✅ Database connection established
+📊 Query executed: { text: 'SELECT NOW()', duration: '29ms', rows: 1 }
+✅ Database connection: OK
+========================================
+
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+✅ Environment variables validated
+
+========================================
+🎓 PROCTORED EXAM SYSTEM - BACKEND
+========================================
+Environment: development
+Server: http://localhost:3000
+Health Check: http://localhost:3000/health
+========================================
+✅ Database connection established
+📊 Query executed: { text: 'SELECT NOW()', duration: '39ms', rows: 1 }
+✅ Database connection: OK
+========================================
+
+✅ Database connection established
+✅ Database connection established
+✅ Snapshot saved for session 33fae1a6-1064-4580-885a-00f968bcfa84: { responses: 1, violations: 0 }
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'tab_switch',
+  severity: 'medium',
+  count: 1,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'tab_switch',
+  severity: 'medium',
+  count: 2,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'tab_switch',
+  severity: 'medium',
+  count: 3,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'tab_switch',
+  severity: 'medium',
+  count: 4,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'tab_switch',
+  severity: 'medium',
+  count: 5,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'tab_switch',
+  severity: 'medium',
+  count: 6,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'high',
+  count: 7,
+  max: 7,
+  shouldTerminate: true
+}
+⚠️  Violation logged: {
+  type: 'paste',
+  severity: 'medium',
+  count: 8,
+  max: 7,
+  shouldTerminate: true
+}
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'right_click',
+  severity: 'low',
+  count: 1,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 2,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'right_click',
+  severity: 'low',
+  count: 3,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 4,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 4de5d257-9751-4295-9e2b-0abae9b50132: { responses: 0, violations: 4 }
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 5,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 4de5d257-9751-4295-9e2b-0abae9b50132: { responses: 0, violations: 5 }
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 6,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 4de5d257-9751-4295-9e2b-0abae9b50132: { responses: 0, violations: 6 }
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 7,
+  max: 7,
+  shouldTerminate: true
+}
+✅ Snapshot saved for session 4de5d257-9751-4295-9e2b-0abae9b50132: { responses: 0, violations: 6 }
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'right_click',
+  severity: 'low',
+  count: 1,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 2,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 130ae313-940e-4ec0-bd85-de3dfe6e83ee: { responses: 0, violations: 2 }
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 3,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 130ae313-940e-4ec0-bd85-de3dfe6e83ee: { responses: 0, violations: 3 }
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 4,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 130ae313-940e-4ec0-bd85-de3dfe6e83ee: { responses: 0, violations: 4 }
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 5,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 130ae313-940e-4ec0-bd85-de3dfe6e83ee: { responses: 0, violations: 5 }
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 6,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 130ae313-940e-4ec0-bd85-de3dfe6e83ee: { responses: 0, violations: 6 }
+⚠️  Violation logged: {
+  type: 'developer_tools',
+  severity: 'low',
+  count: 7,
+  max: 7,
+  shouldTerminate: true
+}
+✅ Snapshot saved for session 130ae313-940e-4ec0-bd85-de3dfe6e83ee: { responses: 0, violations: 6 }
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'right_click',
+  severity: 'low',
+  count: 1,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 0, violations: 1 }
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 2,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 0, violations: 2 }
+✅ Database connection established
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 0, violations: 2 }
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 3,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 0, violations: 3 }
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 0, violations: 3 }
+⚠️  Violation logged: {
+  type: 'exam_resumed',
+  severity: 'low',
+  count: 4,
+  max: 7,
+  shouldTerminate: false
+}
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 5,
+  max: 7,
+  shouldTerminate: false
+}
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 0, violations: 5 }
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 1, violations: 5 }
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 2, violations: 5 }
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 3, violations: 5 }
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 3, violations: 5 }
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 3, violations: 5 }
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 3, violations: 5 }
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 6,
+  max: 7,
+  shouldTerminate: false
+}
+❌ Error: Error: INVALID_CREDENTIALS
+    at AuthService.authenticateAdmin (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/auth.service.ts:92:13)
+    at async adminLogin (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/auth.controller.ts:33:20)
+❌ Error: Error: INVALID_CREDENTIALS
+    at AuthService.authenticateAdmin (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/auth.service.ts:92:13)
+    at async adminLogin (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/auth.controller.ts:33:20)
+❌ Error: Error: INVALID_CREDENTIALS
+    at AuthService.authenticateAdmin (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/auth.service.ts:92:13)
+    at async adminLogin (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/auth.controller.ts:33:20)
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 4, violations: 6 }
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 0, violations: 0 }
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 0, violations: 0 }
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+✅ Environment variables validated
+
+========================================
+🎓 PROCTORED EXAM SYSTEM - BACKEND
+========================================
+Environment: development
+Server: http://localhost:3000
+Health Check: http://localhost:3000/health
+========================================
+✅ Database connection established
+📊 Query executed: { text: 'SELECT NOW()', duration: '65ms', rows: 1 }
+✅ Database connection: OK
+========================================
+
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+✅ Environment variables validated
+
+========================================
+🎓 PROCTORED EXAM SYSTEM - BACKEND
+========================================
+Environment: development
+Server: http://localhost:3000
+Health Check: http://localhost:3000/health
+========================================
+✅ Database connection established
+📊 Query executed: { text: 'SELECT NOW()', duration: '33ms', rows: 1 }
+✅ Database connection: OK
+========================================
+
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+✅ Environment variables validated
+
+========================================
+🎓 PROCTORED EXAM SYSTEM - BACKEND
+========================================
+Environment: development
+Server: http://localhost:3000
+Health Check: http://localhost:3000/health
+========================================
+✅ Database connection established
+📊 Query executed: { text: 'SELECT NOW()', duration: '28ms', rows: 1 }
+✅ Database connection: OK
+========================================
+
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'window_blur',
+  severity: 'medium',
+  count: 7,
+  max: 7,
+  shouldTerminate: true
+}
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 0, violations: 0 }
+✅ Database connection established
+❌ Error: Error: INVALID_CREDENTIALS
+    at AuthService.authenticateAdmin (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/auth.service.ts:92:13)
+    at async adminLogin (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/auth.controller.ts:33:20)
+❌ Error: Error: INVALID_CREDENTIALS
+    at AuthService.authenticateAdmin (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/auth.service.ts:92:13)
+    at async adminLogin (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/auth.controller.ts:33:20)
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+⚠️  Violation logged: {
+  type: 'exam_started',
+  severity: 'low',
+  count: 8,
+  max: 7,
+  shouldTerminate: true
+}
+✅ Snapshot saved for session 1b106604-9965-44c8-9b12-579e8d14e66e: { responses: 0, violations: 0 }
+Error completing session: error: duplicate key value violates unique constraint "proctoring_reports_session_id_key"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.generateProctoringReport (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:298:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:233:7)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 282,
+  severity: 'ERROR',
+  code: '23505',
+  detail: 'Key (session_id)=(1b106604-9965-44c8-9b12-579e8d14e66e) already exists.',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'proctoring_reports',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'proctoring_reports_session_id_key',
+  file: 'nbtinsert.c',
+  line: '673',
+  routine: '_bt_check_unique'
+}
+❌ Error: error: duplicate key value violates unique constraint "proctoring_reports_session_id_key"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SessionService.generateProctoringReport (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:298:5)
+    at async SessionService.completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/session.service.ts:233:7)
+    at async completeSession (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/session.controller.ts:150:20) {
+  length: 282,
+  severity: 'ERROR',
+  code: '23505',
+  detail: 'Key (session_id)=(1b106604-9965-44c8-9b12-579e8d14e66e) already exists.',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'proctoring_reports',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'proctoring_reports_session_id_key',
+  file: 'nbtinsert.c',
+  line: '673',
+  routine: '_bt_check_unique'
+}
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+✅ Database connection established
+❌ Error: error: duplicate key value violates unique constraint "questions_exam_id_question_number_key"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async AdminService.addQuestion (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/admin.service.ts:457:30)
+    at async addQuestion (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/admin.controller.ts:231:20) {
+  length: 298,
+  severity: 'ERROR',
+  code: '23505',
+  detail: 'Key (exam_id, question_number)=(a5c24cdf-ffb2-43cc-8250-f5c92859f83c, 1) already exists.',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'questions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'questions_exam_id_question_number_key',
+  file: 'nbtinsert.c',
+  line: '673',
+  routine: '_bt_check_unique'
+}
+❌ Error: error: duplicate key value violates unique constraint "questions_exam_id_question_number_key"
+    at /Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/node_modules/pg/lib/client.js:588:17
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async AdminService.addQuestion (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/services/admin.service.ts:457:30)
+    at async addQuestion (/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/backend/src/controllers/admin.controller.ts:231:20) {
+  length: 298,
+  severity: 'ERROR',
+  code: '23505',
+  detail: 'Key (exam_id, question_number)=(a5c24cdf-ffb2-43cc-8250-f5c92859f83c, 1) already exists.',
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: 'public',
+  table: 'questions',
+  column: undefined,
+  dataType: undefined,
+  constraint: 'questions_exam_id_question_number_key',
+  file: 'nbtinsert.c',
+  line: '673',
+  routine: '_bt_check_unique'
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+✅ Environment variables validated
+
+========================================
+🎓 PROCTORED EXAM SYSTEM - BACKEND
+========================================
+Environment: development
+Server: http://localhost:3000
+Health Check: http://localhost:3000/health
+========================================
+✅ Database connection established
+📊 Query executed: { text: 'SELECT NOW()', duration: '31ms', rows: 1 }
+✅ Database connection: OK
+========================================
+
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/server.ts`[39m
+✅ Environment variables validated
+
+========================================
+🎓 PROCTORED EXAM SYSTEM - BACKEND
+========================================
+Environment: development
+Server: http://localhost:3000
+Health Check: http://localhost:3000/health
+========================================
+✅ Database connection established
+📊 Query executed: { text: 'SELECT NOW()', duration: '36ms', rows: 1 }
+✅ Database connection: OK
+========================================
+
+
+SIGTERM received. Starting graceful shutdown...
+✅ HTTP server closed
+✅ Database pool closed
+✅ Graceful shutdown complete

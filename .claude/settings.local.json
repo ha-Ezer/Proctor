@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Bash(psql:*)",
+      "Bash(cut:*)",
+      "Bash(createdb:*)",
+      "Bash(pkill:*)",
+      "Bash(jq:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjQ3YTU5NTlhLTg5NTYtNGUzOS05ZTc3LTkyZjhhZmQwNmY4ZSIsImVtYWlsIjoic3R1ZGVudDFAdGVzdC5jb20iLCJ0eXBlIjoic3R1ZGVudCIsImlhdCI6MTc2ODY5NzE0MSwiZXhwIjoxNzY4NzA0MzQxfQ.EY0w8Z0aAqbgUvop4oR_C1PQMMeDCnRxQN7JmPR0ySQ\")",
+      "Bash(node:*)",
+      "Bash(chmod:*)",
+      "Bash(/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/test_frontend_flow.sh)",
+      "Bash(npm run build:*)",
+      "Bash(/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/test_logout_flow.sh)",
+      "Bash(npm start)",
+      "Bash(/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/test_violation_flow.sh)",
+      "Bash(find:*)",
+      "Bash(/Users/pilgrim_13_1/.claude-worktrees/Proctor/relaxed-mirzakhani/test_admin_interface.sh)",
+      "Bash(pgrep:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill -9)",
+      "Bash(python3:*)",
+      "Bash(open http://localhost:5173)",
+      "Bash(npm run create-admin:*)",
+      "Bash(npm run verify-admin:*)",
+      "Bash(PGPASSWORD=\"\" psql:*)",
+      "Bash(npx tsc --noEmit)"
+    ]
+  }
+}
