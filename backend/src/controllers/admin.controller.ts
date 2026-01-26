@@ -489,3 +489,65 @@ export const deleteSessionQuestionNote = async (req: AuthRequest, res: Response,
     next(error);
   }
 };
+
+/**
+ * Get Exam Snapshots Controller
+ * GET /api/admin/exams/:examId/snapshots
+ */
+export const getExamSnapshots = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { examId } = req.params;
+    const { latest } = req.query;
+
+    const result = latest === 'true'
+      ? await adminService.getExamLatestSnapshots(examId)
+      : await adminService.getExamSnapshots(examId);
+
+    res.json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Clear Exam Snapshots Controller
+ * DELETE /api/admin/exams/:examId/snapshots
+ */
+export const clearExamSnapshots = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { examId } = req.params;
+
+    const result = await adminService.clearExamSnapshots(examId);
+
+    res.json({
+      success: true,
+      message: `Cleared ${result.deletedCount} snapshot(s)`,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Clear Session Snapshots Controller
+ * DELETE /api/admin/sessions/:sessionId/snapshots
+ */
+export const clearSessionSnapshots = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { sessionId } = req.params;
+
+    const result = await adminService.clearSessionSnapshots(sessionId);
+
+    res.json({
+      success: true,
+      message: `Cleared ${result.deletedCount} snapshot(s)`,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

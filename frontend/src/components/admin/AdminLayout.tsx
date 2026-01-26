@@ -12,6 +12,7 @@ import {
   X,
   UsersRound,
   Table2,
+  Database,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -36,6 +37,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { to: '/admin/students', icon: Users, label: 'Students' },
     { to: '/admin/sessions', icon: Activity, label: 'Sessions' },
     { to: '/admin/reports', icon: Table2, label: 'Exam Reports' },
+    { to: '/admin/snapshots', icon: Database, label: 'Auto-Save Data' },
   ];
 
   return (

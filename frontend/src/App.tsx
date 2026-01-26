@@ -11,6 +11,7 @@ import { SessionsPage } from './pages/admin/SessionsPage';
 import { SessionDetailPage } from './pages/admin/SessionDetailPage';
 import { ExamReportsPage } from './pages/admin/ExamReportsPage';
 import { GroupsPage } from './pages/admin/GroupsPage';
+import { SnapshotsPage } from './pages/admin/SnapshotsPage';
 import { storage, STORAGE_KEYS } from './lib/storage';
 import { useAdminStore } from './stores/adminStore';
 
@@ -171,6 +172,14 @@ function App() {
             element={
               <AdminRoute>
                 <ExamReportsPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/snapshots"
+            element={
+              <AdminRoute>
+                <SnapshotsPage />
               </AdminRoute>
             }
           />

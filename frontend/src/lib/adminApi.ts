@@ -237,6 +237,27 @@ export interface ExamReportData {
   colors: ExamReportCellColor[];
 }
 
+// Auto-Save Snapshot Types
+export interface ExamSnapshot {
+  id: string;
+  session_id: string;
+  snapshot_data: {
+    responses: Record<string, any>;
+    violations: any[];
+    currentQuestionIndex: number;
+    lastSaved: string;
+  };
+  responses_count: number;
+  violations_count: number;
+  completion_percentage: number;
+  created_at: string;
+  student_id: string;
+  student_email: string;
+  student_name: string | null;
+  exam_title: string;
+  session_status?: string;
+}
+
 // ============================================
 // Admin API Client
 // ============================================
@@ -373,4 +394,16 @@ export const adminApi = {
     api.delete<ApiResponse<{ success: boolean }>>(`/admin/exams/${examId}/report/colors`, {
       data: { sessionId, questionId },
     }),
+
+  // ==================== Auto-Save Snapshots (Data Recovery) ====================
+  getExamSnapshots: (examId: string, latest?: boolean) =>
+    api.get<ApiResponse<{ snapshots: ExamSnapshot[]; count: number }>>(`/admin/exams/${examId}/snapshots`, {
+      params: { latest: latest ? 'true' : 'false' },
+    }),
+
+  clearExamSnapshots: (examId: string) =>
+    api.delete<ApiResponse<{ success: boolean; deletedCount: number }>>(`/admin/exams/${examId}/snapshots`),
+
+  clearSessionSnapshots: (sessionId: string) =>
+    api.delete<ApiResponse<{ success: boolean; deletedCount: number }>>(`/admin/sessions/${sessionId}/snapshots`),
 };

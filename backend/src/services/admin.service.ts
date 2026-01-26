@@ -1005,6 +1005,105 @@ export class AdminService {
 
     return { success: true };
   }
+
+  /**
+   * Get auto-saved snapshots for an exam (for data recovery purposes)
+   */
+  async getExamSnapshots(examId: string) {
+    const result = await pool.query(
+      `SELECT
+        ss.id,
+        ss.session_id,
+        ss.snapshot_data,
+        ss.responses_count,
+        ss.violations_count,
+        ss.completion_percentage,
+        ss.created_at,
+        es.student_id,
+        s.email as student_email,
+        s.full_name as student_name,
+        e.title as exam_title
+      FROM session_snapshots ss
+      JOIN exam_sessions es ON ss.session_id = es.id
+      JOIN students s ON es.student_id = s.id
+      JOIN exams e ON es.exam_id = e.id
+      WHERE es.exam_id = $1
+      ORDER BY ss.created_at DESC`,
+      [examId]
+    );
+
+    return {
+      snapshots: result.rows,
+      count: result.rows.length,
+    };
+  }
+
+  /**
+   * Get latest snapshot for each session of an exam
+   */
+  async getExamLatestSnapshots(examId: string) {
+    const result = await pool.query(
+      `SELECT DISTINCT ON (ss.session_id)
+        ss.id,
+        ss.session_id,
+        ss.snapshot_data,
+        ss.responses_count,
+        ss.violations_count,
+        ss.completion_percentage,
+        ss.created_at,
+        es.student_id,
+        es.status as session_status,
+        s.email as student_email,
+        s.full_name as student_name,
+        e.title as exam_title
+      FROM session_snapshots ss
+      JOIN exam_sessions es ON ss.session_id = es.id
+      JOIN students s ON es.student_id = s.id
+      JOIN exams e ON es.exam_id = e.id
+      WHERE es.exam_id = $1
+      ORDER BY ss.session_id, ss.created_at DESC`,
+      [examId]
+    );
+
+    return {
+      snapshots: result.rows,
+      count: result.rows.length,
+    };
+  }
+
+  /**
+   * Clear all snapshots for an exam
+   */
+  async clearExamSnapshots(examId: string) {
+    const result = await pool.query(
+      `DELETE FROM session_snapshots ss
+       USING exam_sessions es
+       WHERE ss.session_id = es.id
+       AND es.exam_id = $1
+       RETURNING ss.id`,
+      [examId]
+    );
+
+    return {
+      success: true,
+      deletedCount: result.rowCount || 0,
+    };
+  }
+
+  /**
+   * Clear snapshots for a specific session
+   */
+  async clearSessionSnapshots(sessionId: string) {
+    const result = await pool.query(
+      `DELETE FROM session_snapshots WHERE session_id = $1 RETURNING id`,
+      [sessionId]
+    );
+
+    return {
+      success: true,
+      deletedCount: result.rowCount || 0,
+    };
+  }
 }
 
 export const adminService = new AdminService();
