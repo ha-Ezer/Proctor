@@ -12,8 +12,7 @@
     "db:seed": "ts-node scripts/seed-questions.ts",
     "create-admin": "ts-node scripts/create-admin.ts",
     "verify-admin": "ts-node scripts/verify-admin-password.ts",
-    "postinstall": "npm rebuild bcrypt --build-from-source || true",
-    "railway:build": "npm ci && npm rebuild bcrypt --build-from-source || npm run build",
+    "railway:build": "npm ci && npm run build",
     "railway:start": "node dist/server.js"
   },
   "keywords": [
@@ -24,7 +23,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
