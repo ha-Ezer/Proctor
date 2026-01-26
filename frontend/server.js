@@ -22,6 +22,17 @@ if (existsSync(distPath)) {
   console.error('ERROR: dist folder not found!');
 }
 
+// Log all requests
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
+  next();
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Serve static files from dist
 app.use(express.static(distPath));
 
@@ -35,6 +46,17 @@ app.get('*', (req, res) => {
   }
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Frontend server running on port ${PORT}`);
+// Error handler
+app.use((err, req, res, next) => {
+  console.error('Express error:', err);
+  res.status(500).send('Server error');
+});
+
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Frontend server running on http://0.0.0.0:${PORT}`);
+});
+
+// Handle server errors
+server.on('error', (err) => {
+  console.error('Server error:', err);
 });
