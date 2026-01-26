@@ -1,14 +1,14 @@
-# Force Node.js provider and serve
+# Force Node.js provider
 providers = ["node"]
 
 [phases.setup]
 nixPkgs = ["nodejs_18"]
 
 [phases.install]
-cmds = ["npm install", "npm install -g serve"]
+cmds = ["npm install"]
 
 [phases.build]
 cmds = ["npm run build"]
 
 [start]
-cmd = "serve -s dist -l $PORT"
+cmd = "node server.js"
