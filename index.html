@@ -150,7 +150,7 @@
 
         // ========== CONFIGURATION - UPDATE THESE VALUES ==========
         const CONFIG = {
-            DURATION_MINUTES: 25,
+            DURATION_MINUTES: 20,
             WARNING_AT_MINUTES: 5,
             WARNING_MESSAGE: "⚠️ WARNING: Tab switching detected! This violation has been recorded.",
             MAX_VIOLATIONS: 7,
@@ -167,161 +167,115 @@
     {
         id: "q1",
         type: "multiple-choice",
-        question: "Which of the following is a characteristic of bacterial infections on the skin?",
+        question: "An allergen is a.........",
         required: false,
         options: [
-            "They are caused by tiny parasites that burrow into the skin",
-            "They often produce pus and can spread through direct contact",
-            "They always appear as fluid-filled blisters in clusters",
-            "They cannot be treated with antibiotics"
+            "Substances that trigger irritation in everyone",
+            "Usually harmless substances that are capable of triggering reactions in some people",
+            "Substances globally accepted as poisons",
+            "Narcotics"
         ],
         correctAnswer: 1
     },
     {
         id: "q2",
-        type: "text",
-        question: "A client presents with honey-colored crusted sores around their mouth and nose. What bacterial skin condition is this likely to be, and why should you refuse treatment?",
+        type: "multiple-choice",
+        question: "Sebaceous gland disorders are usually one of the most infectious skin diseases. It can be passed on from person to person through sexual intercourse even",
         required: false,
-        image: "attachments/impetigo-0008.jpg",
-        placeholder: "Type your answer here..."
+        options: [
+            "True",
+            "False"
+        ],
+        correctAnswer: 1
     },
     {
         id: "q3",
         type: "multiple-choice",
-        question: "Boils (furuncles) are deep bacterial infections that typically start in a...........",
+        question: "The reason it is not advisable for people with freckles and other pigmentation disorders to expose themselves to the sun for long is because.........",
         required: false,
         options: [
-            "Sweat gland",
-            "Hair follicle or oil gland",
-            "Nerve ending",
-            "Blood vessel"
-        ],
-        correctAnswer: 1
-    },
-    {
-        id: "q4",
-        type: "text",
-        question: "A client has small, itchy blisters grouped together on one side of their lip. What viral condition is this, and what advice would you give them?",
-        required: false,
-        image: "attachments/herpes.png",
-        placeholder: "Type your answer here..."
-    },
-    {
-        id: "q5",
-        type: "multiple-choice",
-        question: "Warts are caused by...........",
-        required: false,
-        options: [
-            "Bacteria entering through cuts",
-            "Fungal spores on the skin",
-            "Human Papillomavirus (HPV)",
-            "Allergic reactions to products"
+            "It makes their skin ache",
+            "It makes their hair discolored",
+            "It makes dark spots appear darker",
+            "It makes light spots appear lighter"
         ],
         correctAnswer: 2
     },
     {
-        id: "q6",
+        id: "q4",
         type: "multiple-choice",
-        question: "A client mentions they have shingles on their back. As a therapist, you should...........",
+        question: "This is an image of a .............mole",
         required: false,
+        image: "attachments/melanoma.webp",
         options: [
-            "Proceed with the massage but avoid the affected area",
-            "Refuse treatment entirely until they have fully recovered",
-            "Apply extra moisturizer to the affected area",
-            "Treat normally since shingles is not contagious"
+            "Malignant",
+            "Normal"
         ],
         correctAnswer: 1
+    },
+    {
+        id: "q5",
+        type: "text",
+        question: "In your own words, briefly explain how the widening of blood vessels close to the skin can lead to skin disorders",
+        required: false,
+        placeholder: "Type your answer here..."
+    },
+    {
+        id: "q6",
+        type: "text",
+        question: "What is the difference between someone with Vitiligo and Albinism?",
+        required: false,
+        placeholder: "Type your answer here..."
     },
     {
         id: "q7",
         type: "text",
-        question: "A client is scratching intensely, especially at night, and you notice small burrow lines between their fingers. What infestation could this be, and what is causing the itching?",
+        question: "What part of the ear when pierced could cause this?",
         required: false,
+        image: "attachments/ear_piercing.webp",
         placeholder: "Type your answer here..."
     },
     {
         id: "q8",
-        type: "multiple-choice",
-        question: "Head lice (Pediculosis) spread mainly through...........",
+        type: "text",
+        question: "When someone begins to grey in their hair, the reason is because.........",
         required: false,
-        options: [
-            "Airborne transmission",
-            "Contaminated food and water",
-            "Direct head-to-head contact or sharing personal items",
-            "Insect bites from mosquitoes"
-        ],
-        correctAnswer: 2
+        placeholder: "Type your answer here..."
     },
     {
         id: "q9",
-        type: "text",
-        question: "The hypodermis (subcutaneous layer) is the deepest layer of the skin. List two important functions it performs for the body.",
+        type: "multiple-choice",
+        question: "Hair that is still attached to the dermal papillae will.........",
         required: false,
-        placeholder: "Type your answer here..."
+        options: [
+            "Stop growing immediately",
+            "Start to grey",
+            "Continue to grow",
+            "Enter the telogen phase"
+        ],
+        correctAnswer: 2
     },
     {
         id: "q10",
         type: "multiple-choice",
-        question: "The subcutaneous layer contains a large amount of adipose tissue. What is the main purpose of this tissue?",
+        question: "The type of hair babies are usually born with are",
         required: false,
         options: [
-            "To produce melanin for skin color",
-            "To store fat for energy and provide insulation",
-            "To produce sweat for temperature regulation",
-            "To generate new skin cells"
-        ],
-        correctAnswer: 1
-    },
-    {
-        id: "q11",
-        type: "multiple-choice",
-        question: "The dermis contains all of the following EXCEPT...........",
-        required: false,
-        options: [
-            "Blood vessels and nerve endings",
-            "Collagen and elastin fibers",
-            "The stratum corneum",
-            "Hair follicles and sebaceous glands"
+            "Terminal hairs",
+            "Catagen hairs",
+            "Lanugo Hairs",
+            "Vellus Hairs"
         ],
         correctAnswer: 2
     },
     {
-        id: "q12",
-        type: "text",
-        question: "Explain how the skin repairs itself after a minor cut or wound. Mention at least two stages of the healing process.",
-        required: false,
-        placeholder: "Type your answer here..."
-    },
-    {
-        id: "q13",
+        id: "q11",
         type: "multiple-choice",
-        question: "Eccrine sweat glands are found all over the body and produce sweat that is mainly composed of...........",
+        question: "The protein found in the skin (Keratin) is very different from the protein found in the hair",
         required: false,
         options: [
-            "Oil and fatty acids",
-            "Water and salt",
-            "Keratin and melanin",
-            "Collagen and elastin"
-        ],
-        correctAnswer: 1
-    },
-    {
-        id: "q14",
-        type: "text",
-        question: "A client asks why they still smell even after sweating during exercise, despite using antiperspirant. Explain the difference between eccrine and apocrine sweat glands in your answer.",
-        required: false,
-        placeholder: "Type your answer here..."
-    },
-    {
-        id: "q15",
-        type: "multiple-choice",
-        question: "Sebaceous glands are NOT found on which of these body parts?",
-        required: false,
-        options: [
-            "The face and scalp",
-            "The Lips",
-            "The chest and back",
-            "The arms and legs"
+            "True",
+            "False"
         ],
         correctAnswer: 1
     }
