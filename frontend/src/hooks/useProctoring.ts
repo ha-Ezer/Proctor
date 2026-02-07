@@ -46,8 +46,8 @@ export function useProctoring({ sessionId, enabled, onViolation, onTerminate }: 
           sessionId,
           violationType,
           description,
-          browserInfo: getBrowserInfo(),
-          deviceInfo: getDeviceInfo(),
+          browserInfo: JSON.stringify(getBrowserInfo()),
+          deviceInfo: JSON.stringify(getDeviceInfo()),
           additionalData: {
             timestamp: Date.now(),
             url: window.location.href,

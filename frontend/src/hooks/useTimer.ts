@@ -74,8 +74,9 @@ export function useTimer({ initialSeconds, onExpire, enabled }: UseTimerOptions)
         if (next <= 0) {
           if (!expiredRef.current) {
             expiredRef.current = true;
-            console.log('[useTimer] ⏰ Timer expired! Calling onExpire');
-            onExpire();
+            console.log('[useTimer] ⏰ Timer expired! Deferring onExpire');
+            // Defer so we don't update parent/store during this setState (avoids React warning)
+            setTimeout(() => onExpire(), 0);
           }
           return 0;
         }

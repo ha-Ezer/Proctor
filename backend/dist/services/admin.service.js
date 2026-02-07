@@ -104,7 +104,13 @@ class AdminService {
         }
         const session = sessionResult.rows[0];
         console.log('[AdminService] Found session:', { id: session.id, session_id: session.session_id, student: session.student_name });
-        // Get all responses with questions
+        // Get all questions for the exam (so we show every question, answered or not)
+        const questionsResult = await database_1.pool.query(`SELECT id, question_number, question_text, question_type, image_url
+       FROM questions
+       WHERE exam_id = $1
+       ORDER BY question_number`, [session.exam_id]);
+        const allQuestions = questionsResult.rows;
+        // Get all responses for this session (may be fewer than questions)
         const responsesResult = await database_1.pool.query(`SELECT
         r.*,
         q.question_number,
@@ -115,19 +121,30 @@ class AdminService {
        JOIN questions q ON r.question_id = q.id
        WHERE r.session_id = $1
        ORDER BY q.question_number`, [session.id]);
-        console.log('[AdminService] Found responses:', responsesResult.rows.length);
+        const responseByQuestionId = new Map(responsesResult.rows.map((r) => [r.question_id, r]));
+        console.log('[AdminService] Found responses:', responsesResult.rows.length, 'questions:', allQuestions.length);
         // Get violations
         const violationsResult = await database_1.pool.query(`SELECT violation_type, severity, description, detected_at, browser_info
        FROM violations
        WHERE session_id = $1
        ORDER BY detected_at`, [session.id]);
-        // Get notes for each question
-        const notesResult = await database_1.pool.query(`SELECT question_id, note, created_by, created_at, updated_by, updated_at
-       FROM session_question_notes
-       WHERE session_id = $1`, [session.id]);
+        // Get notes for each question (table may not exist if migration not run)
+        let notesRows = [];
+        try {
+            const notesResult = await database_1.pool.query(`SELECT question_id, note, created_by, created_at, updated_by, updated_at
+         FROM session_question_notes
+         WHERE session_id = $1`, [session.id]);
+            notesRows = notesResult.rows;
+        }
+        catch (notesErr) {
+            if (notesErr?.code !== '42P01') {
+                throw notesErr;
+            }
+            // Table does not exist; continue with no notes
+        }
         // Create a map of question_id -> note
         const notesMap = new Map();
-        notesResult.rows.forEach((noteRow) => {
+        notesRows.forEach((noteRow) => {
             notesMap.set(noteRow.question_id, {
                 note: noteRow.note,
                 createdBy: noteRow.created_by,
@@ -136,50 +153,52 @@ class AdminService {
                 updatedAt: noteRow.updated_at,
             });
         });
-        // Add notes to responses
-        const responsesWithNotes = await Promise.all(responsesResult.rows.map(async (response) => {
-            const note = notesMap.get(response.question_id);
-            if (response.question_type === 'multiple-choice') {
+        // Build one entry per question (with response when present, empty when not)
+        const responsesWithNotes = await Promise.all(allQuestions.map(async (q) => {
+            const response = responseByQuestionId.get(q.id);
+            const note = notesMap.get(q.id);
+            if (q.question_type === 'multiple-choice') {
                 const optionsResult = await database_1.pool.query(`SELECT option_index, option_text, is_correct
              FROM question_options
              WHERE question_id = $1
-             ORDER BY option_index`, [response.question_id]);
+             ORDER BY option_index`, [q.id]);
                 const options = optionsResult.rows;
-                const selectedOption = response.response_option_index !== null ? options[response.response_option_index] : null;
-                const correctAnswer = options.find((o) => o.is_correct);
+                const selectedOption = response && response.response_option_index !== null
+                    ? options[response.response_option_index]
+                    : null;
                 return {
-                    questionId: response.question_id,
-                    questionNumber: response.question_number,
-                    questionText: response.question_text,
-                    questionType: response.question_type,
-                    imageUrl: response.image_url,
+                    questionId: q.id,
+                    questionNumber: q.question_number,
+                    questionText: q.question_text,
+                    questionType: q.question_type,
+                    imageUrl: q.image_url,
                     options: options.map((o) => o.option_text),
-                    selectedOptionIndex: response.response_option_index,
+                    selectedOptionIndex: response?.response_option_index ?? null,
                     selectedOption: selectedOption?.option_text || null,
-                    correctAnswer: correctAnswer?.option_text || null,
-                    isCorrect: response.is_correct,
-                    answeredAt: response.answered_at,
+                    correctAnswer: options.find((o) => o.is_correct)?.option_text || null,
+                    isCorrect: response?.is_correct ?? null,
+                    answeredAt: response?.answered_at ?? null,
                     note: note?.note || null,
                 };
             }
             return {
-                questionId: response.question_id,
-                questionNumber: response.question_number,
-                questionText: response.question_text,
-                questionType: response.question_type,
-                imageUrl: response.image_url,
-                responseText: response.response_text,
-                answeredAt: response.answered_at,
+                questionId: q.id,
+                questionNumber: q.question_number,
+                questionText: q.question_text,
+                questionType: q.question_type,
+                imageUrl: q.image_url,
+                responseText: response?.response_text ?? null,
+                answeredAt: response?.answered_at ?? null,
                 note: note?.note || null,
             };
         }));
         console.log('[AdminService] Found violations:', violationsResult.rows.length);
-        console.log('[AdminService] Found notes:', notesResult.rows.length);
+        console.log('[AdminService] Found notes:', notesRows.length);
         console.log('[AdminService] Returning data:', {
             hasSession: !!session,
             responsesCount: responsesWithNotes.length,
             violationsCount: violationsResult.rows.length,
-            notesCount: notesResult.rows.length
+            notesCount: notesRows.length
         });
         return {
             session,
@@ -269,13 +288,15 @@ class AdminService {
      * Manage authorized students - Add new student
      */
     async addAuthorizedStudent(email, fullName) {
+        // Use empty string when fullName missing so INSERT works even if full_name is NOT NULL (migration not run)
+        const nameValue = fullName?.trim() || '';
         const result = await database_1.pool.query(`INSERT INTO students (email, full_name, is_authorized)
        VALUES ($1, $2, true)
        ON CONFLICT (email) DO UPDATE SET
          is_authorized = true,
-         full_name = COALESCE(EXCLUDED.full_name, students.full_name),
+         full_name = COALESCE(NULLIF(TRIM(EXCLUDED.full_name), ''), students.full_name),
          updated_at = CURRENT_TIMESTAMP
-       RETURNING *`, [email, fullName || null]);
+       RETURNING *`, [email, nameValue]);
         return result.rows[0];
     }
     /**
@@ -320,14 +341,40 @@ class AdminService {
         }
     }
     /**
-     * Get all authorized students
+     * Get all students (authorized and unauthorized)
+     * Includes authorization status and session count
      */
     async getAuthorizedStudents() {
-        const result = await database_1.pool.query(`SELECT id, email, full_name, last_login, created_at
-       FROM students
-       WHERE is_authorized = true
-       ORDER BY full_name`);
-        return result.rows;
+        const result = await database_1.pool.query(`SELECT 
+         s.id,
+         s.email,
+         s.full_name,
+         s.is_authorized,
+         s.last_login,
+         s.created_at,
+         COUNT(DISTINCT es.id) as total_sessions
+       FROM students s
+       LEFT JOIN exam_sessions es ON es.student_id = s.id
+       GROUP BY s.id, s.email, s.full_name, s.is_authorized, s.last_login, s.created_at
+       ORDER BY s.full_name NULLS LAST, s.email`);
+        // Map database field names to frontend expected names
+        return result.rows.map((row) => {
+            // PostgreSQL COUNT returns bigint as string, convert to number
+            const sessionCount = row.total_sessions != null
+                ? (typeof row.total_sessions === 'string'
+                    ? parseInt(row.total_sessions, 10)
+                    : Number(row.total_sessions))
+                : 0;
+            return {
+                id: row.id,
+                email: row.email,
+                fullName: row.full_name,
+                isAuthorized: row.is_authorized,
+                lastLogin: row.last_login,
+                createdAt: row.created_at,
+                totalSessions: sessionCount,
+            };
+        });
     }
     /**
      * Create new exam
@@ -644,11 +691,23 @@ class AdminService {
                 responses,
             };
         }));
-        // Get cell colors for this exam
-        const colorsResult = await database_1.pool.query(`SELECT session_id, question_id, color
-       FROM exam_report_cell_colors
-       WHERE exam_id = $1`, [examId]);
-        const colors = colorsResult.rows;
+        // Get cell colors for this exam (table may not exist if migration not run)
+        let colors = [];
+        try {
+            const colorsResult = await database_1.pool.query(`SELECT session_id, question_id, color
+         FROM exam_report_cell_colors
+         WHERE exam_id = $1`, [examId]);
+            colors = colorsResult.rows;
+        }
+        catch (colorsError) {
+            // Table might not exist on Railway if migration wasn't run
+            if (colorsError?.code === '42P01') {
+                console.warn('exam_report_cell_colors table not found; run database-migration-exam-report-colors-use-session-id.sql for color coding');
+            }
+            else {
+                console.error('Error fetching exam report cell colors:', colorsError);
+            }
+        }
         return {
             exam,
             questions,
@@ -660,11 +719,18 @@ class AdminService {
      * Save cell color for exam report
      */
     async saveExamReportCellColor(examId, sessionId, questionId, color) {
-        // Upsert the color
-        await database_1.pool.query(`INSERT INTO exam_report_cell_colors (exam_id, session_id, question_id, color)
-       VALUES ($1, $2, $3, $4)
-       ON CONFLICT (exam_id, session_id, question_id)
-       DO UPDATE SET color = $4, updated_at = CURRENT_TIMESTAMP`, [examId, sessionId, questionId, color]);
+        try {
+            await database_1.pool.query(`INSERT INTO exam_report_cell_colors (exam_id, session_id, question_id, color)
+         VALUES ($1, $2, $3, $4)
+         ON CONFLICT (exam_id, session_id, question_id)
+         DO UPDATE SET color = $4, updated_at = CURRENT_TIMESTAMP`, [examId, sessionId, questionId, color]);
+        }
+        catch (err) {
+            if (err?.code === '42P01') {
+                throw new Error('REPORT_COLORS_TABLE_MISSING');
+            }
+            throw err;
+        }
         return { success: true };
     }
     /**
@@ -697,18 +763,114 @@ class AdminService {
      * Get cell colors for an exam report
      */
     async getExamReportCellColors(examId) {
-        const result = await database_1.pool.query(`SELECT session_id, question_id, color
-       FROM exam_report_cell_colors
-       WHERE exam_id = $1`, [examId]);
-        return result.rows;
+        try {
+            const result = await database_1.pool.query(`SELECT session_id, question_id, color
+         FROM exam_report_cell_colors
+         WHERE exam_id = $1`, [examId]);
+            return result.rows;
+        }
+        catch (err) {
+            if (err?.code === '42P01') {
+                return [];
+            }
+            throw err;
+        }
     }
     /**
      * Delete cell color
      */
     async deleteExamReportCellColor(examId, sessionId, questionId) {
-        await database_1.pool.query(`DELETE FROM exam_report_cell_colors
-       WHERE exam_id = $1 AND session_id = $2 AND question_id = $3`, [examId, sessionId, questionId]);
+        try {
+            await database_1.pool.query(`DELETE FROM exam_report_cell_colors
+         WHERE exam_id = $1 AND session_id = $2 AND question_id = $3`, [examId, sessionId, questionId]);
+        }
+        catch (err) {
+            if (err?.code === '42P01') {
+                throw new Error('REPORT_COLORS_TABLE_MISSING');
+            }
+            throw err;
+        }
         return { success: true };
+    }
+    /**
+     * Get auto-saved snapshots for an exam (for data recovery purposes)
+     */
+    async getExamSnapshots(examId) {
+        const result = await database_1.pool.query(`SELECT
+        ss.id,
+        ss.session_id,
+        ss.snapshot_data,
+        ss.responses_count,
+        ss.violations_count,
+        ss.completion_percentage,
+        ss.created_at,
+        es.student_id,
+        es.status as session_status,
+        s.email as student_email,
+        s.full_name as student_name,
+        e.title as exam_title
+      FROM session_snapshots ss
+      JOIN exam_sessions es ON ss.session_id = es.id
+      JOIN students s ON es.student_id = s.id
+      JOIN exams e ON es.exam_id = e.id
+      WHERE es.exam_id = $1
+      ORDER BY ss.created_at DESC`, [examId]);
+        return {
+            snapshots: result.rows,
+            count: result.rows.length,
+        };
+    }
+    /**
+     * Get latest snapshot for each session of an exam
+     */
+    async getExamLatestSnapshots(examId) {
+        const result = await database_1.pool.query(`SELECT DISTINCT ON (ss.session_id)
+        ss.id,
+        ss.session_id,
+        ss.snapshot_data,
+        ss.responses_count,
+        ss.violations_count,
+        ss.completion_percentage,
+        ss.created_at,
+        es.student_id,
+        es.status as session_status,
+        s.email as student_email,
+        s.full_name as student_name,
+        e.title as exam_title
+      FROM session_snapshots ss
+      JOIN exam_sessions es ON ss.session_id = es.id
+      JOIN students s ON es.student_id = s.id
+      JOIN exams e ON es.exam_id = e.id
+      WHERE es.exam_id = $1
+      ORDER BY ss.session_id, ss.created_at DESC`, [examId]);
+        return {
+            snapshots: result.rows,
+            count: result.rows.length,
+        };
+    }
+    /**
+     * Clear all snapshots for an exam
+     */
+    async clearExamSnapshots(examId) {
+        const result = await database_1.pool.query(`DELETE FROM session_snapshots ss
+       USING exam_sessions es
+       WHERE ss.session_id = es.id
+       AND es.exam_id = $1
+       RETURNING ss.id`, [examId]);
+        return {
+            success: true,
+            deletedCount: result.rowCount || 0,
+        };
+    }
+    /**
+     * Clear snapshots for a specific session
+     */
+    async clearSessionSnapshots(sessionId) {
+        const result = await database_1.pool.query(`DELETE FROM session_snapshots WHERE session_id = $1 RETURNING id`, [sessionId]);
+        return {
+            success: true,
+            deletedCount: result.rowCount || 0,
+        };
     }
 }
 exports.AdminService = AdminService;

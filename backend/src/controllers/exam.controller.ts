@@ -9,7 +9,8 @@ import { examService } from '../services/exam.service';
  */
 export const getActiveExam = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const exam = await examService.getActiveExam();
+    const studentId = req.user!.id;
+    const exam = await examService.getActiveExam(studentId);
 
     res.json({
       success: true,

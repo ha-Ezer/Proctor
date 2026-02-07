@@ -9,7 +9,8 @@ const exam_service_1 = require("../services/exam.service");
  */
 const getActiveExam = async (req, res, next) => {
     try {
-        const exam = await exam_service_1.examService.getActiveExam();
+        const studentId = req.user.id;
+        const exam = await exam_service_1.examService.getActiveExam(studentId);
         res.json({
             success: true,
             message: 'Active exam retrieved successfully',

@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight, Send, ImageOff } from 'lucide-react';
 import { Question } from '@/lib/api';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface QuestionCardProps {
   question: Question;
@@ -40,18 +45,20 @@ export function QuestionCard({
       return url.replace('attachments/', '/images/');
     }
 
-    // Check if URL has image extension
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
-    const urlLower = url.toLowerCase();
-    const hasImageExtension = imageExtensions.some(ext => urlLower.includes(ext));
-
-    // If it doesn't look like an image URL, return null
-    if (!hasImageExtension && !url.startsWith('data:image')) {
-      console.warn('[QuestionCard] Invalid image URL (no image extension):', url);
-      return null;
+    // Allow data:image and http/https (CDNs often use query params, no file extension)
+    if (url.startsWith('data:image') || url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
     }
 
-    return url;
+    // Allow relative paths with image extension or /images/
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
+    const urlLower = url.toLowerCase();
+    if (imageExtensions.some(ext => urlLower.includes(ext)) || url.startsWith('/images/')) {
+      return url;
+    }
+
+    console.warn('[QuestionCard] Invalid image URL (unsupported format):', url);
+    return null;
   };
 
   const imageUrl = transformImageUrl(question.imageUrl || '');
@@ -67,117 +74,124 @@ export function QuestionCard({
   });
 
   return (
-    <div className="card animate-fade-in">
-      {/* Question Header */}
-      <div className="mb-6">
+    <Card className="animate-fade-in">
+      <CardHeader>
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-primary-600">
+          <Badge variant="outline" className="text-sm font-medium">
             Question {questionNumber} of {totalQuestions}
-          </span>
-          {question.required && <span className="text-xs text-danger-600 font-medium">* Required</span>}
+          </Badge>
+          {question.required && (
+            <Badge variant="destructive" className="text-xs">
+              Required
+            </Badge>
+          )}
         </div>
-        <h2 className="text-xl font-medium text-gray-900 leading-relaxed">{question.questionText}</h2>
-      </div>
+        <CardTitle className="text-xl leading-relaxed">{question.questionText}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
 
-      {/* Question Image */}
-      {question.imageUrl && imageUrl && !imageError && (
-        <div className="mb-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
-          <img
-            src={imageUrl}
-            alt={`Question ${questionNumber} illustration`}
-            className="max-w-full h-auto rounded-lg mx-auto"
-            loading="lazy"
-            onError={() => {
-              console.error('[QuestionCard] Failed to load image:', imageUrl);
-              setImageError(true);
-            }}
-          />
-        </div>
-      )}
-
-      {/* Image Error Placeholder */}
-      {question.imageUrl && (imageError || !imageUrl) && (
-        <div className="mb-6 bg-gray-100 rounded-lg p-8 border border-gray-300">
-          <div className="flex flex-col items-center justify-center text-gray-500">
-            <ImageOff className="w-12 h-12 mb-3" />
-            <p className="text-sm font-medium">Image not available</p>
-            <p className="text-xs text-gray-400 mt-1">{question.imageUrl}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Answer Input */}
-      <div className="mb-8">
-        {/* Multiple Choice */}
-        {question.questionType === 'multiple-choice' && (
-          <div className="space-y-3">
-            {question.options?.map((option) => (
-              <label
-                key={option.index}
-                className={`radio-option ${response?.responseOptionIndex === option.index ? 'selected' : ''}`}
-              >
-                <input
-                  type="radio"
-                  name={`question-${question.id}`}
-                  checked={response?.responseOptionIndex === option.index}
-                  onChange={() => onResponseChange({ responseOptionIndex: option.index })}
-                  className="w-5 h-5 text-primary-600 focus:ring-primary-500 flex-shrink-0"
-                />
-                <span className="text-gray-900 flex-1">{option.text}</span>
-              </label>
-            ))}
+        {/* Question Image */}
+        {question.imageUrl && imageUrl && !imageError && (
+          <div className="bg-muted rounded-lg p-4 border border-border">
+            <img
+              src={imageUrl}
+              alt={`Question ${questionNumber} illustration`}
+              className="max-w-full h-auto rounded-lg mx-auto"
+              loading="lazy"
+              onError={() => {
+                console.error('[QuestionCard] Failed to load image:', imageUrl);
+                setImageError(true);
+              }}
+            />
           </div>
         )}
 
-        {/* Text Input */}
-        {question.questionType === 'text' && (
-          <input
-            type="text"
-            value={response?.responseText || ''}
-            onChange={(e) => onResponseChange({ responseText: e.target.value })}
-            placeholder={question.placeholder || 'Type your answer here...'}
-            className="input"
-            aria-label={`Answer for question ${questionNumber}`}
-          />
+        {/* Image Error Placeholder */}
+        {question.imageUrl && (imageError || !imageUrl) && (
+          <div className="bg-muted rounded-lg p-8 border border-border">
+            <div className="flex flex-col items-center justify-center text-muted-foreground">
+              <ImageOff className="w-12 h-12 mb-3" />
+              <p className="text-sm font-medium">Image not available</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">{question.imageUrl}</p>
+            </div>
+          </div>
         )}
 
-        {/* Textarea Input */}
-        {question.questionType === 'textarea' && (
-          <textarea
-            value={response?.responseText || ''}
-            onChange={(e) => onResponseChange({ responseText: e.target.value })}
-            placeholder={question.placeholder || 'Type your answer here...'}
-            rows={8}
-            className="textarea custom-scrollbar"
-            aria-label={`Answer for question ${questionNumber}`}
-          />
-        )}
-      </div>
+        {/* Answer Input */}
+        <div>
+          {/* Multiple Choice */}
+          {question.questionType === 'multiple-choice' && (
+            <div className="space-y-3">
+              {question.options?.map((option) => (
+                <label
+                  key={option.index}
+                  className={cn(
+                    "radio-option",
+                    response?.responseOptionIndex === option.index && "selected"
+                  )}
+                >
+                  <input
+                    type="radio"
+                    name={`question-${question.id}`}
+                    checked={response?.responseOptionIndex === option.index}
+                    onChange={() => onResponseChange({ responseOptionIndex: option.index })}
+                    className="w-5 h-5 text-primary focus:ring-primary flex-shrink-0"
+                  />
+                  <span className="text-foreground flex-1">{option.text}</span>
+                </label>
+              ))}
+            </div>
+          )}
 
-      {/* Navigation Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-        <button
-          onClick={onPrevious}
-          disabled={isFirst}
-          className={`btn btn-secondary flex items-center gap-2 ${isFirst ? 'opacity-50 cursor-not-allowed' : ''}`}
-          aria-label="Previous question"
-        >
-          <ChevronLeft className="w-5 h-5" />
-          <span>Previous</span>
-        </button>
+          {/* Text Input */}
+          {question.questionType === 'text' && (
+            <Input
+              type="text"
+              value={response?.responseText || ''}
+              onChange={(e) => onResponseChange({ responseText: e.target.value })}
+              placeholder={question.placeholder || 'Type your answer here...'}
+              aria-label={`Answer for question ${questionNumber}`}
+            />
+          )}
 
-        {isLast ? (
-          <button onClick={onSubmit} className="btn btn-primary flex items-center gap-2" aria-label="Submit exam">
-            <Send className="w-5 h-5" />
-            <span>Submit Exam</span>
-          </button>
-        ) : (
-          <button onClick={onNext} className="btn btn-primary flex items-center gap-2" aria-label="Next question">
-            <span>Next</span>
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        )}
-      </div>
-    </div>
+          {/* Textarea Input */}
+          {question.questionType === 'textarea' && (
+            <textarea
+              value={response?.responseText || ''}
+              onChange={(e) => onResponseChange({ responseText: e.target.value })}
+              placeholder={question.placeholder || 'Type your answer here...'}
+              rows={8}
+              className="textarea custom-scrollbar"
+              aria-label={`Answer for question ${questionNumber}`}
+            />
+          )}
+        </div>
+
+        {/* Navigation Buttons */}
+        <div className="flex items-center justify-between pt-6 border-t border-border">
+          <Button
+            onClick={onPrevious}
+            disabled={isFirst}
+            variant="outline"
+            aria-label="Previous question"
+          >
+            <ChevronLeft className="w-4 h-4 mr-2" />
+            Previous
+          </Button>
+
+          {isLast ? (
+            <Button onClick={onSubmit} aria-label="Submit exam">
+              <Send className="w-4 h-4 mr-2" />
+              Submit Exam
+            </Button>
+          ) : (
+            <Button onClick={onNext} aria-label="Next question">
+              Next
+              <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

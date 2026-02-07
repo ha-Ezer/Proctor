@@ -19,18 +19,27 @@ const transformImageUrl = (url: string): string | null => {
     return url.replace('attachments/', '/images/');
   }
 
-  // Check if URL has image extension
+  // Allow data:image URLs (inline base64)
+  if (url.startsWith('data:image')) {
+    return url;
+  }
+
+  // Allow http/https URLs (many CDNs like Google images use query params, no file extension)
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url;
+  }
+
+  // Allow relative paths that look like images (e.g. /images/...)
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.bmp'];
   const urlLower = url.toLowerCase();
   const hasImageExtension = imageExtensions.some(ext => urlLower.includes(ext));
-
-  // If it doesn't look like an image URL, return null
-  if (!hasImageExtension && !url.startsWith('data:image')) {
-    console.warn('[QuestionList] Invalid image URL (no image extension):', url);
-    return null;
+  if (hasImageExtension || url.startsWith('/images/')) {
+    return url;
   }
 
-  return url;
+  // Reject only clearly non-image URLs
+  console.warn('[QuestionList] Invalid image URL (unsupported format):', url);
+  return null;
 };
 
 function QuestionImage({ imageUrl, questionNumber }: { imageUrl: string; questionNumber: number }) {
@@ -39,18 +48,18 @@ function QuestionImage({ imageUrl, questionNumber }: { imageUrl: string; questio
 
   if (!transformedUrl || imageError) {
     return (
-      <div className="mb-6 bg-gray-100 rounded-lg p-8 border border-gray-300">
-        <div className="flex flex-col items-center justify-center text-gray-500">
+      <div className="mb-6 bg-muted rounded-lg p-8 border border-border">
+        <div className="flex flex-col items-center justify-center text-muted-foreground">
           <ImageOff className="w-12 h-12 mb-3" />
           <p className="text-sm font-medium">Image not available</p>
-          <p className="text-xs text-gray-400 mt-1">{imageUrl}</p>
+          <p className="text-xs text-muted-foreground/70 mt-1">{imageUrl}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="mb-6 bg-gray-50 rounded-lg p-4 border border-gray-200">
+    <div className="mb-6 bg-muted/50 rounded-lg p-4 border border-border">
       <img
         src={transformedUrl}
         alt={`Question ${questionNumber} illustration`}
@@ -73,14 +82,14 @@ export function QuestionList({ questions, responses, onResponseChange }: Questio
           {/* Question Header */}
           <div className="mb-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-primary-600">
+              <span className="text-sm font-medium text-primary">
                 Question {index + 1} of {questions.length}
               </span>
               {question.required && (
-                <span className="text-xs text-danger-600 font-medium">* Required</span>
+                <span className="text-xs text-destructive font-medium">* Required</span>
               )}
             </div>
-            <h2 className="text-xl font-medium text-gray-900 leading-relaxed">
+            <h2 className="text-xl font-medium text-foreground leading-relaxed">
               {question.questionText}
             </h2>
           </div>
@@ -107,9 +116,9 @@ export function QuestionList({ questions, responses, onResponseChange }: Questio
                       name={`question-${question.id}`}
                       checked={responses[question.id]?.responseOptionIndex === option.index}
                       onChange={() => onResponseChange(question.id, { responseOptionIndex: option.index })}
-                      className="w-5 h-5 text-primary-600 focus:ring-primary-500 flex-shrink-0"
+                      className="w-5 h-5 text-primary focus:ring-primary flex-shrink-0"
                     />
-                    <span className="text-gray-900 flex-1">{option.text}</span>
+                    <span className="text-foreground flex-1">{option.text}</span>
                   </label>
                 ))}
               </div>

@@ -2,17 +2,25 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.examService = exports.ExamService = void 0;
 const database_1 = require("../config/database");
+const studentGroup_service_1 = require("./studentGroup.service");
 class ExamService {
     /**
-     * Get active exam with all questions
+     * Get active exam with all questions.
+     * When studentId is provided, enforces group-based access: if the exam uses group access,
+     * the student must be in an assigned group to see it.
      */
-    async getActiveExam() {
+    async getActiveExam(studentId) {
         // Get active exam
         const examResult = await database_1.pool.query('SELECT * FROM exams WHERE is_active = true LIMIT 1');
         if (examResult.rows.length === 0) {
             throw new Error('NO_ACTIVE_EXAM');
         }
         const exam = examResult.rows[0];
+        // Enforce group-based access for students
+        const canAccess = await studentGroup_service_1.studentGroupService.canStudentAccessExam(studentId, exam.id);
+        if (!canAccess) {
+            throw new Error('ACCESS_DENIED_TO_EXAM');
+        }
         // Get all questions for this exam
         const questionsResult = await database_1.pool.query(`SELECT * FROM questions
        WHERE exam_id = $1

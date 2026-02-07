@@ -15,12 +15,21 @@ export interface CreateGroupData {
 export declare class StudentGroupService {
     /**
      * Get all student groups with stats
+     * Uses v_group_stats view if present; otherwise queries tables directly (e.g. if migration failed partway)
      */
     getGroups(): Promise<StudentGroup[]>;
     /**
      * Get a single group by ID
      */
-    getGroupById(groupId: string): Promise<any>;
+    getGroupById(groupId: string): Promise<{
+        id: any;
+        name: any;
+        description: any;
+        memberCount: number;
+        examCount: number;
+        createdAt: any;
+        updatedAt: any;
+    }>;
     /**
      * Create a new student group
      */

@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { ThemeProvider } from './components/theme-provider';
 import { LoginPage } from './pages/LoginPage';
 import { ExamPage } from './pages/ExamPage';
 import { CompletePage } from './pages/CompletePage';
@@ -61,7 +62,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <>
+    <ThemeProvider defaultTheme="system" storageKey="proctor-ui-theme">
       <Toaster
         position="top-right"
         toastOptions={{
@@ -191,7 +192,7 @@ function App() {
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
-    </>
+    </ThemeProvider>
   );
 }
 

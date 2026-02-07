@@ -40,29 +40,34 @@ export const createExamSchema = z.object({
  */
 export const addQuestionSchema = z.object({
   examId: z.string().uuid('Invalid exam ID format'),
-  questionNumber: z.number().int().min(1),
+  questionNumber: z.coerce.number().int().min(1),
   questionText: z.string().min(1, 'Question text is required'),
   questionType: z.enum(['multiple-choice', 'text', 'textarea']),
   required: z.boolean().optional(),
   placeholder: z.string().optional(),
-  // Allow full URLs, relative URLs (starting with /), attachments paths, or empty string
+  // Allow full URLs, relative URLs (starting with /), attachments/images paths, or empty string
   imageUrl: z
     .string()
     .optional()
     .transform((val) => {
-      if (!val) return '';
-      // Convert attachments/filename to /images/filename
-      if (val.startsWith('attachments/')) {
-        return val.replace('attachments/', '/images/');
-      }
-      return val;
+      if (!val || typeof val !== 'string') return '';
+      const v = val.trim();
+      if (!v) return '';
+      // Normalize to path starting with / or full URL
+      if (v.startsWith('attachments/')) return v.replace('attachments/', '/images/');
+      if (v.startsWith('images/') && !v.startsWith('/')) return '/' + v;
+      return v;
     })
     .refine(
-      (val) => val === '' || val.startsWith('/') || val.startsWith('http://') || val.startsWith('https://'),
-      { message: 'Image URL must be a valid URL, relative path starting with /, or attachments/filename format' }
+      (val) =>
+        val === '' ||
+        val.startsWith('/') ||
+        val.startsWith('http://') ||
+        val.startsWith('https://'),
+      { message: 'Image URL must be a valid URL, path starting with /, or attachments/images path' }
     ),
-  options: z.array(z.string()).min(2).max(10).optional(),
-  correctAnswer: z.number().int().min(0).optional(),
+  options: z.array(z.string()).max(10).optional(),
+  correctAnswer: z.coerce.number().int().min(0).optional(),
 });
 
 /**

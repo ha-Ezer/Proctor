@@ -45,14 +45,22 @@ export const config = {
 
 /**
  * Validate required environment variables
+ * DB: either DATABASE_URL (Railway) or DATABASE_HOST + DATABASE_NAME + DATABASE_USER
  */
 export const validateEnvironment = (): void => {
-  const required = ['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'JWT_SECRET'];
+  const hasDatabaseUrl = !!process.env.DATABASE_URL;
+  const hasDatabaseVars =
+    !!process.env.DATABASE_HOST && !!process.env.DATABASE_NAME && !!process.env.DATABASE_USER;
 
-  const missing = required.filter((key) => !process.env[key]);
+  if (!hasDatabaseUrl && !hasDatabaseVars) {
+    console.error(
+      '❌ Set either DATABASE_URL or (DATABASE_HOST, DATABASE_NAME, DATABASE_USER) for the database'
+    );
+    process.exit(1);
+  }
 
-  if (missing.length > 0) {
-    console.error('❌ Missing required environment variables:', missing.join(', '));
+  if (!process.env.JWT_SECRET) {
+    console.error('❌ JWT_SECRET is required');
     process.exit(1);
   }
 

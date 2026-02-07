@@ -1,6 +1,7 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import path from 'path';
 import { config } from './config/environment';
 import { generalLimiter } from './middleware/rateLimit.middleware';
 
@@ -51,6 +52,16 @@ export const createApp = (): Express => {
       environment: config.nodeEnv,
     });
   });
+
+  // Serve static files (images for exam questions)
+  // Serves files from /attachments folder at /images endpoint
+  // In production, images can also be served from a CDN
+  const attachmentsPath = path.join(__dirname, '../../attachments');
+  const publicImagesPath = path.join(__dirname, '../public/images');
+  
+  // Try to serve from attachments folder first, then from public/images
+  app.use('/images', express.static(attachmentsPath, { maxAge: '1d' }));
+  app.use('/images', express.static(publicImagesPath, { maxAge: '1d' }));
 
   // Apply general rate limiting to all API routes
   app.use('/api', generalLimiter);
@@ -110,11 +121,45 @@ export const createApp = (): Express => {
       });
     }
 
+    if (err.message === 'ACCESS_DENIED_TO_EXAM') {
+      return res.status(403).json({
+        success: false,
+        message: 'You do not have access to this exam. It may be restricted to a specific group.',
+        code: 'ACCESS_DENIED_TO_EXAM',
+      });
+    }
+
     if (err.message === 'SESSION_NOT_FOUND') {
       return res.status(404).json({
         success: false,
         message: 'Session not found',
         code: 'SESSION_NOT_FOUND',
+      });
+    }
+
+    if (err.message === 'GROUPS_TABLE_MISSING') {
+      return res.status(503).json({
+        success: false,
+        message:
+          'Student groups feature is not set up. Run the database migration: database-migration-student-groups.sql',
+        code: 'GROUPS_TABLE_MISSING',
+      });
+    }
+
+    if (err.message === 'GROUP_NAME_EXISTS') {
+      return res.status(409).json({
+        success: false,
+        message: 'A group with this name already exists',
+        code: 'GROUP_NAME_EXISTS',
+      });
+    }
+
+    if (err.message === 'REPORT_COLORS_TABLE_MISSING') {
+      return res.status(503).json({
+        success: false,
+        message:
+          'Exam report colors feature is not set up. Run the database migration: backend/database-migration-exam-report-colors-use-session-id.sql',
+        code: 'REPORT_COLORS_TABLE_MISSING',
       });
     }
 

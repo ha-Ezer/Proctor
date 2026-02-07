@@ -5,20 +5,68 @@ const database_1 = require("../config/database");
 class StudentGroupService {
     /**
      * Get all student groups with stats
+     * Uses v_group_stats view if present; otherwise queries tables directly (e.g. if migration failed partway)
      */
     async getGroups() {
-        const result = await database_1.pool.query(`
-      SELECT
-        id,
-        name,
-        description,
-        member_count,
-        exam_count,
-        created_at
-      FROM v_group_stats
-      ORDER BY name
-    `);
-        return result.rows;
+        try {
+            const result = await database_1.pool.query(`
+        SELECT
+          id,
+          name,
+          description,
+          member_count,
+          exam_count,
+          created_at
+        FROM v_group_stats
+        ORDER BY name
+      `);
+            // Map database field names to frontend expected names
+            return result.rows.map((row) => ({
+                id: row.id,
+                name: row.name,
+                description: row.description,
+                memberCount: Number(row.member_count) || 0,
+                examCount: Number(row.exam_count) || 0,
+                createdAt: row.created_at,
+                updatedAt: row.updated_at || row.created_at,
+            }));
+        }
+        catch (err) {
+            if (err?.code === '42P01') {
+                // View or table missing - fallback: query student_groups with inline counts
+                try {
+                    const result = await database_1.pool.query(`
+            SELECT
+              g.id,
+              g.name,
+              g.description,
+              (SELECT COUNT(*) FROM student_group_members WHERE group_id = g.id)::int as member_count,
+              (SELECT COUNT(*) FROM exam_group_access WHERE group_id = g.id)::int as exam_count,
+              g.created_at,
+              g.updated_at
+            FROM student_groups g
+            ORDER BY g.name
+          `);
+                    // Map database field names to frontend expected names
+                    return result.rows.map((row) => ({
+                        id: row.id,
+                        name: row.name,
+                        description: row.description,
+                        memberCount: Number(row.member_count) || 0,
+                        examCount: Number(row.exam_count) || 0,
+                        createdAt: row.created_at,
+                        updatedAt: row.updated_at || row.created_at,
+                    }));
+                }
+                catch (fallbackErr) {
+                    if (fallbackErr?.code === '42P01') {
+                        return []; // student_groups table missing (migration not run)
+                    }
+                    throw fallbackErr;
+                }
+            }
+            throw err;
+        }
     }
     /**
      * Get a single group by ID
@@ -33,23 +81,43 @@ class StudentGroupService {
         if (result.rows.length === 0) {
             throw new Error('GROUP_NOT_FOUND');
         }
-        return result.rows[0];
+        const row = result.rows[0];
+        // Map database field names to frontend expected names
+        return {
+            id: row.id,
+            name: row.name,
+            description: row.description,
+            memberCount: Number(row.member_count) || 0,
+            examCount: Number(row.exam_count) || 0,
+            createdAt: row.created_at,
+            updatedAt: row.updated_at,
+        };
     }
     /**
      * Create a new student group
      */
     async createGroup(data) {
-        // Check if name already exists
-        const existingResult = await database_1.pool.query('SELECT id FROM student_groups WHERE LOWER(name) = LOWER($1)', [
-            data.name,
-        ]);
-        if (existingResult.rows.length > 0) {
-            throw new Error('GROUP_NAME_EXISTS');
+        try {
+            // Check if name already exists
+            const existingResult = await database_1.pool.query('SELECT id FROM student_groups WHERE LOWER(name) = LOWER($1)', [
+                data.name,
+            ]);
+            if (existingResult.rows.length > 0) {
+                throw new Error('GROUP_NAME_EXISTS');
+            }
+            const result = await database_1.pool.query(`INSERT INTO student_groups (name, description, created_by)
+         VALUES ($1, $2, $3)
+         RETURNING *`, [data.name, data.description || null, data.createdBy || null]);
+            return result.rows[0];
         }
-        const result = await database_1.pool.query(`INSERT INTO student_groups (name, description, created_by)
-       VALUES ($1, $2, $3)
-       RETURNING *`, [data.name, data.description || null, data.createdBy || null]);
-        return result.rows[0];
+        catch (err) {
+            if (err?.code === '42P01') {
+                const e = new Error('GROUPS_TABLE_MISSING');
+                e.code = 'GROUPS_TABLE_MISSING';
+                throw e;
+            }
+            throw err;
+        }
     }
     /**
      * Update group details

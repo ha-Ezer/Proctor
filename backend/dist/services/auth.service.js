@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authService = exports.AuthService = void 0;
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const database_1 = require("../config/database");
 const environment_1 = require("../config/environment");
@@ -25,8 +25,9 @@ class AuthService {
         if (!student.is_authorized) {
             throw new Error('UNAUTHORIZED_EMAIL');
         }
-        // Check if profile completion is needed (no full_name)
-        const needsProfileCompletion = !student.full_name;
+        // Check if profile completion is needed (no full_name or empty string)
+        const hasName = student.full_name && String(student.full_name).trim().length > 0;
+        const needsProfileCompletion = !hasName;
         // Update last login
         await database_1.pool.query('UPDATE students SET last_login = CURRENT_TIMESTAMP WHERE id = $1', [student.id]);
         // Generate JWT token (expires after exam duration + buffer)
@@ -51,7 +52,7 @@ class AuthService {
     async completeStudentProfile(studentId, fullName) {
         const result = await database_1.pool.query(`UPDATE students
        SET full_name = $1, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $2 AND full_name IS NULL
+       WHERE id = $2 AND (full_name IS NULL OR TRIM(full_name) = '')
        RETURNING *`, [fullName, studentId]);
         if (result.rows.length === 0) {
             throw new Error('PROFILE_ALREADY_COMPLETED');
@@ -73,7 +74,7 @@ class AuthService {
             throw new Error('INVALID_CREDENTIALS');
         }
         // Verify password
-        const isPasswordValid = await bcrypt_1.default.compare(data.password, admin.password_hash);
+        const isPasswordValid = await bcryptjs_1.default.compare(data.password, admin.password_hash);
         if (!isPasswordValid) {
             throw new Error('INVALID_CREDENTIALS');
         }
@@ -112,7 +113,7 @@ class AuthService {
      */
     async createAdmin(email, password, fullName, role) {
         // Hash password
-        const passwordHash = await bcrypt_1.default.hash(password, 12);
+        const passwordHash = await bcryptjs_1.default.hash(password, 12);
         const result = await database_1.pool.query(`INSERT INTO admin_users (email, password_hash, full_name, role)
        VALUES ($1, $2, $3, $4)
        RETURNING id, email, full_name, role`, [email, passwordHash, fullName, role]);

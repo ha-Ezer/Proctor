@@ -253,8 +253,8 @@ export function GroupsPage() {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
-          <span className="ml-3 text-gray-600">Loading groups...</span>
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
+          <span className="ml-3 text-muted-foreground">Loading groups...</span>
         </div>
       </AdminLayout>
     );
@@ -266,8 +266,8 @@ export function GroupsPage() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Student Groups</h1>
-            <p className="text-gray-600 mt-1">Organize students and control exam access</p>
+            <h1 className="text-3xl font-bold text-foreground">Student Groups</h1>
+            <p className="text-muted-foreground mt-1">Organize students and control exam access</p>
           </div>
           <button onClick={() => setShowCreateModal(true)} className="btn btn-primary flex items-center gap-2">
             <Plus className="w-5 h-5" />
@@ -277,18 +277,18 @@ export function GroupsPage() {
 
         {/* Error */}
         {error && (
-          <div className="mb-6 p-4 bg-danger-50 border border-danger-200 rounded-lg flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-danger-600 flex-shrink-0 mt-0.5" />
-            <p className="text-danger-800">{error}</p>
+          <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+            <p className="text-destructive">{error}</p>
           </div>
         )}
 
         {/* Groups Grid */}
         {groups.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-            <Users className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-gray-900 mb-1">No groups yet</h3>
-            <p className="text-gray-600 mb-4">Create your first student group to get started</p>
+          <div className="text-center py-12 bg-muted/50 rounded-lg border-2 border-dashed border-border">
+            <Users className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+            <h3 className="text-lg font-medium text-foreground mb-1">No groups yet</h3>
+            <p className="text-muted-foreground mb-4">Create your first student group to get started</p>
             <button onClick={() => setShowCreateModal(true)} className="btn btn-primary">
               <Plus className="w-5 h-5 mr-2" />
               Create Group
@@ -300,20 +300,20 @@ export function GroupsPage() {
               <div key={group.id} className="card hover:shadow-lg transition-shadow">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900">{group.name}</h3>
-                    {group.description && <p className="text-sm text-gray-600 mt-1">{group.description}</p>}
+                    <h3 className="text-lg font-semibold text-foreground">{group.name}</h3>
+                    {group.description && <p className="text-sm text-muted-foreground mt-1">{group.description}</p>}
                   </div>
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 gap-4 py-4 border-t border-b border-gray-200">
+                <div className="grid grid-cols-2 gap-4 py-4 border-t border-b border-border">
                   <div>
-                    <div className="text-2xl font-bold text-primary-600">{group.memberCount || 0}</div>
-                    <div className="text-xs text-gray-600">Members</div>
+                    <div className="text-2xl font-bold text-primary">{group.memberCount || 0}</div>
+                    <div className="text-xs text-muted-foreground">Members</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-blue-600">{group.examCount || 0}</div>
-                    <div className="text-xs text-gray-600">Exams</div>
+                    <div className="text-xs text-muted-foreground">Exams</div>
                   </div>
                 </div>
 
@@ -349,10 +349,10 @@ export function GroupsPage() {
         {/* Create Group Modal */}
         {showCreateModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <h2 className="text-xl font-bold text-gray-900">Create New Group</h2>
-                <button onClick={() => setShowCreateModal(false)} className="text-gray-400 hover:text-gray-600">
+            <div className="rounded-lg shadow-xl max-w-md w-full border border-border" style={{ backgroundColor: 'hsl(var(--card))' }}>
+              <div className="flex items-center justify-between p-6 border-b border-border">
+                <h2 className="text-xl font-bold text-foreground">Create New Group</h2>
+                <button onClick={() => setShowCreateModal(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -419,10 +419,10 @@ export function GroupsPage() {
         {/* Edit Group Modal */}
         {showEditModal && editingGroup && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <h2 className="text-xl font-bold text-gray-900">Edit Group</h2>
-                <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600">
+            <div className="rounded-lg shadow-xl max-w-md w-full border border-border" style={{ backgroundColor: 'hsl(var(--card))' }}>
+              <div className="flex items-center justify-between p-6 border-b border-border">
+                <h2 className="text-xl font-bold text-foreground">Edit Group</h2>
+                <button onClick={() => setShowEditModal(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -486,15 +486,15 @@ export function GroupsPage() {
         {/* Members Modal */}
         {showMembersModal && selectedGroup && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <div className="rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col border border-border" style={{ backgroundColor: 'hsl(var(--card))' }}>
+              <div className="flex items-center justify-between p-6 border-b border-border">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">{selectedGroup.name}</h2>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <h2 className="text-xl font-bold text-foreground">{selectedGroup.name}</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
                     {groupMembers.length} member{groupMembers.length !== 1 ? 's' : ''}
                   </p>
                 </div>
-                <button onClick={() => setShowMembersModal(false)} className="text-gray-400 hover:text-gray-600">
+                <button onClick={() => setShowMembersModal(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -515,24 +515,24 @@ export function GroupsPage() {
 
                 {isLoadingMembers ? (
                   <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-6 h-6 text-primary-600 animate-spin" />
-                    <span className="ml-2 text-gray-600">Loading members...</span>
+                    <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                    <span className="ml-2 text-muted-foreground">Loading members...</span>
                   </div>
                 ) : groupMembers.length === 0 ? (
-                  <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                    <Users className="w-10 h-10 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-600">No members in this group yet</p>
+                  <div className="text-center py-8 bg-muted/50 rounded-lg border-2 border-dashed border-border">
+                    <Users className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-muted-foreground">No members in this group yet</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     {groupMembers.map((member) => (
                       <div
                         key={member.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100"
+                        className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors"
                       >
                         <div className="flex-1">
-                          <div className="font-medium text-gray-900">{member.fullName}</div>
-                          <div className="text-sm text-gray-600">{member.email}</div>
+                          <div className="font-medium text-foreground">{member.fullName}</div>
+                          <div className="text-sm text-muted-foreground">{member.email}</div>
                         </div>
                         <button
                           onClick={() => setRemoveMemberConfirm(member)}
@@ -553,11 +553,11 @@ export function GroupsPage() {
         {/* Add Members Modal */}
         {showAddMembersModal && selectedGroup && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col">
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
+            <div className="rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] flex flex-col border border-border" style={{ backgroundColor: 'hsl(var(--card))' }}>
+              <div className="flex items-center justify-between p-6 border-b border-border">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Add Members to {selectedGroup.name}</h2>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <h2 className="text-xl font-bold text-foreground">Add Members to {selectedGroup.name}</h2>
+                  <p className="text-sm text-muted-foreground mt-1">
                     {selectedStudentIds.size} student{selectedStudentIds.size !== 1 ? 's' : ''} selected
                   </p>
                 </div>
@@ -567,7 +567,7 @@ export function GroupsPage() {
                     setSelectedStudentIds(new Set());
                     setSearchQuery('');
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -576,9 +576,9 @@ export function GroupsPage() {
               <form onSubmit={handleAddMembers} className="flex-1 overflow-hidden flex flex-col">
                 <div className="p-6 space-y-4 flex-1 overflow-y-auto">
                   {/* Search Bar */}
-                  <div className="sticky top-0 bg-white pb-4">
+                  <div className="sticky top-0 pb-4" style={{ backgroundColor: 'hsl(var(--card))' }}>
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                       <input
                         type="text"
                         placeholder="Search by name or email..."
@@ -591,22 +591,22 @@ export function GroupsPage() {
 
                   {isLoadingStudents ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="w-6 h-6 text-primary-600 animate-spin" />
-                      <span className="ml-2 text-gray-600">Loading students...</span>
+                      <Loader2 className="w-6 h-6 text-primary animate-spin" />
+                      <span className="ml-2 text-muted-foreground">Loading students...</span>
                     </div>
                   ) : availableStudents.length === 0 ? (
-                    <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                      <Users className="w-10 h-10 text-gray-400 mx-auto mb-2" />
-                      <p className="text-gray-600">All students are already in this group</p>
+                    <div className="text-center py-8 bg-muted/50 rounded-lg border-2 border-dashed border-border">
+                      <Users className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-muted-foreground">All students are already in this group</p>
                     </div>
                   ) : (
                     <>
                       {/* Select All Button */}
-                      <div className="flex items-center justify-between pb-2 border-b border-gray-200">
+                      <div className="flex items-center justify-between pb-2 border-b border-border">
                         <button
                           type="button"
                           onClick={toggleAllVisible}
-                          className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-2"
+                          className="text-sm text-primary hover:text-primary/80 font-medium flex items-center gap-2"
                         >
                           {availableStudents
                             .filter((student) => {
@@ -628,7 +628,7 @@ export function GroupsPage() {
                             </>
                           )}
                         </button>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-muted-foreground">
                           {availableStudents.filter((s) => {
                             const query = searchQuery.toLowerCase();
                             return (
@@ -658,22 +658,22 @@ export function GroupsPage() {
                                 onClick={() => toggleStudentSelection(student.id)}
                                 className={`w-full text-left p-3 rounded-lg border-2 transition-all flex items-center gap-3 ${
                                   isSelected
-                                    ? 'border-primary-500 bg-primary-50'
-                                    : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+                                    ? 'border-primary bg-primary/10'
+                                    : 'border-border bg-card hover:bg-muted/50'
                                 }`}
                               >
                                 <div className="flex-shrink-0">
                                   {isSelected ? (
-                                    <CheckSquare className="w-5 h-5 text-primary-600" />
+                                    <CheckSquare className="w-5 h-5 text-primary" />
                                   ) : (
-                                    <Square className="w-5 h-5 text-gray-400" />
+                                    <Square className="w-5 h-5 text-muted-foreground" />
                                   )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <div className="font-medium text-gray-900 truncate">
-                                    {student.fullName || <span className="text-gray-400 italic">Pending Registration</span>}
+                                  <div className="font-medium text-foreground truncate">
+                                    {student.fullName || <span className="text-muted-foreground italic">Pending Registration</span>}
                                   </div>
-                                  <div className="text-sm text-gray-600 truncate">{student.email}</div>
+                                  <div className="text-sm text-muted-foreground truncate">{student.email}</div>
                                 </div>
                               </button>
                             );
@@ -690,7 +690,7 @@ export function GroupsPage() {
                           );
                         }).length === 0 && (
                           <div className="text-center py-8">
-                            <p className="text-gray-600">No students found matching "{searchQuery}"</p>
+                            <p className="text-muted-foreground">No students found matching "{searchQuery}"</p>
                           </div>
                         )}
                     </>
@@ -698,7 +698,7 @@ export function GroupsPage() {
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-gray-200 bg-gray-50">
+                <div className="p-6 border-t border-border bg-muted/50">
                   <div className="flex gap-3">
                     <button
                       type="button"

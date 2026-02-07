@@ -1,5 +1,6 @@
 import { pool, getClient } from '../config/database';
 import { v4 as uuidv4 } from 'uuid';
+import { studentGroupService } from './studentGroup.service';
 
 export interface CreateSessionData {
   studentId: string;
@@ -19,6 +20,12 @@ export class SessionService {
    * Create a new exam session for a student
    */
   async createSession(data: CreateSessionData) {
+    // Enforce group-based access before creating session
+    const canAccess = await studentGroupService.canStudentAccessExam(data.studentId, data.examId);
+    if (!canAccess) {
+      throw new Error('ACCESS_DENIED_TO_EXAM');
+    }
+
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const client = await getClient();
 
@@ -197,6 +204,14 @@ export class SessionService {
   ) {
     const client = await getClient();
 
+    // Map frontend submission types to DB enum (schema: manual, auto_timeout, max_violations, admin_terminated)
+    const dbSubmissionType =
+      submissionType === 'auto_time_expired'
+        ? 'auto_timeout'
+        : submissionType === 'auto_violations'
+          ? 'max_violations'
+          : submissionType;
+
     try {
       await client.query('BEGIN');
 
@@ -213,7 +228,7 @@ export class SessionService {
            updated_at = CURRENT_TIMESTAMP
          WHERE id = $3
          RETURNING *`,
-        [endTime, submissionType, sessionId]
+        [endTime, dbSubmissionType, sessionId]
       );
 
       if (result.rows.length === 0) {
@@ -222,9 +237,31 @@ export class SessionService {
 
       const session = result.rows[0];
 
-      // Calculate score
-      const scoreResult = await client.query('SELECT calculate_session_score($1) as score', [sessionId]);
-      const score = scoreResult.rows[0].score;
+      // Calculate score - with fallback if database function doesn't exist
+      let score = 0;
+      try {
+        const scoreResult = await client.query('SELECT calculate_session_score($1) as score', [sessionId]);
+        score = scoreResult.rows[0].score || 0;
+      } catch (scoreError: any) {
+        // If the function doesn't exist, calculate manually
+        console.warn('calculate_session_score function not available, calculating manually:', scoreError.message);
+        
+        // Manual score calculation
+        const responsesResult = await client.query(
+          `SELECT 
+            COUNT(*) as total_questions,
+            COUNT(CASE WHEN is_correct = true THEN 1 END) as correct_answers
+          FROM responses
+          WHERE session_id = $1`,
+          [sessionId]
+        );
+        
+        const { total_questions, correct_answers } = responsesResult.rows[0];
+        if (parseInt(total_questions) > 0) {
+          score = (parseInt(correct_answers) / parseInt(total_questions)) * 100;
+          score = Math.round(score * 100) / 100; // Round to 2 decimal places
+        }
+      }
 
       // Update session with score
       await client.query('UPDATE exam_sessions SET score = $1 WHERE id = $2', [score, sessionId]);

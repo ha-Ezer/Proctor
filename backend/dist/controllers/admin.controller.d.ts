@@ -111,4 +111,19 @@ export declare const saveSessionQuestionNote: (req: AuthRequest, res: Response, 
  * DELETE /api/admin/sessions/:sessionId/notes
  */
 export declare const deleteSessionQuestionNote: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
+/**
+ * Get Exam Snapshots Controller
+ * GET /api/admin/exams/:examId/snapshots
+ */
+export declare const getExamSnapshots: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
+/**
+ * Clear Exam Snapshots Controller
+ * DELETE /api/admin/exams/:examId/snapshots
+ */
+export declare const clearExamSnapshots: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
+/**
+ * Clear Session Snapshots Controller
+ * DELETE /api/admin/sessions/:sessionId/snapshots
+ */
+export declare const clearSessionSnapshots: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
 //# sourceMappingURL=admin.controller.d.ts.map

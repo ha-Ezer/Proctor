@@ -5,6 +5,13 @@ import { storage, STORAGE_KEYS } from '@/lib/storage';
 import { useExamStore } from '@/stores/examStore';
 import { AlertCircle, Loader2, ShieldCheck, User, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Label } from '@/components/ui/label';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -88,164 +95,169 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-primary-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/5 flex items-center justify-center p-4">
+      {/* Theme Toggle - Top Right */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
+
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-600 rounded-full mb-4">
-            <ShieldCheck className="w-8 h-8 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary rounded-full mb-4 shadow-lg">
+            <ShieldCheck className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Proctored Exam System</h1>
-          <p className="text-gray-600">Enter your email to access the exam</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Proctored Exam System</h1>
+          <p className="text-muted-foreground">Enter your email to access the exam</p>
         </div>
 
         {/* Login Card */}
-        <div className="card animate-slide-in">
-          <form onSubmit={handleLogin} className="space-y-6">
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="student@example.com"
-                className="input"
-                disabled={isLoading}
-                required
-              />
-            </div>
-
-            {/* Error Message */}
-            {error && (
-              <div className="flex items-start gap-3 p-4 bg-danger-50 border border-danger-200 rounded-lg animate-shake">
-                <AlertCircle className="w-5 h-5 text-danger-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-danger-800">Login Failed</p>
-                  <p className="text-sm text-danger-700 mt-1">{error}</p>
-                </div>
+        <Card className="animate-slide-in">
+          <CardHeader>
+            <CardTitle>Student Login</CardTitle>
+            <CardDescription>Enter your email address to begin</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleLogin} className="space-y-6">
+              {/* Email Field */}
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="student@example.com"
+                  disabled={isLoading}
+                  required
+                />
               </div>
-            )}
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="btn btn-primary w-full flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Logging in...</span>
-                </>
-              ) : (
-                <span>Access Exam</span>
+              {/* Error Message */}
+              {error && (
+                <Alert variant="destructive" className="animate-shake">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Login Failed</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
-            </button>
-          </form>
 
-          {/* Important Notes */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <h3 className="text-sm font-medium text-gray-900 mb-2">Important Notes:</h3>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Your email must be authorized to access the exam</li>
-              <li>• The exam is proctored - violations will be tracked</li>
-              <li>• Do not switch tabs or open developer tools</li>
-              <li>• Your progress will be auto-saved every 5 seconds</li>
-            </ul>
-          </div>
-        </div>
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full"
+                size="lg"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Logging in...
+                  </>
+                ) : (
+                  'Access Exam'
+                )}
+              </Button>
+            </form>
+          </CardContent>
+          <CardFooter className="flex-col space-y-4">
+            <div className="w-full pt-4 border-t">
+              <h3 className="text-sm font-medium text-foreground mb-2">Important Notes:</h3>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Your email must be authorized to access the exam</li>
+                <li>• The exam is proctored - violations will be tracked</li>
+                <li>• Do not switch tabs or open developer tools</li>
+                <li>• Your progress will be auto-saved every 5 seconds</li>
+              </ul>
+            </div>
+          </CardFooter>
+        </Card>
 
         {/* Footer */}
         <div className="text-center mt-6 space-y-3">
-          <p className="text-sm text-gray-600">Need help? Contact your instructor</p>
+          <p className="text-sm text-muted-foreground">Need help? Contact your instructor</p>
 
           {/* Admin Login Button */}
-          <button
+          <Button
             type="button"
             onClick={() => navigate('/admin/login')}
-            className="text-sm text-primary-600 hover:text-primary-700 font-medium underline"
+            variant="link"
+            className="text-sm"
           >
             Admin Login
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Profile Completion Modal */}
-      {showProfileModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full animate-slide-in">
-            {/* Modal Header */}
-            <div className="p-6 border-b border-gray-200">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-primary-600" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">Complete Your Profile</h2>
-                  <p className="text-sm text-gray-600">Just one more step before starting the exam</p>
-                </div>
+      <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+        <DialogContent className="sm:max-w-md bg-card">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                <User className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <DialogTitle>Complete Your Profile</DialogTitle>
+                <DialogDescription>Just one more step before starting the exam</DialogDescription>
               </div>
             </div>
+          </DialogHeader>
+          <form onSubmit={handleCompleteProfile} className="space-y-4">
+            {/* Email Display (Read-only) */}
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input
+                value={email}
+                disabled
+                className="bg-muted cursor-not-allowed"
+              />
+            </div>
 
-            {/* Modal Body */}
-            <form onSubmit={handleCompleteProfile} className="p-6 space-y-4">
-              {/* Email Display (Read-only) */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <div className="input bg-gray-50 text-gray-600 cursor-not-allowed">
-                  {email}
-                </div>
-              </div>
+            {/* Full Name Input */}
+            <div className="space-y-2">
+              <Label htmlFor="fullName">
+                Full Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                type="text"
+                id="fullName"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Enter your full name"
+                disabled={isCompletingProfile}
+                required
+                autoFocus
+              />
+              <p className="text-xs text-muted-foreground">
+                This will be used to identify you in exam reports
+              </p>
+            </div>
 
-              {/* Full Name Input */}
-              <div>
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name *
-                </label>
-                <input
-                  type="text"
-                  id="fullName"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Enter your full name"
-                  className="input"
-                  disabled={isCompletingProfile}
-                  required
-                  autoFocus
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  This will be used to identify you in exam reports
-                </p>
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="submit"
-                  disabled={isCompletingProfile || !fullName.trim()}
-                  className="btn btn-primary flex-1 flex items-center justify-center gap-2"
-                >
-                  {isCompletingProfile ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="w-5 h-5" />
-                      <span>Continue to Exam</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            {/* Submit Button */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="submit"
+                disabled={isCompletingProfile || !fullName.trim()}
+                className="w-full"
+                size="lg"
+              >
+                {isCompletingProfile ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4 mr-2" />
+                    Continue to Exam
+                  </>
+                )}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

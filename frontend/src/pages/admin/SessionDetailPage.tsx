@@ -132,7 +132,7 @@ export function SessionDetailPage() {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
         </div>
       </AdminLayout>
     );
@@ -141,8 +141,8 @@ export function SessionDetailPage() {
   if (error || !data) {
     return (
       <AdminLayout>
-        <div className="card bg-danger-50 border-danger-200">
-          <p className="text-danger-800">{error || 'Session not found'}</p>
+        <div className="card border-destructive bg-destructive/10">
+          <p className="text-destructive">{error || 'Session not found'}</p>
         </div>
       </AdminLayout>
     );
@@ -155,17 +155,17 @@ export function SessionDetailPage() {
       <div className="max-w-7xl mx-auto">
         {/* Breadcrumbs */}
         <nav className="flex items-center gap-2 text-sm mb-6">
-          <Link to="/admin/sessions" className="text-primary-600 hover:text-primary-700 font-medium">
+          <Link to="/admin/sessions" className="text-primary hover:text-primary/80 font-medium">
             Sessions
           </Link>
-          <span className="text-gray-400">/</span>
-          <span className="text-gray-600">Session Details</span>
+          <span className="text-muted-foreground">/</span>
+          <span className="text-muted-foreground">Session Details</span>
         </nav>
 
         {/* Back Button */}
         <button
           onClick={() => navigate('/admin/sessions')}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>Back to Sessions</span>
@@ -174,12 +174,12 @@ export function SessionDetailPage() {
         {/* Header */}
         <div className="mb-8 flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Session Details</h1>
-            <p className="text-gray-600">{session.examTitle}</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Session Details</h1>
+            <p className="text-muted-foreground">{session.examTitle}</p>
           </div>
           <button
             onClick={handleExportPDF}
-            className="btn-primary flex items-center gap-2"
+            className="btn btn-primary flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
             Export as PDF
@@ -188,18 +188,18 @@ export function SessionDetailPage() {
 
         {/* Session Info Card */}
         <div className="card mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Session Information</h2>
+          <h2 className="text-xl font-bold text-foreground mb-4">Session Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="text-sm text-gray-600 font-medium">Student</label>
+              <label className="text-sm text-muted-foreground font-medium">Student</label>
               <div className="flex items-center gap-2 mt-1">
-                <User className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-900 font-medium">{session.studentName}</span>
+                <User className="w-4 h-4 text-muted-foreground" />
+                <span className="text-foreground font-medium">{session.studentName}</span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">{session.studentId}</p>
+              <p className="text-xs text-muted-foreground mt-1">{session.studentId}</p>
             </div>
             <div>
-              <label className="text-sm text-gray-600 font-medium">Status</label>
+              <label className="text-sm text-muted-foreground font-medium">Status</label>
               <div className="mt-1">
                 {session.status === 'completed' && (
                   <span className="flex items-center gap-1 text-success-600">
@@ -222,16 +222,16 @@ export function SessionDetailPage() {
               </div>
             </div>
             <div>
-              <label className="text-sm text-gray-600 font-medium">Start Time</label>
-              <p className="text-gray-900 mt-1">{new Date(session.startTime).toLocaleString()}</p>
+              <label className="text-sm text-muted-foreground font-medium">Start Time</label>
+              <p className="text-foreground mt-1">{new Date(session.startTime).toLocaleString()}</p>
             </div>
             <div>
-              <label className="text-sm text-gray-600 font-medium">Violations</label>
+              <label className="text-sm text-muted-foreground font-medium">Violations</label>
               <div className="flex items-center gap-2 mt-1">
                 <AlertTriangle
-                  className={`w-4 h-4 ${session.totalViolations > 3 ? 'text-orange-600' : 'text-gray-400'}`}
+                  className={`w-4 h-4 ${session.totalViolations > 3 ? 'text-orange-600' : 'text-muted-foreground'}`}
                 />
-                <span className={`font-medium ${session.totalViolations > 3 ? 'text-orange-600' : 'text-gray-900'}`}>
+                <span className={`font-medium ${session.totalViolations > 3 ? 'text-orange-600' : 'text-foreground'}`}>
                   {session.totalViolations}
                 </span>
               </div>
@@ -241,27 +241,27 @@ export function SessionDetailPage() {
 
         {/* Questions and Responses - Side by Side */}
         <div className="card mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Questions & Responses</h2>
+          <h2 className="text-xl font-bold text-foreground mb-6">Questions & Responses</h2>
 
           {responses.length === 0 ? (
             <div className="text-center py-12">
-              <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">No responses recorded for this session</p>
+              <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No responses recorded for this session</p>
             </div>
           ) : (
             <div className="space-y-6">
               {responses.map((response, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
-                <div className="grid md:grid-cols-2 divide-x divide-gray-200">
+              <div key={index} className="border border-border rounded-lg overflow-hidden">
+                <div className="grid md:grid-cols-2 divide-x divide-border">
                   {/* Left: Question */}
-                  <div className="p-6 bg-gray-50">
+                  <div className="p-6 bg-muted/50">
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="px-2 py-1 bg-primary-600 text-white text-xs font-bold rounded">
+                      <span className="px-2 py-1 bg-primary text-primary-foreground text-xs font-bold rounded">
                         Q{response.questionNumber}
                       </span>
-                      <span className="text-xs text-gray-500 uppercase">{response.questionType}</span>
+                      <span className="text-xs text-muted-foreground uppercase">{response.questionType}</span>
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-3">{response.questionText}</h3>
+                    <h3 className="text-lg font-medium text-foreground mb-3">{response.questionText}</h3>
 
                     {/* Multiple Choice Options */}
                     {response.questionType === 'multiple-choice' && response.options && (
@@ -280,15 +280,15 @@ export function SessionDetailPage() {
                                   ? 'bg-danger-50 border-danger-300'
                                   : isCorrect
                                   ? 'bg-success-50 border-success-200'
-                                  : 'bg-white border-gray-200'
+                                  : 'bg-card border-border'
                               }`}
                             >
                               <div className="flex items-center gap-2">
                                 <span
                                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
                                     isSelected
-                                      ? 'bg-primary-600 text-white'
-                                      : 'bg-gray-200 text-gray-600'
+                                      ? 'bg-primary text-primary-foreground'
+                                      : 'bg-muted text-muted-foreground'
                                   }`}
                                 >
                                   {String.fromCharCode(65 + optIndex)}
@@ -306,11 +306,11 @@ export function SessionDetailPage() {
                   </div>
 
                   {/* Right: Student Response */}
-                  <div className="p-6 bg-white">
+                  <div className="p-6 bg-card">
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-sm font-semibold text-gray-700">Student Response</h4>
+                      <h4 className="text-sm font-semibold text-foreground">Student Response</h4>
                       {response.answeredAt && (
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-muted-foreground">
                           {new Date(response.answeredAt).toLocaleTimeString()}
                         </span>
                       )}
@@ -335,10 +335,10 @@ export function SessionDetailPage() {
                                   <XCircle className="w-6 h-6 text-danger-600 flex-shrink-0 mt-0.5" />
                                 )}
                                 <div className="flex-1">
-                                  <p className="font-medium text-gray-900 mb-1">
+                                  <p className="font-medium text-foreground mb-1">
                                     {response.selectedOption}
                                   </p>
-                                  <p className="text-sm text-gray-600">
+                                  <p className="text-sm text-muted-foreground">
                                     {response.isCorrect ? 'Correct Answer' : 'Incorrect Answer'}
                                   </p>
                                 </div>
@@ -346,14 +346,14 @@ export function SessionDetailPage() {
                             </div>
 
                             {!response.isCorrect && response.correctAnswer && (
-                              <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                                <p className="text-xs text-gray-600 mb-1">Correct Answer:</p>
-                                <p className="text-sm font-medium text-gray-900">{response.correctAnswer}</p>
+                              <div className="p-3 bg-muted/50 rounded-lg border border-border">
+                                <p className="text-xs text-muted-foreground mb-1">Correct Answer:</p>
+                                <p className="text-sm font-medium text-foreground">{response.correctAnswer}</p>
                               </div>
                             )}
                           </div>
                         ) : (
-                          <div className="p-4 bg-gray-100 rounded-lg text-center text-gray-500">
+                          <div className="p-4 bg-muted rounded-lg text-center text-muted-foreground">
                             No response provided
                           </div>
                         )}
@@ -364,11 +364,11 @@ export function SessionDetailPage() {
                     {(response.questionType === 'text' || response.questionType === 'textarea') && (
                       <div>
                         {response.responseText ? (
-                          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <p className="text-gray-900 whitespace-pre-wrap">{response.responseText}</p>
+                          <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                            <p className="text-foreground whitespace-pre-wrap">{response.responseText}</p>
                           </div>
                         ) : (
-                          <div className="p-4 bg-gray-100 rounded-lg text-center text-gray-500">
+                          <div className="p-4 bg-muted rounded-lg text-center text-muted-foreground">
                             No response provided
                           </div>
                         )}
@@ -376,9 +376,9 @@ export function SessionDetailPage() {
                     )}
 
                     {/* Admin Note */}
-                    <div className="mt-4 border-t border-gray-200 pt-4">
+                    <div className="mt-4 border-t border-border pt-4">
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-xs font-semibold text-gray-700 uppercase">Admin Note</label>
+                        <label className="text-xs font-semibold text-foreground uppercase">Admin Note</label>
                         {!editingNoteId && response.note && (
                           <button
                             onClick={() => handleDeleteNote(response.questionId)}
@@ -422,9 +422,9 @@ export function SessionDetailPage() {
                           {response.note ? (
                             <div
                               onClick={() => handleEditNote(response.questionId, response.note || null)}
-                              className="p-3 bg-blue-50 rounded-lg border border-blue-200 cursor-pointer hover:bg-blue-100 transition-colors"
+                              className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20 cursor-pointer hover:bg-blue-500/20 transition-colors"
                             >
-                              <p className="text-sm text-gray-900 whitespace-pre-wrap">{response.note}</p>
+                              <p className="text-sm text-foreground whitespace-pre-wrap">{response.note}</p>
                               <p className="text-xs text-blue-600 mt-2">Click to edit</p>
                             </div>
                           ) : (
@@ -449,17 +449,17 @@ export function SessionDetailPage() {
         {/* Violations */}
         {violations.length > 0 && (
           <div className="card">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Violations Log</h2>
+            <h2 className="text-xl font-bold text-foreground mb-4">Violations Log</h2>
             <div className="space-y-3">
               {violations.map((violation, index) => (
                 <div
                   key={index}
                   className={`p-4 rounded-lg border ${
                     violation.severity === 'high' || violation.severity === 'critical'
-                      ? 'bg-danger-50 border-danger-200'
+                      ? 'bg-destructive/10 border-destructive/20'
                       : violation.severity === 'medium'
-                      ? 'bg-orange-50 border-orange-200'
-                      : 'bg-gray-50 border-gray-200'
+                      ? 'bg-orange-500/10 border-orange-500/20'
+                      : 'bg-muted border-border'
                   }`}
                 >
                   <div className="flex items-start justify-between">
@@ -468,13 +468,13 @@ export function SessionDetailPage() {
                         <AlertTriangle
                           className={`w-4 h-4 ${
                             violation.severity === 'high' || violation.severity === 'critical'
-                              ? 'text-danger-600'
+                              ? 'text-destructive'
                               : violation.severity === 'medium'
                               ? 'text-orange-600'
-                              : 'text-gray-600'
+                              : 'text-muted-foreground'
                           }`}
                         />
-                        <span className="font-semibold text-gray-900">{violation.violationType}</span>
+                        <span className="font-semibold text-foreground">{violation.violationType}</span>
                         <span
                           className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                             violation.severity === 'high' || violation.severity === 'critical'
@@ -488,10 +488,10 @@ export function SessionDetailPage() {
                         </span>
                       </div>
                       {violation.description && (
-                        <p className="text-sm text-gray-600">{violation.description}</p>
+                        <p className="text-sm text-muted-foreground">{violation.description}</p>
                       )}
                     </div>
-                    <span className="text-xs text-gray-500 whitespace-nowrap ml-4">
+                    <span className="text-xs text-muted-foreground whitespace-nowrap ml-4">
                       {new Date(violation.detectedAt).toLocaleString()}
                     </span>
                   </div>

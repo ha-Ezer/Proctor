@@ -3,7 +3,7 @@
  * Run with: npm run verify-admin
  */
 
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { pool } from '../src/config/database';
 
 async function verifyAdminPassword() {

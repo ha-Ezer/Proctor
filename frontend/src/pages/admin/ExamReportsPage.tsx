@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { adminApi, ExamDetails } from '@/lib/adminApi';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { ExamReportTable } from '@/components/admin/ExamReportTable';
-import { Loader2, Table2 } from 'lucide-react';
+import { EmptyState } from '@/components/common/EmptyState';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Table2 } from 'lucide-react';
 
 export function ExamReportsPage() {
   const [exams, setExams] = useState<ExamDetails[]>([]);
@@ -17,12 +22,12 @@ export function ExamReportsPage() {
     try {
       setIsLoading(true);
       const response = await adminApi.getExams();
-      const activeExams = response.data.data.exams.filter((exam) => exam.isActive);
-      setExams(activeExams);
+      const allExams = response.data.data.exams;
+      setExams(allExams);
 
       // Auto-select first exam if available
-      if (activeExams.length > 0 && !selectedExamId) {
-        setSelectedExamId(activeExams[0].id);
+      if (allExams.length > 0 && !selectedExamId) {
+        setSelectedExamId(allExams[0].id);
       }
     } catch (err) {
       console.error('Failed to load exams:', err);
@@ -34,8 +39,16 @@ export function ExamReportsPage() {
   if (isLoading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 text-primary-600 animate-spin" />
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-8">
+            <Skeleton className="h-9 w-64 mb-2" />
+            <Skeleton className="h-5 w-96" />
+          </div>
+          <Card>
+            <CardContent className="p-6">
+              <Skeleton className="h-10 w-full max-w-md" />
+            </CardContent>
+          </Card>
         </div>
       </AdminLayout>
     );
@@ -46,39 +59,46 @@ export function ExamReportsPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Exam Reports</h1>
-          <p className="text-gray-600">View detailed reports for all students who completed an exam</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Exam Reports</h1>
+          <p className="text-muted-foreground">View detailed reports for all students who completed an exam</p>
         </div>
 
         {/* Exam Selector */}
-        <div className="card mb-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Table2 className="w-5 h-5 text-gray-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Select Exam</h2>
-          </div>
-          <select
-            value={selectedExamId}
-            onChange={(e) => setSelectedExamId(e.target.value)}
-            className="input max-w-md"
-          >
-            <option value="">Select an exam...</option>
-            {exams.map((exam) => (
-              <option key={exam.id} value={exam.id}>
-                {exam.title} ({exam.version})
-              </option>
-            ))}
-          </select>
-        </div>
+        <Card className="mb-6">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Table2 className="w-5 h-5 text-muted-foreground" />
+              <CardTitle>Select Exam</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 max-w-md">
+              <Label htmlFor="exam-select">Exam</Label>
+              <Select value={selectedExamId} onValueChange={setSelectedExamId}>
+                <SelectTrigger id="exam-select">
+                  <SelectValue placeholder="Select an exam..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {exams.map((exam) => (
+                    <SelectItem key={exam.id} value={exam.id}>
+                      {exam.title} ({exam.version})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Exam Report Table */}
         {selectedExamId ? (
           <ExamReportTable examId={selectedExamId} />
         ) : (
-          <div className="card text-center py-12">
-            <Table2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Select an Exam</h3>
-            <p className="text-gray-600">Choose an exam from the dropdown above to view the report</p>
-          </div>
+          <EmptyState
+            icon={Table2}
+            title="Select an Exam"
+            description="Choose an exam from the dropdown above to view the report"
+          />
         )}
       </div>
     </AdminLayout>

@@ -82,5 +82,11 @@ router.get('/exams/:examId/report', adminController.getExamReport);
 router.get('/exams/:examId/report/colors', adminController.getExamReportCellColors);
 router.post('/exams/:examId/report/colors', adminController.saveExamReportCellColor);
 router.delete('/exams/:examId/report/colors', adminController.deleteExamReportCellColor);
+/**
+ * Auto-Save Snapshots (Data Recovery)
+ */
+router.get('/exams/:examId/snapshots', adminController.getExamSnapshots);
+router.delete('/exams/:examId/snapshots', adminController.clearExamSnapshots);
+router.delete('/sessions/:sessionId/snapshots', adminController.clearSessionSnapshots);
 exports.default = router;
 //# sourceMappingURL=admin.routes.js.map

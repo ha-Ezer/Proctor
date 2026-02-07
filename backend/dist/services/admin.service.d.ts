@@ -107,9 +107,18 @@ export declare class AdminService {
         fullName: string;
     }>): Promise<any[]>;
     /**
-     * Get all authorized students
+     * Get all students (authorized and unauthorized)
+     * Includes authorization status and session count
      */
-    getAuthorizedStudents(): Promise<any[]>;
+    getAuthorizedStudents(): Promise<{
+        id: any;
+        email: any;
+        fullName: any;
+        isAuthorized: any;
+        lastLogin: any;
+        createdAt: any;
+        totalSessions: number;
+    }[]>;
     /**
      * Create new exam
      */
@@ -211,7 +220,11 @@ export declare class AdminService {
                 isCorrect?: undefined;
             } | null)[];
         }[];
-        colors: any[];
+        colors: {
+            session_id: string;
+            question_id: string;
+            color: string;
+        }[];
     }>;
     /**
      * Save cell color for exam report
@@ -240,6 +253,34 @@ export declare class AdminService {
      */
     deleteExamReportCellColor(examId: string, sessionId: string, questionId: string): Promise<{
         success: boolean;
+    }>;
+    /**
+     * Get auto-saved snapshots for an exam (for data recovery purposes)
+     */
+    getExamSnapshots(examId: string): Promise<{
+        snapshots: any[];
+        count: number;
+    }>;
+    /**
+     * Get latest snapshot for each session of an exam
+     */
+    getExamLatestSnapshots(examId: string): Promise<{
+        snapshots: any[];
+        count: number;
+    }>;
+    /**
+     * Clear all snapshots for an exam
+     */
+    clearExamSnapshots(examId: string): Promise<{
+        success: boolean;
+        deletedCount: number;
+    }>;
+    /**
+     * Clear snapshots for a specific session
+     */
+    clearSessionSnapshots(sessionId: string): Promise<{
+        success: boolean;
+        deletedCount: number;
     }>;
 }
 export declare const adminService: AdminService;

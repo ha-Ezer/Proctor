@@ -32,7 +32,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER update_exam_report_color_timestamp_trigger
 BEFORE UPDATE ON exam_report_cell_colors
 FOR EACH ROW
-EXECUTE FUNCTION update_exam_report_color_timestamp();
+EXECUTE PROCEDURE update_exam_report_color_timestamp();
 
 COMMENT ON TABLE exam_report_cell_colors IS 'Stores color coding for exam report table cells per session';
 COMMENT ON COLUMN exam_report_cell_colors.color IS 'Hex color code for the cell background';

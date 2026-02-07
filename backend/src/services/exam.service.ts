@@ -1,10 +1,13 @@
 import { pool } from '../config/database';
+import { studentGroupService } from './studentGroup.service';
 
 export class ExamService {
   /**
-   * Get active exam with all questions
+   * Get active exam with all questions.
+   * When studentId is provided, enforces group-based access: if the exam uses group access,
+   * the student must be in an assigned group to see it.
    */
-  async getActiveExam() {
+  async getActiveExam(studentId: string) {
     // Get active exam
     const examResult = await pool.query(
       'SELECT * FROM exams WHERE is_active = true LIMIT 1'
@@ -15,6 +18,12 @@ export class ExamService {
     }
 
     const exam = examResult.rows[0];
+
+    // Enforce group-based access for students
+    const canAccess = await studentGroupService.canStudentAccessExam(studentId, exam.id);
+    if (!canAccess) {
+      throw new Error('ACCESS_DENIED_TO_EXAM');
+    }
 
     // Get all questions for this exam
     const questionsResult = await pool.query(

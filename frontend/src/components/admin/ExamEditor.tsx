@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, X, GripVertical, Copy, Image as ImageIcon, Loader2, UsersRound, CheckSquare, Square, AlertCircle } from 'lucide-react';
-import { AddQuestionData, adminApi, StudentGroup } from '@/lib/adminApi';
+import { Plus, Trash2, X, GripVertical, Copy, Image as ImageIcon, Loader2, UsersRound, CheckSquare, Square, AlertCircle, Settings } from 'lucide-react';
+import { AddQuestionData, adminApi, ExamDetails, StudentGroup } from '@/lib/adminApi';
 import toast from 'react-hot-toast';
 
 interface Question {
@@ -26,6 +26,22 @@ export function ExamEditor({ examId, onSave, onCancel }: ExamEditorProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Exam details (for header and edit-settings modal)
+  const [examDetails, setExamDetails] = useState<ExamDetails | null>(null);
+  const [showEditSettingsModal, setShowEditSettingsModal] = useState(false);
+  const [editSettingsForm, setEditSettingsForm] = useState<{
+    title: string;
+    description: string;
+    version: string;
+    durationMinutes: number;
+    maxViolations: number;
+    autoSaveIntervalSeconds: number;
+    enableFullscreen: boolean;
+    warningAtMinutes: number;
+    minTimeGuaranteeMinutes: number;
+  } | null>(null);
+  const [isSavingSettings, setIsSavingSettings] = useState(false);
 
   // Group settings state
   const [showGroupSettings, setShowGroupSettings] = useState(false);
@@ -63,9 +79,54 @@ export function ExamEditor({ examId, onSave, onCancel }: ExamEditorProps) {
   const loadExamDetails = async () => {
     try {
       const response = await adminApi.getExamById(examId);
-      setUseGroupAccess(response.data.data.useGroupAccess || false);
+      const data = response.data.data;
+      setExamDetails(data);
+      setUseGroupAccess(data.useGroupAccess || false);
     } catch (error) {
       console.error('Failed to load exam details:', error);
+    }
+  };
+
+  const openEditSettingsModal = () => {
+    if (!examDetails) return;
+    setEditSettingsForm({
+      title: examDetails.title,
+      description: examDetails.description || '',
+      version: examDetails.version || 'v1.0',
+      durationMinutes: examDetails.durationMinutes,
+      maxViolations: examDetails.maxViolations,
+      autoSaveIntervalSeconds: examDetails.autoSaveIntervalSeconds ?? 5,
+      enableFullscreen: examDetails.enableFullscreen ?? true,
+      warningAtMinutes: examDetails.warningAtMinutes ?? 10,
+      minTimeGuaranteeMinutes: examDetails.minTimeGuaranteeMinutes ?? 5,
+    });
+    setShowEditSettingsModal(true);
+  };
+
+  const handleSaveEditSettings = async () => {
+    if (!editSettingsForm) return;
+    setIsSavingSettings(true);
+    try {
+      await adminApi.updateExam(examId, {
+        title: editSettingsForm.title,
+        description: editSettingsForm.description || undefined,
+        version: editSettingsForm.version,
+        durationMinutes: editSettingsForm.durationMinutes,
+        maxViolations: editSettingsForm.maxViolations,
+        autoSaveIntervalSeconds: editSettingsForm.autoSaveIntervalSeconds,
+        enableFullscreen: editSettingsForm.enableFullscreen,
+        warningAtMinutes: editSettingsForm.warningAtMinutes,
+        minTimeGuaranteeMinutes: editSettingsForm.minTimeGuaranteeMinutes,
+      });
+      await loadExamDetails();
+      setShowEditSettingsModal(false);
+      setEditSettingsForm(null);
+      toast.success('Exam settings updated');
+    } catch (error) {
+      console.error('Failed to update exam settings:', error);
+      toast.error('Failed to update exam settings');
+    } finally {
+      setIsSavingSettings(false);
     }
   };
 
@@ -289,15 +350,33 @@ export function ExamEditor({ examId, onSave, onCancel }: ExamEditorProps) {
         cleanedText = cleanedText + ']';
       }
 
-      // Parse the JSON using JSON.parse instead of eval for better error messages
-      // But first need to convert to proper JSON format
+      // Convert JavaScript object notation to proper JSON format
+      // This handles unquoted keys and single quotes
+      let jsonText = cleanedText
+        // Replace single quotes with double quotes
+        .replace(/'/g, '"')
+        // Add quotes around unquoted keys (handles word characters and hyphens)
+        .replace(/(\s*)(\w+)(\s*):/g, '$1"$2"$3:')
+        // Fix any double-quoted keys that got double-double-quoted
+        .replace(/""+/g, '"')
+        // Handle trailing commas before ] or }
+        .replace(/,(\s*[}\]])/g, '$1');
+
       let parsed: any[];
       try {
-        // Try eval first as it's more forgiving with JavaScript object notation
-        parsed = eval(`(${cleanedText})`);
-      } catch {
-        // If eval fails, try JSON.parse
-        parsed = JSON.parse(cleanedText);
+        parsed = JSON.parse(jsonText);
+      } catch (jsonError) {
+        // If standard JSON parsing fails, try a more lenient approach
+        // by removing any remaining problematic characters
+        try {
+          jsonText = jsonText
+            // Remove any remaining trailing commas
+            .replace(/,\s*]/g, ']')
+            .replace(/,\s*}/g, '}');
+          parsed = JSON.parse(jsonText);
+        } catch {
+          throw new Error('Unable to parse the pasted content. Please ensure it is valid JSON or JavaScript object notation.');
+        }
       }
 
       if (!Array.isArray(parsed)) {
@@ -439,6 +518,15 @@ export function ExamEditor({ examId, onSave, onCancel }: ExamEditorProps) {
         </div>
         <div className="flex gap-2">
           <button
+            onClick={openEditSettingsModal}
+            disabled={!examDetails}
+            className="btn btn-secondary flex items-center gap-2"
+            title="Edit exam title, duration, and other settings"
+          >
+            <Settings className="w-4 h-4" />
+            Edit settings
+          </button>
+          <button
             onClick={() => {
               setShowGroupSettings(true);
               loadGroupSettings();
@@ -461,6 +549,196 @@ export function ExamEditor({ examId, onSave, onCancel }: ExamEditorProps) {
           </button>
         </div>
       </div>
+
+      {/* Edit Exam Settings Modal */}
+      {showEditSettingsModal && editSettingsForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-gray-900">Edit Exam Settings</h3>
+              <button
+                onClick={() => { setShowEditSettingsModal(false); setEditSettingsForm(null); }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1">
+              <div className="space-y-4">
+                <div>
+                  <label className="label">Exam Title *</label>
+                  <input
+                    type="text"
+                    value={editSettingsForm.title}
+                    onChange={(e) => setEditSettingsForm({ ...editSettingsForm, title: e.target.value })}
+                    className="input w-full"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="label">Description</label>
+                  <textarea
+                    value={editSettingsForm.description}
+                    onChange={(e) => setEditSettingsForm({ ...editSettingsForm, description: e.target.value })}
+                    className="textarea w-full"
+                    rows={3}
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="label">Duration (minutes) *</label>
+                    <input
+                      type="number"
+                      value={editSettingsForm.durationMinutes || ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Allow empty string while typing
+                        if (value === '') {
+                          setEditSettingsForm({ ...editSettingsForm, durationMinutes: 0 });
+                        } else {
+                          const n = parseInt(value, 10);
+                          if (!Number.isNaN(n) && n >= 1) {
+                            setEditSettingsForm({ ...editSettingsForm, durationMinutes: n });
+                          }
+                        }
+                      }}
+                      onBlur={(e) => {
+                        // Ensure a valid value on blur - restore previous value or default if empty or invalid
+                        const value = e.target.value;
+                        if (!value || value === '' || parseInt(value, 10) < 1) {
+                          setEditSettingsForm({ ...editSettingsForm, durationMinutes: editSettingsForm.durationMinutes || 60 });
+                        }
+                      }}
+                      className="input w-full"
+                      min={1}
+                      max={480}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Max Violations *</label>
+                    <input
+                      type="number"
+                      value={editSettingsForm.maxViolations || ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Allow empty string while typing
+                        if (value === '') {
+                          setEditSettingsForm({ ...editSettingsForm, maxViolations: 0 });
+                        } else {
+                          const n = parseInt(value, 10);
+                          if (!Number.isNaN(n) && n >= 1) {
+                            setEditSettingsForm({ ...editSettingsForm, maxViolations: n });
+                          }
+                        }
+                      }}
+                      onBlur={(e) => {
+                        // Ensure a valid value on blur - restore previous value or default if empty or invalid
+                        const value = e.target.value;
+                        if (!value || value === '' || parseInt(value, 10) < 1) {
+                          setEditSettingsForm({ ...editSettingsForm, maxViolations: editSettingsForm.maxViolations || 7 });
+                        }
+                      }}
+                      className="input w-full"
+                      min={1}
+                      max={20}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Version</label>
+                    <input
+                      type="text"
+                      value={editSettingsForm.version}
+                      onChange={(e) => setEditSettingsForm({ ...editSettingsForm, version: e.target.value })}
+                      className="input w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Auto-save interval (seconds)</label>
+                    <input
+                      type="number"
+                      value={Number.isFinite(editSettingsForm.autoSaveIntervalSeconds) ? editSettingsForm.autoSaveIntervalSeconds : ''}
+                      onChange={(e) => {
+                        const n = parseInt(e.target.value, 10);
+                        if (!Number.isNaN(n)) setEditSettingsForm({ ...editSettingsForm, autoSaveIntervalSeconds: n });
+                      }}
+                      className="input w-full"
+                      min={1}
+                      max={60}
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Warning at (minutes left)</label>
+                    <input
+                      type="number"
+                      value={Number.isFinite(editSettingsForm.warningAtMinutes) ? editSettingsForm.warningAtMinutes : ''}
+                      onChange={(e) => {
+                        const n = parseInt(e.target.value, 10);
+                        if (!Number.isNaN(n)) setEditSettingsForm({ ...editSettingsForm, warningAtMinutes: n });
+                      }}
+                      className="input w-full"
+                      min={0}
+                      max={120}
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Min time guarantee (minutes)</label>
+                    <input
+                      type="number"
+                      value={Number.isFinite(editSettingsForm.minTimeGuaranteeMinutes) ? editSettingsForm.minTimeGuaranteeMinutes : ''}
+                      onChange={(e) => {
+                        const n = parseInt(e.target.value, 10);
+                        if (!Number.isNaN(n)) setEditSettingsForm({ ...editSettingsForm, minTimeGuaranteeMinutes: n });
+                      }}
+                      className="input w-full"
+                      min={0}
+                      max={60}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 pt-2">
+                  <input
+                    type="checkbox"
+                    id="editEnableFullscreen"
+                    checked={editSettingsForm.enableFullscreen}
+                    onChange={(e) => setEditSettingsForm({ ...editSettingsForm, enableFullscreen: e.target.checked })}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  />
+                  <label htmlFor="editEnableFullscreen" className="font-medium text-gray-900 cursor-pointer">
+                    Fullscreen required
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => { setShowEditSettingsModal(false); setEditSettingsForm(null); }}
+                className="btn btn-secondary"
+                disabled={isSavingSettings}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveEditSettings}
+                disabled={isSavingSettings || !editSettingsForm.title.trim()}
+                className="btn btn-primary"
+              >
+                {isSavingSettings ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save settings'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Bulk Paste Modal */}
       {showBulkPaste && (

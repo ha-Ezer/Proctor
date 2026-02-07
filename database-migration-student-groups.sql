@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS student_groups (
     created_by VARCHAR(255)
 );
 
-CREATE INDEX idx_student_groups_name ON student_groups(name);
-CREATE INDEX idx_student_groups_created_at ON student_groups(created_at);
+CREATE INDEX IF NOT EXISTS idx_student_groups_name ON student_groups(name);
+CREATE INDEX IF NOT EXISTS idx_student_groups_created_at ON student_groups(created_at);
 
 COMMENT ON TABLE student_groups IS 'Student groups for organizing exam access control';
 COMMENT ON COLUMN student_groups.name IS 'Unique group name (e.g., "CS101 Section A", "Biology Midterm Group")';
@@ -35,9 +35,9 @@ CREATE TABLE IF NOT EXISTS student_group_members (
     UNIQUE(group_id, student_id)
 );
 
-CREATE INDEX idx_group_members_group ON student_group_members(group_id);
-CREATE INDEX idx_group_members_student ON student_group_members(student_id);
-CREATE INDEX idx_group_members_combined ON student_group_members(group_id, student_id);
+CREATE INDEX IF NOT EXISTS idx_group_members_group ON student_group_members(group_id);
+CREATE INDEX IF NOT EXISTS idx_group_members_student ON student_group_members(student_id);
+CREATE INDEX IF NOT EXISTS idx_group_members_combined ON student_group_members(group_id, student_id);
 
 COMMENT ON TABLE student_group_members IS 'Maps students to groups for access control';
 COMMENT ON COLUMN student_group_members.added_by IS 'Admin email who added the student to group';
@@ -56,9 +56,9 @@ CREATE TABLE IF NOT EXISTS exam_group_access (
     UNIQUE(exam_id, group_id)
 );
 
-CREATE INDEX idx_exam_group_exam ON exam_group_access(exam_id);
-CREATE INDEX idx_exam_group_group ON exam_group_access(group_id);
-CREATE INDEX idx_exam_group_combined ON exam_group_access(exam_id, group_id);
+CREATE INDEX IF NOT EXISTS idx_exam_group_exam ON exam_group_access(exam_id);
+CREATE INDEX IF NOT EXISTS idx_exam_group_group ON exam_group_access(group_id);
+CREATE INDEX IF NOT EXISTS idx_exam_group_combined ON exam_group_access(exam_id, group_id);
 
 COMMENT ON TABLE exam_group_access IS 'Defines which student groups can access which exams';
 COMMENT ON COLUMN exam_group_access.created_by IS 'Admin email who granted access';
@@ -88,7 +88,7 @@ DROP TRIGGER IF EXISTS trigger_update_student_groups_timestamp ON student_groups
 CREATE TRIGGER trigger_update_student_groups_timestamp
     BEFORE UPDATE ON student_groups
     FOR EACH ROW
-    EXECUTE FUNCTION update_student_groups_updated_at();
+    EXECUTE PROCEDURE update_student_groups_updated_at();
 
 -- ============================================
 -- 6. HELPER VIEW: GROUP MEMBERSHIP COUNTS

@@ -7,7 +7,7 @@ import { useProctoring, VIOLATION_TYPES } from '@/hooks/useProctoring';
 import { useAutoSave } from '@/hooks/useAutoSave';
 import { useTimer } from '@/hooks/useTimer';
 import { getBrowserInfo, clearAllExamData } from '@/lib/utils';
-import { Loader2, AlertTriangle } from 'lucide-react';
+import { Loader2, AlertTriangle, Calendar } from 'lucide-react';
 
 // Import components
 import { ExamHeader } from '@/components/exam/ExamHeader';
@@ -39,6 +39,7 @@ export function ExamPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [noActiveExam, setNoActiveExam] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
   const [recoveryData, setRecoveryData] = useState<any>(null);
   const [showViolationAlert, setShowViolationAlert] = useState(false);
@@ -99,7 +100,7 @@ export function ExamPage() {
           }
         } else {
           // Start new session
-          const newSessionResponse = await sessionApi.startSession(examData.id, getBrowserInfo());
+          const newSessionResponse = await sessionApi.startSession(examData.id, JSON.stringify(getBrowserInfo()));
           const newSession = newSessionResponse.data.data;
           setSession(newSession);
 
@@ -110,7 +111,15 @@ export function ExamPage() {
         setIsLoading(false);
       } catch (err: any) {
         console.error('Exam initialization error:', err);
-        setError(err.response?.data?.message || 'Failed to load exam');
+        const errorMessage = err.response?.data?.message || err.message || 'Failed to load exam';
+
+        // Check if it's a "no active exam" error
+        if (errorMessage.includes('NO_ACTIVE_EXAM') || errorMessage.includes('no active exam')) {
+          setNoActiveExam(true);
+        } else {
+          setError(errorMessage);
+        }
+
         setIsLoading(false);
       }
     };
@@ -374,10 +383,34 @@ export function ExamPage() {
    */
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-primary-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading exam...</p>
+          <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading exam...</p>
+        </div>
+      </div>
+    );
+  }
+
+  /**
+   * Render no active exam state
+   */
+  if (noActiveExam) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <div className="max-w-md w-full card text-center">
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
+              <Calendar className="w-8 h-8 text-primary" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">No Tests Available</h2>
+          <p className="text-muted-foreground mb-6">
+            There are currently no tests scheduled for you. Please check back later or contact your instructor.
+          </p>
+          <button onClick={handleLogout} className="btn btn-primary w-full">
+            Return to Login
+          </button>
         </div>
       </div>
     );
@@ -388,13 +421,13 @@ export function ExamPage() {
    */
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="max-w-md w-full card">
-          <div className="flex items-center gap-3 text-danger-600 mb-4">
+          <div className="flex items-center gap-3 text-destructive mb-4">
             <AlertTriangle className="w-8 h-8" />
-            <h2 className="text-2xl font-bold">Error</h2>
+            <h2 className="text-2xl font-bold text-foreground">Error</h2>
           </div>
-          <p className="text-gray-700 mb-6">{error}</p>
+          <p className="text-foreground mb-6">{error}</p>
           <button onClick={handleLogout} className="btn btn-primary w-full">
             Return to Login
           </button>
@@ -413,7 +446,7 @@ export function ExamPage() {
   const progress = Math.round((Object.keys(responses).length / questions.length) * 100);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Recovery Dialog */}
       {showRecovery && (
         <RecoveryDialog
@@ -466,7 +499,7 @@ export function ExamPage() {
             />
 
             {/* Submit Button - Fixed at bottom of question list */}
-            <div className="sticky bottom-0 bg-white pt-6 pb-4 mt-8 border-t border-gray-200">
+            <div className="sticky bottom-0 bg-background pt-6 pb-4 mt-8 border-t border-border">
               <button
                 onClick={() => setShowSubmitDialog(true)}
                 className="btn btn-primary w-full flex items-center justify-center gap-2"

@@ -1,0 +1,3 @@
+# This directory holds images for exam questions
+# Copy images from /attachments to this folder for production deployment
+# Or configure a CDN to serve images and update image URLs in the database

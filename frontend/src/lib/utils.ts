@@ -1,11 +1,8 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 
-/**
- * Utility to merge Tailwind CSS classes
- */
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
 /**
@@ -18,80 +15,115 @@ export function formatTime(seconds: number): string {
 }
 
 /**
- * Format time in milliseconds to human-readable format
+ * Format duration in seconds to a human-readable string
  */
-export function formatDuration(ms: number): string {
-  const seconds = Math.floor(ms / 1000);
+export function formatDuration(seconds: number): string {
+  if (seconds < 60) {
+    return `${seconds} second${seconds !== 1 ? 's' : ''}`;
+  }
   const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  if (minutes < 60) {
+    if (remainingSeconds === 0) {
+      return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+    }
+    return `${minutes} minute${minutes !== 1 ? 's' : ''} ${remainingSeconds} second${remainingSeconds !== 1 ? 's' : ''}`;
+  }
   const hours = Math.floor(minutes / 60);
-
-  if (hours > 0) {
-    return `${hours}h ${minutes % 60}m`;
+  const remainingMinutes = minutes % 60;
+  if (remainingMinutes === 0) {
+    return `${hours} hour${hours !== 1 ? 's' : ''}`;
   }
-  if (minutes > 0) {
-    return `${minutes}m ${seconds % 60}s`;
-  }
-  return `${seconds}s`;
+  return `${hours} hour${hours !== 1 ? 's' : ''} ${remainingMinutes} minute${remainingMinutes !== 1 ? 's' : ''}`;
 }
 
 /**
- * Calculate progress percentage
- */
-export function calculateProgress(current: number, total: number): number {
-  if (total === 0) return 0;
-  return Math.round((current / total) * 100);
-}
-
-/**
- * Get browser information
- */
-export function getBrowserInfo(): string {
-  return navigator.userAgent;
-}
-
-/**
- * Get device information
- */
-export function getDeviceInfo(): string {
-  return `${navigator.platform} - Screen: ${window.screen.width}x${window.screen.height}`;
-}
-
-/**
- * Debounce function
+ * Debounce function - delays execution until after wait time has passed
  */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
-  let timeout: number | null = null;
-
-  return (...args: Parameters<T>) => {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  return function executedFunction(...args: Parameters<T>) {
+    const later = () => {
+      timeout = null;
+      func(...args);
+    };
     if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
+    timeout = setTimeout(later, wait);
   };
 }
 
 /**
- * Throttle function
+ * Throttle function - limits execution to at most once per wait time
  */
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
-  limit: number
+  wait: number
 ): (...args: Parameters<T>) => void {
-  let inThrottle: boolean;
-
-  return (...args: Parameters<T>) => {
-    if (!inThrottle) {
+  let timeout: ReturnType<typeof setTimeout> | null = null;
+  let previous = 0;
+  return function executedFunction(...args: Parameters<T>) {
+    const now = Date.now();
+    const remaining = wait - (now - previous);
+    if (remaining <= 0 || remaining > wait) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      previous = now;
       func(...args);
-      inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
+    } else if (!timeout) {
+      timeout = setTimeout(() => {
+        previous = Date.now();
+        timeout = null;
+        func(...args);
+      }, remaining);
     }
   };
 }
 
 /**
+ * Get browser information
+ */
+export function getBrowserInfo(): Record<string, any> {
+  return {
+    userAgent: navigator.userAgent,
+    language: navigator.language,
+    platform: navigator.platform,
+    cookieEnabled: navigator.cookieEnabled,
+    onLine: navigator.onLine,
+    screenWidth: window.screen.width,
+    screenHeight: window.screen.height,
+    windowWidth: window.innerWidth,
+    windowHeight: window.innerHeight,
+    colorDepth: window.screen.colorDepth,
+    pixelDepth: window.screen.pixelDepth,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  };
+}
+
+/**
+ * Get device information
+ */
+export function getDeviceInfo(): Record<string, any> {
+  const ua = navigator.userAgent;
+  const isMobile = /Mobile|Android|iPhone|iPad/i.test(ua);
+  const isTablet = /iPad|Android/i.test(ua) && !/Mobile/i.test(ua);
+  
+  return {
+    isMobile,
+    isTablet,
+    isDesktop: !isMobile && !isTablet,
+    touchSupport: 'ontouchstart' in window || navigator.maxTouchPoints > 0,
+    hardwareConcurrency: navigator.hardwareConcurrency || 0,
+    deviceMemory: (navigator as any).deviceMemory || 0,
+  };
+}
+
+/**
  * Clear all exam-related data from localStorage
- * Used for logout and session cleanup
  */
 export function clearAllExamData(): void {
   const keysToRemove = [

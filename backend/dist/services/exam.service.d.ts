@@ -1,8 +1,10 @@
 export declare class ExamService {
     /**
-     * Get active exam with all questions
+     * Get active exam with all questions.
+     * When studentId is provided, enforces group-based access: if the exam uses group access,
+     * the student must be in an assigned group to see it.
      */
-    getActiveExam(): Promise<{
+    getActiveExam(studentId: string): Promise<{
         exam: any;
         questions: any[];
     }>;

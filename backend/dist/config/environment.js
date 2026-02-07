@@ -42,12 +42,17 @@ exports.config = {
 };
 /**
  * Validate required environment variables
+ * DB: either DATABASE_URL (Railway) or DATABASE_HOST + DATABASE_NAME + DATABASE_USER
  */
 const validateEnvironment = () => {
-    const required = ['DATABASE_HOST', 'DATABASE_NAME', 'DATABASE_USER', 'JWT_SECRET'];
-    const missing = required.filter((key) => !process.env[key]);
-    if (missing.length > 0) {
-        console.error('❌ Missing required environment variables:', missing.join(', '));
+    const hasDatabaseUrl = !!process.env.DATABASE_URL;
+    const hasDatabaseVars = !!process.env.DATABASE_HOST && !!process.env.DATABASE_NAME && !!process.env.DATABASE_USER;
+    if (!hasDatabaseUrl && !hasDatabaseVars) {
+        console.error('❌ Set either DATABASE_URL or (DATABASE_HOST, DATABASE_NAME, DATABASE_USER) for the database');
+        process.exit(1);
+    }
+    if (!process.env.JWT_SECRET) {
+        console.error('❌ JWT_SECRET is required');
         process.exit(1);
     }
     if (exports.config.nodeEnv === 'production' && exports.config.jwt.secret === 'change_this_secret_in_production') {

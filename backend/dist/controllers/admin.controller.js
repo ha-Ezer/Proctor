@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteSessionQuestionNote = exports.saveSessionQuestionNote = exports.deleteExamReportCellColor = exports.getExamReportCellColors = exports.saveExamReportCellColor = exports.getExamReport = exports.deleteExam = exports.deleteExamQuestions = exports.setExamActive = exports.getExamQuestions = exports.addQuestion = exports.updateExam = exports.createExam = exports.getExamById = exports.getExams = exports.bulkAddStudents = exports.removeAuthorizedStudent = exports.addAuthorizedStudent = exports.getAuthorizedStudents = exports.exportSessions = exports.getDashboardStats = exports.getSessionDetails = exports.getSessions = void 0;
+exports.clearSessionSnapshots = exports.clearExamSnapshots = exports.getExamSnapshots = exports.deleteSessionQuestionNote = exports.saveSessionQuestionNote = exports.deleteExamReportCellColor = exports.getExamReportCellColors = exports.saveExamReportCellColor = exports.getExamReport = exports.deleteExam = exports.deleteExamQuestions = exports.setExamActive = exports.getExamQuestions = exports.addQuestion = exports.updateExam = exports.createExam = exports.getExamById = exports.getExams = exports.bulkAddStudents = exports.removeAuthorizedStudent = exports.addAuthorizedStudent = exports.getAuthorizedStudents = exports.exportSessions = exports.getDashboardStats = exports.getSessionDetails = exports.getSessions = void 0;
 const admin_service_1 = require("../services/admin.service");
 /**
  * Get All Sessions Controller
@@ -473,4 +473,63 @@ const deleteSessionQuestionNote = async (req, res, next) => {
     }
 };
 exports.deleteSessionQuestionNote = deleteSessionQuestionNote;
+/**
+ * Get Exam Snapshots Controller
+ * GET /api/admin/exams/:examId/snapshots
+ */
+const getExamSnapshots = async (req, res, next) => {
+    try {
+        const { examId } = req.params;
+        const { latest } = req.query;
+        const result = latest === 'true'
+            ? await admin_service_1.adminService.getExamLatestSnapshots(examId)
+            : await admin_service_1.adminService.getExamSnapshots(examId);
+        res.json({
+            success: true,
+            data: result,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.getExamSnapshots = getExamSnapshots;
+/**
+ * Clear Exam Snapshots Controller
+ * DELETE /api/admin/exams/:examId/snapshots
+ */
+const clearExamSnapshots = async (req, res, next) => {
+    try {
+        const { examId } = req.params;
+        const result = await admin_service_1.adminService.clearExamSnapshots(examId);
+        res.json({
+            success: true,
+            message: `Cleared ${result.deletedCount} snapshot(s)`,
+            data: result,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.clearExamSnapshots = clearExamSnapshots;
+/**
+ * Clear Session Snapshots Controller
+ * DELETE /api/admin/sessions/:sessionId/snapshots
+ */
+const clearSessionSnapshots = async (req, res, next) => {
+    try {
+        const { sessionId } = req.params;
+        const result = await admin_service_1.adminService.clearSessionSnapshots(sessionId);
+        res.json({
+            success: true,
+            message: `Cleared ${result.deletedCount} snapshot(s)`,
+            data: result,
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.clearSessionSnapshots = clearSessionSnapshots;
 //# sourceMappingURL=admin.controller.js.map

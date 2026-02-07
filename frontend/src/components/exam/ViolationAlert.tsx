@@ -41,10 +41,10 @@ export function ViolationAlert({ violationType, totalViolations, maxViolations, 
       <div
         className={`card ${
           isCritical
-            ? 'bg-danger-50 border-danger-300 animate-shake'
+            ? 'bg-destructive/10 border-destructive/30 animate-shake'
             : isCloseToLimit
-            ? 'bg-warning-50 border-warning-300'
-            : 'bg-primary-50 border-primary-300'
+            ? 'bg-orange-500/10 border-orange-500/30'
+            : 'bg-primary/10 border-primary/30'
         } shadow-lg`}
       >
         <div className="flex items-start gap-3">
@@ -52,20 +52,20 @@ export function ViolationAlert({ violationType, totalViolations, maxViolations, 
           <div
             className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
               isCritical
-                ? 'bg-danger-100'
+                ? 'bg-destructive/20'
                 : isCloseToLimit
-                ? 'bg-warning-100'
-                : 'bg-primary-100'
+                ? 'bg-orange-500/20'
+                : 'bg-primary/20'
             }`}
           >
             {isCritical || isCloseToLimit ? (
               <ShieldAlert
                 className={`w-6 h-6 ${
-                  isCritical ? 'text-danger-600' : 'text-warning-600'
+                  isCritical ? 'text-destructive' : 'text-orange-600'
                 }`}
               />
             ) : (
-              <AlertTriangle className="w-6 h-6 text-primary-600" />
+              <AlertTriangle className="w-6 h-6 text-primary" />
             )}
           </div>
 
@@ -74,10 +74,10 @@ export function ViolationAlert({ violationType, totalViolations, maxViolations, 
             <h3
               className={`text-sm font-bold mb-1 ${
                 isCritical
-                  ? 'text-danger-900'
+                  ? 'text-destructive'
                   : isCloseToLimit
-                  ? 'text-warning-900'
-                  : 'text-primary-900'
+                  ? 'text-orange-600'
+                  : 'text-primary'
               }`}
             >
               {isCritical ? 'EXAM TERMINATED' : isCloseToLimit ? 'WARNING: Final Violations' : 'Violation Detected'}
@@ -85,10 +85,10 @@ export function ViolationAlert({ violationType, totalViolations, maxViolations, 
             <p
               className={`text-sm mb-2 ${
                 isCritical
-                  ? 'text-danger-800'
+                  ? 'text-destructive'
                   : isCloseToLimit
-                  ? 'text-warning-800'
-                  : 'text-primary-800'
+                  ? 'text-orange-600'
+                  : 'text-primary'
               }`}
             >
               {message}
@@ -96,10 +96,10 @@ export function ViolationAlert({ violationType, totalViolations, maxViolations, 
             <div
               className={`text-xs font-medium ${
                 isCritical
-                  ? 'text-danger-700'
+                  ? 'text-destructive'
                   : isCloseToLimit
-                  ? 'text-warning-700'
-                  : 'text-primary-700'
+                  ? 'text-orange-600'
+                  : 'text-primary'
               }`}
             >
               {isCritical ? (
@@ -122,10 +122,10 @@ export function ViolationAlert({ violationType, totalViolations, maxViolations, 
             onClick={onClose}
             className={`flex-shrink-0 p-1 rounded-lg transition-colors ${
               isCritical
-                ? 'hover:bg-danger-100 text-danger-600'
+                ? 'hover:bg-destructive/20 text-destructive'
                 : isCloseToLimit
-                ? 'hover:bg-warning-100 text-warning-600'
-                : 'hover:bg-primary-100 text-primary-600'
+                ? 'hover:bg-orange-500/20 text-orange-600'
+                : 'hover:bg-primary/20 text-primary'
             }`}
             aria-label="Close notification"
           >
@@ -134,15 +134,15 @@ export function ViolationAlert({ violationType, totalViolations, maxViolations, 
         </div>
 
         {/* Progress Bar */}
-        <div className="mt-3 pt-3 border-t border-gray-200">
+        <div className="mt-3 pt-3 border-t border-border">
           <div className="progress-bar h-1">
             <div
               className={`h-full transition-all duration-300 ${
                 isCritical
-                  ? 'bg-danger-600'
+                  ? 'bg-destructive'
                   : isCloseToLimit
-                  ? 'bg-warning-600'
-                  : 'bg-primary-600'
+                  ? 'bg-orange-600'
+                  : 'bg-primary'
               }`}
               style={{ width: `${((maxViolations - totalViolations) / maxViolations) * 100}%` }}
             />

@@ -37,8 +37,9 @@ export class AuthService {
       throw new Error('UNAUTHORIZED_EMAIL');
     }
 
-    // Check if profile completion is needed (no full_name)
-    const needsProfileCompletion = !student.full_name;
+    // Check if profile completion is needed (no full_name or empty string)
+    const hasName = student.full_name && String(student.full_name).trim().length > 0;
+    const needsProfileCompletion = !hasName;
 
     // Update last login
     await pool.query(
@@ -75,7 +76,7 @@ export class AuthService {
     const result = await pool.query(
       `UPDATE students
        SET full_name = $1, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $2 AND full_name IS NULL
+       WHERE id = $2 AND (full_name IS NULL OR TRIM(full_name) = '')
        RETURNING *`,
       [fullName, studentId]
     );

@@ -7,17 +7,27 @@ exports.closePool = exports.healthCheck = exports.getClient = exports.query = ex
 const pg_1 = require("pg");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const poolConfig = {
-    host: process.env.DATABASE_HOST || 'localhost',
-    port: parseInt(process.env.DATABASE_PORT || '5432'),
-    database: process.env.DATABASE_NAME || 'proctor_db',
-    user: process.env.DATABASE_USER || 'postgres',
-    password: process.env.DATABASE_PASSWORD || '',
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
-    max: 20, // Maximum number of connections in pool
-    idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-    connectionTimeoutMillis: 2000, // Return error after 2 seconds if connection not established
-};
+// Railway (and many hosts) provide DATABASE_URL; otherwise use DATABASE_HOST, etc.
+const databaseUrl = process.env.DATABASE_URL;
+const poolConfig = databaseUrl
+    ? {
+        connectionString: databaseUrl,
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+    }
+    : {
+        host: process.env.DATABASE_HOST || 'localhost',
+        port: parseInt(process.env.DATABASE_PORT || '5432'),
+        database: process.env.DATABASE_NAME || 'proctor_db',
+        user: process.env.DATABASE_USER || 'postgres',
+        password: process.env.DATABASE_PASSWORD || '',
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+        max: 20,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 2000,
+    };
 exports.pool = new pg_1.Pool(poolConfig);
 // Test database connection
 exports.pool.on('connect', () => {

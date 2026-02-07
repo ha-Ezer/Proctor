@@ -27,6 +27,7 @@ export declare const config: {
 };
 /**
  * Validate required environment variables
+ * DB: either DATABASE_URL (Railway) or DATABASE_HOST + DATABASE_NAME + DATABASE_USER
  */
 export declare const validateEnvironment: () => void;
 //# sourceMappingURL=environment.d.ts.map
