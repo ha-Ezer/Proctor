@@ -15,7 +15,7 @@
     "reset-admin-password": "ts-node scripts/reset-admin-password.ts",
     "migrate:groups": "ts-node scripts/run-student-groups-migration.ts",
     "migrate:report-colors": "ts-node scripts/run-exam-report-colors-migration.ts",
-    "railway:build": "npm ci && npm run build",
+    "railway:build": "npm run build",
     "railway:start": "node dist/server.js"
   },
   "keywords": [
