@@ -5,7 +5,14 @@ dotenv.config();
 export const config = {
   // Server
   nodeEnv: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.PORT || '3000'),
+  port: (() => {
+    const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+    if (isNaN(port) || port < 0 || port > 65535) {
+      console.warn(`⚠️  Invalid PORT value: ${process.env.PORT}, using default 3000`);
+      return 3000;
+    }
+    return port;
+  })(),
 
   // Database
   database: {
@@ -48,6 +55,13 @@ export const config = {
  * DB: either DATABASE_URL (Railway) or DATABASE_HOST + DATABASE_NAME + DATABASE_USER
  */
 export const validateEnvironment = (): void => {
+  // Validate PORT
+  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+  if (process.env.PORT && (isNaN(port) || port < 0 || port > 65535)) {
+    console.error(`❌ Invalid PORT value: ${process.env.PORT}. Must be an integer between 0 and 65535.`);
+    process.exit(1);
+  }
+
   const hasDatabaseUrl = !!process.env.DATABASE_URL;
   const hasDatabaseVars =
     !!process.env.DATABASE_HOST && !!process.env.DATABASE_NAME && !!process.env.DATABASE_USER;

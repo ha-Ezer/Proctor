@@ -46,7 +46,8 @@
 4. **Set Environment Variables** (in Railway dashboard → Variables):
    ```
    NODE_ENV=production
-   PORT=${{PORT}}
+   # PORT is automatically provided by Railway - DO NOT set it manually
+   # If you need to override, use: PORT=3000 (must be integer 0-65535)
    
    # Database (use the PostgreSQL service reference)
    DATABASE_URL=${{Postgres.DATABASE_URL}}
