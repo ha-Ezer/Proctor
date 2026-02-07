@@ -40,9 +40,9 @@
 2. Select **"GitHub Repo"** → Select this repository
 3. Configure the service:
    - **Root Directory**: `backend`
-   - **Build Command**: Leave empty (Railway auto-detects Node.js and runs `npm install` + `npm run build`)
-     - OR manually set: `npm run build` (Railway runs `npm install` automatically)
-   - **Start Command**: `node dist/server.js` (or `npm run railway:start`)
+   - **Build Command**: Leave empty (Dockerfile will be used automatically)
+   - **Start Command**: Leave empty (Dockerfile CMD will be used)
+   - **OR** If Railway still tries to use Nixpacks, go to Settings → Builder → Select **"Dockerfile"**
 
 4. **Set Environment Variables** (in Railway dashboard → Variables):
    ```
