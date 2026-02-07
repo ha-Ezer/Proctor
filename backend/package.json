@@ -11,6 +11,7 @@
     "migrate": "ts-node scripts/migrate-from-sheets.ts",
     "db:seed": "ts-node scripts/seed-questions.ts",
     "create-admin": "ts-node scripts/create-admin.ts",
+    "add-admin": "ts-node scripts/add-admin.ts",
     "verify-admin": "ts-node scripts/verify-admin-password.ts",
     "reset-admin-password": "ts-node scripts/reset-admin-password.ts",
     "migrate:groups": "ts-node scripts/run-student-groups-migration.ts",
