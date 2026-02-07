@@ -40,8 +40,9 @@
 2. Select **"GitHub Repo"** → Select this repository
 3. Configure the service:
    - **Root Directory**: `backend`
-   - **Build Command**: `npm run railway:build`
-   - **Start Command**: `npm run railway:start`
+   - **Build Command**: Leave empty (Railway auto-detects Node.js and runs `npm install` + `npm run build`)
+     - OR manually set: `npm run build` (Railway runs `npm install` automatically)
+   - **Start Command**: `node dist/server.js` (or `npm run railway:start`)
 
 4. **Set Environment Variables** (in Railway dashboard → Variables):
    ```
@@ -90,23 +91,30 @@
 
 Once backend is deployed, run the database schema:
 
-**Option A: Using Railway CLI**
+**Option A: Using Railway CLI with Postgres Service (Recommended)**
 ```bash
+# Link to your Railway project (if not already linked)
 railway link
-railway run psql $DATABASE_URL < database-schema.sql
+
+# Run schema using Railway CLI (executes on Railway's servers, can access internal URLs)
+railway run -s postgres psql $DATABASE_URL < database-schema.sql
 ```
 
-**Option B: Using Railway Dashboard**
-1. Go to PostgreSQL service → **"Connect"** → Copy connection string
-2. Run locally:
+**Option B: Get Public DATABASE_URL and Run Locally**
+1. Go to PostgreSQL service → **"Variables"** tab
+2. Copy the **public** `DATABASE_URL` (should start with `postgresql://postgres:...@containers-us-west-xxx.railway.app` or similar, NOT `postgres.railway.internal`)
+3. Run locally:
    ```bash
-   psql <your-railway-database-url> < database-schema.sql
+   psql "<paste-public-database-url>" < database-schema.sql
    ```
 
-**Option C: Using Railway SQL Editor**
-1. Go to PostgreSQL service → **"Data"** tab
-2. Copy contents of `database-schema.sql`
-3. Paste and execute in SQL editor
+**Option C: Using Railway Connect Button**
+1. Go to PostgreSQL service → Click **"Connect"** button (top right)
+2. Copy the connection string (public URL)
+3. Run locally:
+   ```bash
+   psql "<paste-connection-string>" < database-schema.sql
+   ```
 
 ### Step 5: Run Database Migrations
 
@@ -160,7 +168,8 @@ Then insert into database with the generated hash.
 2. Select **"GitHub Repo"** → Select this repository
 3. Configure the service:
    - **Root Directory**: `frontend`
-   - **Build Command**: `npm run railway:build`
+   - **Build Command**: Leave empty (Railway auto-detects and runs `npm install` + `npm run build`)
+     - OR manually set: `npm run build` (Railway runs `npm install` automatically)
    - **Start Command**: `npx serve -s dist -l $PORT`
 
 4. **Set Environment Variables**:
