@@ -37,26 +37,34 @@ export function ViolationAlert({ violationType, totalViolations, maxViolations, 
   }, [onClose]);
 
   return (
-    <div className="fixed top-28 right-4 z-[60] max-w-md animate-slide-in">
+    <div className="fixed top-20 right-3 left-3 sm:left-auto sm:right-4 sm:max-w-md z-[60] animate-slide-in">
       <div
-        className={`card ${
+        className={`rounded-lg shadow-lg border p-6 transition-shadow ${
           isCritical
-            ? 'bg-destructive/10 border-destructive/30 animate-shake'
+            ? 'border-destructive/50 animate-shake'
             : isCloseToLimit
-            ? 'bg-orange-500/10 border-orange-500/30'
-            : 'bg-primary/10 border-primary/30'
-        } shadow-lg`}
+            ? 'border-orange-500/50'
+            : 'border-primary/50'
+        }`}
+        style={{
+          backgroundColor: isCritical
+            ? 'hsl(var(--card))'
+            : isCloseToLimit
+            ? 'hsl(var(--card))'
+            : 'hsl(var(--card))',
+        }}
       >
         <div className="flex items-start gap-3">
           {/* Icon */}
           <div
-            className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-              isCritical
-                ? 'bg-destructive/20'
+            className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+            style={{
+              backgroundColor: isCritical
+                ? 'hsl(var(--destructive) / 0.2)'
                 : isCloseToLimit
-                ? 'bg-orange-500/20'
-                : 'bg-primary/20'
-            }`}
+                ? 'rgb(249 115 22 / 0.2)'
+                : 'hsl(var(--primary) / 0.2)',
+            }}
           >
             {isCritical || isCloseToLimit ? (
               <ShieldAlert

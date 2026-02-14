@@ -487,19 +487,32 @@ export function ExamPage() {
         maxViolations={exam?.maxViolations || 7}
       />
 
+      {/* Fixed Submit Bar - Mobile only: always visible, no scroll recoil */}
+      <div
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 px-4 pt-4 bg-background/95 backdrop-blur-sm border-t border-border"
+        style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+      >
+        <button
+          onClick={() => setShowSubmitDialog(true)}
+          className="btn btn-primary w-full flex items-center justify-center gap-2 py-3 text-base font-semibold"
+        >
+          <span>Submit Exam</span>
+        </button>
+      </div>
+
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-6 lg:py-8 max-w-7xl pb-28 lg:pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Questions List - Scrollable */}
-          <div className="lg:col-span-3 max-h-[calc(100vh-12rem)] overflow-y-auto custom-scrollbar pr-2">
+          <div className="lg:col-span-3 max-h-[calc(100vh-8rem)] lg:max-h-[calc(100vh-12rem)] overflow-y-auto custom-scrollbar pr-2 -mr-2">
             <QuestionList
               questions={questions}
               responses={responses}
               onResponseChange={handleAnswerChange}
             />
 
-            {/* Submit Button - Fixed at bottom of question list */}
-            <div className="sticky bottom-0 bg-background pt-6 pb-4 mt-8 border-t border-border">
+            {/* Submit Button - Sticky on desktop; fixed bar on mobile to avoid recoil/scroll quirks */}
+            <div className="hidden lg:block sticky bottom-0 bg-background pt-6 pb-4 mt-8 border-t border-border -mb-2">
               <button
                 onClick={() => setShowSubmitDialog(true)}
                 className="btn btn-primary w-full flex items-center justify-center gap-2"
